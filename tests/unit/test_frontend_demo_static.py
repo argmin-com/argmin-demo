@@ -131,7 +131,10 @@ def test_guided_demo_drawer_uses_presenter_facing_copy() -> None:
     assert "Recommended next step" in js
     assert "Presentation mode" in js
     assert "The walkthrough is available from local demo data." in js
-    assert "No demo activity yet. Start the 90-second walkthrough, or run one live proof action." in js
+    assert (
+        "No demo activity yet. Start the 90-second walkthrough, or run one live proof action."
+        in js
+    )
 
 
 def test_forecast_scenario_selection_updates_preview_state_immediately() -> None:

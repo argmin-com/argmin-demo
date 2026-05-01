@@ -4,17 +4,52 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PORT="${ACI_DEMO_PORT:-8000}"
+VENV_DIR="${ACI_DEMO_VENV_DIR:-${REPO_ROOT}/.venv}"
+REQUIREMENTS_FILE="${ACI_DEMO_REQUIREMENTS_FILE:-requirements.lock}"
+DEPS_STAMP="${VENV_DIR}/.argmin-demo-deps.sha256"
 
 cd "${REPO_ROOT}"
 
-if [[ ! -d .venv ]]; then
-  python3 -m venv .venv
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "python3 is required to run the local demo." >&2
+  exit 1
 fi
 
-source .venv/bin/activate
-python -m pip install --upgrade pip >/dev/null
-python -m pip install -r requirements-dev.lock >/dev/null
-python -m pip install --no-deps -e . >/dev/null
+if [[ ! -d "${VENV_DIR}" ]]; then
+  python3 -m venv "${VENV_DIR}"
+fi
+
+source "${VENV_DIR}/bin/activate"
+
+current_deps_hash="$(
+  REQUIREMENTS_FILE="${REQUIREMENTS_FILE}" python - <<'PY'
+from hashlib import sha256
+import os
+from pathlib import Path
+
+digest = sha256()
+for filename in (os.environ["REQUIREMENTS_FILE"], "pyproject.toml"):
+    path = Path(filename)
+    digest.update(filename.encode())
+    digest.update(b"\0")
+    digest.update(path.read_bytes())
+print(digest.hexdigest())
+PY
+)"
+
+if [[ "${ACI_DEMO_SKIP_INSTALL:-0}" != "1" ]]; then
+  if [[ ! -f "${DEPS_STAMP}" ]] || [[ "$(cat "${DEPS_STAMP}")" != "${current_deps_hash}" ]]; then
+    echo "Installing local demo dependencies..."
+    python -m pip install --upgrade pip >/dev/null
+    python -m pip install -r "${REQUIREMENTS_FILE}" >/dev/null
+    python -m pip install --no-deps -e . >/dev/null
+    printf '%s\n' "${current_deps_hash}" > "${DEPS_STAMP}"
+  else
+    echo "Local demo dependencies are up to date."
+  fi
+else
+  echo "Skipping dependency installation because ACI_DEMO_SKIP_INSTALL=1."
+fi
 
 # Deterministic local runtime defaults for demo mode.
 export ACI_ENVIRONMENT="${ACI_ENVIRONMENT:-demo}"

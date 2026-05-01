@@ -114,6 +114,11 @@ For policy semantics and enforcement behavior, see [docs/policy-reference.md](do
 For ingestion contracts and examples, see [docs/ingestion-reference.md](docs/ingestion-reference.md).
 For automated end-to-end demo verification, run `./scripts/smoke_demo.sh`.
 
+The launcher installs runtime dependencies into `.venv` on the first run and
+reuses them until `requirements.lock` or `pyproject.toml` changes. Set
+`ACI_DEMO_SKIP_INSTALL=1` only when you know the local environment is already
+prepared.
+
 ## Runtime Profiles
 
 ### Demo profile
@@ -278,10 +283,12 @@ See:
 Run quality gates locally:
 
 ```bash
-ruff check src tests
-mypy src tests --strict
-pytest -q
+./scripts/validate_local.sh
 ```
+
+Set `ACI_VALIDATE_SMOKE=1` to include the end-to-end local demo smoke test.
+The script installs dev/test dependencies only when `requirements-dev.lock` or
+`pyproject.toml` changes.
 
 ## CI/CD and Release Workflows
 

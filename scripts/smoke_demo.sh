@@ -7,6 +7,15 @@ PORT="${ACI_DEMO_PORT:-8010}"
 BASE_URL="http://127.0.0.1:${PORT}"
 SERVER_LOG="${REPO_ROOT}/.demo-smoke.log"
 
+fail() {
+  echo "Demo smoke failed: $*" >&2
+  if [[ -f "${SERVER_LOG}" ]]; then
+    echo "--- ${SERVER_LOG} ---" >&2
+    tail -n 120 "${SERVER_LOG}" >&2
+  fi
+  exit 1
+}
+
 cleanup() {
   if [[ -n "${SERVER_PID:-}" ]] && kill -0 "${SERVER_PID}" 2>/dev/null; then
     kill "${SERVER_PID}" 2>/dev/null || true
@@ -16,6 +25,11 @@ cleanup() {
 trap cleanup EXIT
 
 cd "${REPO_ROOT}"
+
+if ! command -v curl >/dev/null 2>&1; then
+  fail "curl is required"
+fi
+
 ACI_DEMO_PORT="${PORT}" ACI_DEMO_RELOAD=0 ./scripts/run_demo.sh >"${SERVER_LOG}" 2>&1 &
 SERVER_PID=$!
 
@@ -23,13 +37,16 @@ for _ in {1..60}; do
   if curl -fsS "${BASE_URL}/health" >/dev/null 2>&1; then
     break
   fi
+  if ! kill -0 "${SERVER_PID}" 2>/dev/null; then
+    fail "server process exited before health check passed"
+  fi
   sleep 1
 done
 
-curl -fsS "${BASE_URL}/health" >/dev/null
-curl -fsS "${BASE_URL}/ready" >/dev/null
-curl -fsS "${BASE_URL}/v1/dashboard/overview" >/dev/null
-curl -fsS "${BASE_URL}/v1/attribution/customer-support-bot" >/dev/null
+curl -fsS "${BASE_URL}/health" >/dev/null || fail "health endpoint did not become ready"
+curl -fsS "${BASE_URL}/ready" >/dev/null || fail "readiness endpoint failed"
+curl -fsS "${BASE_URL}/v1/dashboard/overview" >/dev/null || fail "dashboard endpoint failed"
+curl -fsS "${BASE_URL}/v1/attribution/customer-support-bot" >/dev/null || fail "attribution endpoint failed"
 
 INTERCEPT_RESPONSE="$(curl -fsS -X POST "${BASE_URL}/v1/intercept" \
   -H 'Content-Type: application/json' \
@@ -42,8 +59,8 @@ INTERCEPT_RESPONSE="$(curl -fsS -X POST "${BASE_URL}/v1/intercept" \
     "max_tokens": 300,
     "estimated_cost_usd": 0.003,
     "environment": "staging"
-  }')"
+  }')" || fail "intercept endpoint failed"
 
-printf '%s\n' "${INTERCEPT_RESPONSE}" | grep -q '"outcome":"enriched"\|"outcome":"soft_stopped"\|"outcome":"redirected"'
+printf '%s\n' "${INTERCEPT_RESPONSE}" | grep -q '"outcome":"enriched"\|"outcome":"soft_stopped"\|"outcome":"redirected"' || fail "intercept response did not contain an expected outcome"
 
 echo "Demo smoke passed against ${BASE_URL}"

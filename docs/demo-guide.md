@@ -42,6 +42,8 @@ Open:
 
 The local launcher uses the dedicated `demo` runtime profile. It starts single-worker,
 auto-seeds deterministic attribution/index state, and allows auth bypass only in `demo`.
+It installs runtime dependencies into `.venv` on the first run and reuses that
+environment on later runs unless `requirements.lock` or `pyproject.toml` changes.
 
 ## Recommended UI Flow
 
