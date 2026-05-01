@@ -258,6 +258,8 @@ flowchart LR
 Implemented controls include:
 
 - JWT auth on `/v1/*` (issuer/audience/scope/tenant validation).
+- JWT signing algorithms are explicitly allowlisted, and asymmetric algorithms
+  require a configured public key when auth bypass is disabled.
 - Additional mutation scopes for pricing catalog writes, intervention lifecycle
   changes, and live outbound notification delivery.
 - Startup-time guardrails preventing unsafe production config.
@@ -286,8 +288,9 @@ Run quality gates locally:
 ./scripts/validate_local.sh
 ```
 
-Set `ACI_VALIDATE_SMOKE=1` to include the end-to-end local demo smoke test.
-The script installs dev/test dependencies only when `requirements-dev.lock` or
+Set `ACI_VALIDATE_FULL=1` to include integration and glass-jaw tests. Set
+`ACI_VALIDATE_SMOKE=1` to include the end-to-end local demo smoke test. The
+script installs dev/test dependencies only when `requirements-dev.lock` or
 `pyproject.toml` changes.
 
 ## CI/CD and Release Workflows

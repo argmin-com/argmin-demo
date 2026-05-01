@@ -57,7 +57,7 @@ The launcher uses the dedicated `demo` runtime profile and auto-seeds the backen
 Optional live API auth token:
 
 - set `window.__ACI_API_TOKEN__` before the app initializes, or
-- store the bearer token in browser storage as `aci_demo_api_token`
+- store the bearer token in `sessionStorage` as `aci_demo_api_token`
 
 This is only needed if the local backend is configured to require auth for demo UI calls.
 

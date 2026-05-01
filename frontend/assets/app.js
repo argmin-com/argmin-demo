@@ -1016,10 +1016,6 @@ function getApiBearerToken() {
       if (fromSession) {
         return fromSession;
       }
-      const fromLocal = window.localStorage.getItem(key);
-      if (fromLocal) {
-        return fromLocal;
-      }
     } catch (error) {
       void error;
     }
@@ -6717,10 +6713,10 @@ function applyDatasetMetadata() {
 }
 
 function render() {
-  // TODO: A requestAnimationFrame-based queueRender() debounce was evaluated for
-  // this path, but direct render sequencing remains intentional because focus,
+  // Direct render sequencing remains intentional because focus,
   // drawer feedback, and same-page chart timing are coupled to immediate
-  // repaint order during the live demo.
+  // repaint order during the live demo. A requestAnimationFrame debounce was
+  // evaluated and rejected for this path.
   const inputSnapshot = captureFocusedInputState();
   const rootBeforeRender = document.getElementById("view-root");
   const previousScrollTop = rootBeforeRender ? rootBeforeRender.scrollTop : 0;

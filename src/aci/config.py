@@ -11,6 +11,21 @@ from __future__ import annotations
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings
 
+SUPPORTED_JWT_ALGORITHMS = {
+    "HS256",
+    "HS384",
+    "HS512",
+    "RS256",
+    "RS384",
+    "RS512",
+    "PS256",
+    "PS384",
+    "PS512",
+    "ES256",
+    "ES384",
+    "ES512",
+}
+
 
 class InterceptorConfig(BaseSettings):
     """Fail-open interceptor configuration (Patent Spec Section 6.1)."""
@@ -611,6 +626,13 @@ class PlatformConfig(BaseSettings):
             )
 
         algorithm = self.auth.jwt_algorithm.upper()
+        if algorithm not in SUPPORTED_JWT_ALGORITHMS:
+            raise ValueError(
+                "auth.jwt_algorithm must be one of "
+                f"{sorted(SUPPORTED_JWT_ALGORITHMS)}"
+            )
+        self.auth.jwt_algorithm = algorithm
+
         if self.auth.enabled:
             bypass_allowed = env_name in non_production_envs and self.auth.allow_dev_bypass
             if (
@@ -619,12 +641,12 @@ class PlatformConfig(BaseSettings):
                 and not bypass_allowed
             ):
                 raise ValueError("auth.jwt_hs256_secret is required for HS* auth algorithms")
-            if (
-                algorithm.startswith("RS")
-                and not _secret_value(self.auth.jwt_public_key_pem)
-                and not bypass_allowed
-            ):
-                raise ValueError("auth.jwt_public_key_pem is required for RS* auth algorithms")
+            if not algorithm.startswith("HS") and not _secret_value(
+                self.auth.jwt_public_key_pem
+            ) and not bypass_allowed:
+                raise ValueError(
+                    "auth.jwt_public_key_pem is required for asymmetric JWT algorithms"
+                )
 
         if production_like and algorithm.startswith("HS"):
             weak_defaults = {"", "dev-only-secret"}

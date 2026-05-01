@@ -108,7 +108,7 @@ def test_frontend_polish_and_responsive_guards_present() -> None:
     assert "root.classList.add(\"transitioning\")" in js
     assert "loader.remove();" in js
     assert "drawerBody.scrollTop = 0;" in js
-    assert "TODO: A requestAnimationFrame-based queueRender() debounce was evaluated" in js
+    assert "A requestAnimationFrame debounce was" in js
     assert 'No models available in the current dataset.' in js
     assert 'No teams available in the current dataset.' in js
     assert 'No manual mapping items are available in the current dataset.' in js
@@ -118,6 +118,7 @@ def test_frontend_polish_and_responsive_guards_present() -> None:
     assert 'role="button" tabindex="0" aria-label="Open Forecasting"' in js
     assert 'role="button" tabindex="0" aria-label="Open Manual Mapping"' in js
     assert 'role="button" tabindex="0" aria-label="Open Interventions"' in js
+    assert "window.localStorage" not in js
     assert 'role="button" tabindex="0" aria-label="Open ${esc(team.name)} team detail"' in js
 
 

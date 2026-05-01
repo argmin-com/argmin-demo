@@ -222,6 +222,50 @@ def test_platform_config_rejects_disabled_auth_in_production() -> None:
         )
 
 
+def test_platform_config_rejects_unsupported_jwt_algorithm() -> None:
+    with pytest.raises(ValueError, match="auth.jwt_algorithm must be one of"):
+        PlatformConfig(
+            auth=AuthConfig(
+                enabled=True,
+                allow_dev_bypass=True,
+                jwt_algorithm="none",
+            ),
+        )
+
+
+def test_platform_config_normalizes_jwt_algorithm_case() -> None:
+    config = PlatformConfig(
+        environment="demo",
+        auth=AuthConfig(
+            enabled=True,
+            allow_dev_bypass=True,
+            jwt_algorithm="hs256",
+            jwt_hs256_secret="demo-secret-32-characters-minimum",
+        ),
+    )
+
+    assert config.auth.jwt_algorithm == "HS256"
+
+
+def test_platform_config_requires_public_key_for_asymmetric_jwt_algorithms() -> None:
+    with pytest.raises(
+        ValueError,
+        match="auth.jwt_public_key_pem is required for asymmetric JWT algorithms",
+    ):
+        PlatformConfig(
+            environment="production",
+            runtime_role="processor",
+            graph_backend="neo4j",
+            neo4j_password="strong-secret",
+            auth=AuthConfig(
+                enabled=True,
+                allow_dev_bypass=False,
+                jwt_algorithm="ES256",
+                jwt_public_key_pem="",
+            ),
+        )
+
+
 def test_platform_config_requires_rediss_for_production_durable_backends() -> None:
     with pytest.raises(ValueError, match="redis_url must use rediss://"):
         PlatformConfig(

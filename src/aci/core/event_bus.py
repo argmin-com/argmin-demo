@@ -195,7 +195,6 @@ class InMemoryEventBus:
         if len(errors) == 1:
             raise first
         raise RuntimeError(f"{len(errors)} handlers failed for topic '{topic}'") from first
-        return True
 
     def subscribe(self, topic: str, handler: EventHandler) -> None:
         """Subscribe a handler to a topic. Use '*' for all events."""

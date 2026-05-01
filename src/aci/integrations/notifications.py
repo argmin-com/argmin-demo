@@ -28,6 +28,7 @@ NOTIFICATION_DELIVERY_TOTAL = Counter(
     "Notification delivery attempts by channel and status.",
     ["channel", "status"],
 )
+SUPPORTED_CHANNELS = {"email", "slack", "webhook"}
 
 
 class SupportsAsyncHTTPClient(Protocol):
@@ -132,10 +133,30 @@ class NotificationHub:
         """Dispatch one message across the selected channels."""
         dispatched: list[NotificationDelivery] = []
         email_targets = email_to or []
-        normalized_channels = [channel.strip().lower() for channel in channels]
+        normalized_channels = [channel.strip().lower() for channel in channels if channel.strip()]
         timestamp = datetime.now(UTC)
 
         async_tasks: list[asyncio.Task[NotificationDelivery]] = []
+
+        if not normalized_channels:
+            dispatched.append(
+                self._record(
+                    channel="unknown",
+                    target="notification://missing-channel",
+                    status="failed",
+                    message="at least one notification channel is required",
+                    timestamp=timestamp,
+                    event_type=message.event_type,
+                    severity=message.severity,
+                    route_id=route_id,
+                    route_name=route_name,
+                    workflow_name=workflow_name,
+                    audience=audience,
+                    business_outcome=business_outcome,
+                    scenario_id=scenario_id,
+                )
+            )
+            return dispatched
 
         for channel in normalized_channels:
             if channel == "slack":
@@ -223,6 +244,24 @@ class NotificationHub:
                             scenario_id=scenario_id,
                         )
                     )
+            elif channel not in SUPPORTED_CHANNELS:
+                dispatched.append(
+                    self._record(
+                        channel=channel,
+                        target=f"notification://unsupported/{channel}",
+                        status="failed",
+                        message=f"unsupported notification channel '{channel}'",
+                        timestamp=timestamp,
+                        event_type=message.event_type,
+                        severity=message.severity,
+                        route_id=route_id,
+                        route_name=route_name,
+                        workflow_name=workflow_name,
+                        audience=audience,
+                        business_outcome=business_outcome,
+                        scenario_id=scenario_id,
+                    )
+                )
 
         if async_tasks:
             dispatched.extend(await asyncio.gather(*async_tasks))

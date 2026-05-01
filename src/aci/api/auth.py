@@ -46,10 +46,11 @@ def decode_and_validate_token(
 ) -> dict[str, Any]:
     """Decode and validate JWT claims for service-to-service authentication."""
     key = _jwt_key(config)
+    algorithm = config.jwt_algorithm.upper()
     claims = jwt.decode(
         token,
         key=key,
-        algorithms=[config.jwt_algorithm],
+        algorithms=[algorithm],
         audience=config.jwt_audience,
         issuer=config.jwt_issuer,
         leeway=config.clock_skew_seconds,

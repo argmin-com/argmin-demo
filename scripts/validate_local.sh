@@ -53,6 +53,14 @@ mypy src tests --strict
 echo "Running unit tests..."
 pytest tests/unit -q
 
+if [[ "${ACI_VALIDATE_FULL:-0}" == "1" ]]; then
+  echo "Running integration tests..."
+  pytest tests/integration -q
+
+  echo "Running glass-jaw tests..."
+  pytest tests/glass_jaw -q
+fi
+
 if [[ "${ACI_VALIDATE_SMOKE:-0}" == "1" ]]; then
   echo "Running demo smoke..."
   ./scripts/smoke_demo.sh

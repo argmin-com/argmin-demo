@@ -168,6 +168,69 @@ def test_notifications_endpoints_simulated_delivery() -> None:
         assert listed_payload[-1]["route_id"] == ""
 
 
+def test_notifications_endpoint_records_missing_channel_failure() -> None:
+    app_state = get_state()
+    app_state.notification_hub.clear()
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/v1/integrations/notify",
+            json={
+                "event_type": "policy_violation",
+                "title": "Budget ceiling exceeded",
+                "detail": "Team Product exceeded staging threshold",
+                "severity": "warning",
+                "channels": [],
+            },
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload == [
+        {
+            "delivery_id": payload[0]["delivery_id"],
+            "channel": "unknown",
+            "target": "notification://missing-channel",
+            "status": "failed",
+            "message": "at least one notification channel is required",
+            "sent_at": payload[0]["sent_at"],
+            "event_type": "policy_violation",
+            "severity": "warning",
+            "route_id": "",
+            "route_name": "",
+            "workflow_name": "",
+            "audience": "",
+            "business_outcome": "",
+            "scenario_id": "",
+        }
+    ]
+
+
+def test_notifications_endpoint_records_unsupported_channel_failure() -> None:
+    app_state = get_state()
+    app_state.notification_hub.clear()
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/v1/integrations/notify",
+            json={
+                "event_type": "policy_violation",
+                "title": "Budget ceiling exceeded",
+                "detail": "Team Product exceeded staging threshold",
+                "severity": "warning",
+                "channels": ["pagerduty"],
+            },
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert len(payload) == 1
+    assert payload[0]["channel"] == "pagerduty"
+    assert payload[0]["target"] == "notification://unsupported/pagerduty"
+    assert payload[0]["status"] == "failed"
+    assert payload[0]["message"] == "unsupported notification channel 'pagerduty'"
+
+
 class _FakeAsyncHTTPClient:
     def __init__(self) -> None:
         self.calls: list[tuple[str, dict[str, object]]] = []
