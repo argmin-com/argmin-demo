@@ -1,0 +1,724 @@
+"""
+Platform configuration.
+
+All configurable parameters referenced in the patent specification are centralized here
+with their documented defaults and rationale. Customer-specific overrides are loaded
+from environment variables or a configuration service.
+"""
+
+from __future__ import annotations
+
+from pydantic import Field, SecretStr, model_validator
+from pydantic_settings import BaseSettings
+
+
+class InterceptorConfig(BaseSettings):
+    """Fail-open interceptor configuration (Patent Spec Section 6.1)."""
+
+    model_config = {"env_prefix": "ACI_INTERCEPTOR_"}
+
+    # Hard timeout budget: 20ms for enrichment lookup.
+    # The remaining 30ms of the 50ms total budget is reserved for routing.
+    timeout_ms: int = Field(default=20, description="Hard timeout for index lookup (ms)")
+
+    # Total interception budget including routing decision.
+    total_budget_ms: int = Field(default=50, description="Total interception overhead budget (ms)")
+
+    # Policy evaluation budget (subset of enrichment timeout budget).
+    policy_timeout_ms: int = Field(
+        default=15,
+        description="Hard timeout for in-process policy evaluation (ms)",
+    )
+
+    # Circuit breaker: consecutive failures before opening.
+    circuit_breaker_threshold: int = Field(default=5, description="Failures before circuit opens")
+
+    # Circuit breaker: seconds before attempting half-open.
+    circuit_breaker_reset_s: float = Field(default=30.0, description="Seconds before half-open")
+
+    # Circuit breaker state backend.
+    # local: per-process memory (development/testing)
+    # redis: shared state across horizontally scaled pods
+    circuit_state_backend: str = Field(
+        default="local",
+        description="Circuit breaker state backend (local|redis)",
+    )
+    circuit_state_redis_key: str = Field(
+        default="aci:circuit:interceptor",
+        description="Redis key for shared circuit breaker state",
+    )
+
+    # Shadow warming: probability of triggering background refresh on cache miss.
+    # Prevents thundering herd (Section 6.3).
+    shadow_warm_probability: float = Field(default=0.01, description="P(trigger refresh)")
+    shadow_warm_timeout_s: float = Field(
+        default=5.0,
+        description="Hard timeout for one background shadow refresh",
+    )
+    shadow_warm_max_tracked_workloads: int = Field(
+        default=10_000,
+        description="Max cached workload refresh timestamps retained for shadow warming",
+    )
+
+    # Emit shadow events to the event bus on miss/timeout.
+    shadow_events_enabled: bool = Field(default=True)
+
+    # Stale-while-revalidate: serve last known entry during refresh.
+    stale_while_revalidate: bool = Field(default=True)
+
+    # Header enrichment budget controls.
+    max_enrichment_header_bytes: int = Field(
+        default=4096,
+        description="Max total bytes for generated enrichment headers",
+    )
+    max_header_value_length: int = Field(
+        default=512,
+        description="Max length of each generated header value",
+    )
+    fail_open_alert_window_requests: int = Field(
+        default=200,
+        description="Rolling request window used to determine fail-open alert state",
+    )
+    fail_open_warn_rate: float = Field(
+        default=0.05,
+        description="Warn when fail-open rate in the rolling window meets this threshold",
+    )
+    fail_open_critical_rate: float = Field(
+        default=0.15,
+        description="Critical alert threshold for rolling fail-open rate",
+    )
+    active_lite_min_confidence: float = Field(
+        default=0.90,
+        description="Minimum attribution confidence required for Active-Lite shape actions",
+    )
+    active_lite_gate_min_confidence: float = Field(
+        default=0.95,
+        description="Minimum attribution confidence required for Active-Lite gate actions",
+    )
+
+    @model_validator(mode="after")
+    def _validate_active_lite_thresholds(self) -> InterceptorConfig:
+        if self.policy_timeout_ms <= 0:
+            raise ValueError("policy_timeout_ms must be greater than 0")
+        if self.timeout_ms > 0 and self.policy_timeout_ms > self.timeout_ms:
+            raise ValueError("policy_timeout_ms must be less than or equal to timeout_ms")
+
+        if not (0.0 <= self.active_lite_min_confidence <= 1.0):
+            raise ValueError("active_lite_min_confidence must be between 0 and 1")
+        if not (0.0 <= self.active_lite_gate_min_confidence <= 1.0):
+            raise ValueError("active_lite_gate_min_confidence must be between 0 and 1")
+        if self.active_lite_gate_min_confidence < self.active_lite_min_confidence:
+            raise ValueError(
+                "active_lite_gate_min_confidence must be greater than or equal to "
+                "active_lite_min_confidence"
+            )
+        if self.shadow_warm_timeout_s <= 0:
+            raise ValueError("shadow_warm_timeout_s must be greater than 0")
+        if self.shadow_warm_max_tracked_workloads <= 0:
+            raise ValueError("shadow_warm_max_tracked_workloads must be greater than 0")
+        if self.fail_open_alert_window_requests <= 0:
+            raise ValueError("fail_open_alert_window_requests must be greater than 0")
+        if not (0.0 <= self.fail_open_warn_rate <= 1.0):
+            raise ValueError("fail_open_warn_rate must be between 0 and 1")
+        if not (0.0 <= self.fail_open_critical_rate <= 1.0):
+            raise ValueError("fail_open_critical_rate must be between 0 and 1")
+        if self.fail_open_critical_rate < self.fail_open_warn_rate:
+            raise ValueError(
+                "fail_open_critical_rate must be greater than or equal to fail_open_warn_rate"
+            )
+        return self
+
+
+class ConfidenceConfig(BaseSettings):
+    """Confidence governance configuration (Patent Spec Section 5)."""
+
+    model_config = {"env_prefix": "ACI_CONFIDENCE_"}
+
+    # Combined confidence cap (Section 5.3a).
+    # Rationale: 2-5% data quality error rate in enterprise identity systems.
+    cap: float = Field(default=0.95, description="Max combined confidence score")
+
+    # Diminishing returns: third signal adds at most 50% of second (Section 5.3b).
+    diminishing_factor: float = Field(default=0.5, description="Diminishing returns per signal")
+
+    # Default dependency discount for correlated signals (Section 5.3c).
+    # Initial value; adjusted per method pair as ground truth accumulates.
+    default_dependency_discount: float = Field(
+        default=0.5, description="Correlated signal discount"
+    )
+
+    # Operational thresholds (Section 5.1).
+    chargeback_threshold: float = Field(default=0.80, description="Min confidence for chargeback")
+    provisional_threshold: float = Field(default=0.50, description="Min confidence for dashboard")
+
+    # Calibration requirements (Section 5.2).
+    min_samples_full_calibration: int = Field(default=200, description="Samples for isotonic")
+    min_samples_bootstrap: int = Field(default=50, description="Samples for bootstrap CI")
+
+    # Warm-start transition threshold (Section 5.2).
+    # KS statistic threshold for switching from pre-calibrated to customer-calibrated.
+    warmstart_ks_threshold: float = Field(default=0.15, description="KS stat for curve transition")
+
+    # Temporal decay (Section 7).
+    decay_window_days: int = Field(default=90, description="Recency window for decay")
+    decay_rate: float = Field(default=0.01, description="Daily decay factor")
+
+    @model_validator(mode="after")
+    def _validate_threshold_ordering(self) -> ConfidenceConfig:
+        if self.chargeback_threshold <= self.provisional_threshold:
+            raise ValueError("chargeback_threshold must be greater than provisional_threshold")
+        return self
+
+
+class TRACConfig(BaseSettings):
+    """TRAC metric configuration (Patent Spec Section 7)."""
+
+    model_config = {"env_prefix": "ACI_TRAC_"}
+
+    # MVP default: keep TRAC focused on billed cost plus confidence risk.
+    include_carbon_liability: bool = Field(
+        default=False,
+        description="Include carbon liability in TRAC calculations",
+    )
+
+    # Default internal carbon price ($/tCO2e).
+    # Reference value sourced from EMBER Carbon Price Tracker.
+    carbon_price_per_tco2e: float = Field(default=50.0, description="Internal carbon price")
+
+    # Default risk multiplier for confidence risk premium.
+    # Represents estimated 15% average dispute cost for misallocated workloads.
+    risk_multiplier: float = Field(default=0.15, description="Chargeback dispute cost factor")
+
+
+class CarbonConfig(BaseSettings):
+    """Carbon ledger configuration (Patent Spec Section 8)."""
+
+    model_config = {"env_prefix": "ACI_CARBON_"}
+
+    # Default embodied carbon hardware lifetime (Section 8.1).
+    hardware_lifetime_years: float = Field(default=4.0, description="GPU useful life (years)")
+    hardware_utilization: float = Field(default=0.85, description="Expected utilization rate")
+
+    # Default methodology layer for new deployments.
+    default_layer: int = Field(default=2, description="Default carbon methodology layer")
+
+    # Embodied carbon: tokens-to-GPU-second conversion for online inference.
+    # Override per model profile when real telemetry is available.
+    # This is an estimate; batch and training workloads should provide actual
+    # measured_gpu_seconds instead of relying on this default.
+    tokens_per_gpu_second: float = Field(
+        default=500.0,
+        description="Tokens processed per GPU-second (default for online inference)",
+    )
+
+    # A100-80GB manufacturing embodied carbon estimate (kgCO2e).
+    # Source: Gupta et al. 2022, "Chasing Carbon," ACM ASPLOS.
+    embodied_carbon_manufacturing_kg: float = Field(
+        default=150.0,
+        description="GPU manufacturing embodied carbon (kgCO2e)",
+    )
+
+
+class EquivalenceConfig(BaseSettings):
+    """Capability equivalence configuration (Patent Spec Section 6.2)."""
+
+    model_config = {"env_prefix": "ACI_EQUIV_"}
+
+    # Mode 2a: minimum sample size for empirical evaluation.
+    min_shadow_samples: int = Field(default=100, description="Min requests for shadow eval")
+
+    # Mode 2b: minimum sample size for LLM-as-judge.
+    min_judge_samples: int = Field(default=200, description="Min samples for judge eval")
+
+    # Equivalence determination TTL (days).
+    ttl_days: int = Field(default=7, description="Days before re-evaluation required")
+
+    # Quality threshold delta: candidate must score >= baseline - delta.
+    quality_delta: float = Field(default=0.05, description="Allowed quality degradation")
+
+
+class FBPConfig(BaseSettings):
+    """Federated Benchmarking Protocol configuration (Patent Spec Section 11)."""
+
+    model_config = {"env_prefix": "ACI_FBP_"}
+
+    # Privacy budget per quarter (Section 11.1).
+    epsilon_total_quarterly: float = Field(default=4.0, description="Total epsilon per quarter")
+    epsilon_per_release: float = Field(default=1.0, description="Epsilon per benchmark release")
+
+    # Sensitivity bounds for Laplace mechanism (Section 11.1).
+    cost_per_token_clip: float = Field(default=0.10, description="Max cost/token before clipping")
+    carbon_per_inference_clip: float = Field(default=100.0, description="Max gCO2e before clipping")
+
+    # Minimum cohort size (Section 11.1).
+    min_cohort_size: int = Field(default=5, description="Min orgs per cohort")
+
+    # Noise mechanism selection.
+    # True (default): discrete geometric Laplace via secrets CSPRNG.
+    # Required before any real organizational data flows through the protocol.
+    # False: continuous Laplace via numpy for local protocol testing only.
+    use_secure_noise: bool = Field(default=True, description="Use discrete Laplace (production)")
+
+    # Max membership churn for cohort publication.
+    max_churn_rate: float = Field(default=0.20, description="Max month-over-month churn")
+
+
+class NotificationConfig(BaseSettings):
+    """Outbound notification delivery configuration."""
+
+    model_config = {"env_prefix": "ACI_NOTIFICATION_"}
+
+    live_network: bool = Field(
+        default=False,
+        description="Enable live outbound Slack/webhook delivery instead of simulation-only mode",
+    )
+    timeout_seconds: float = Field(default=2.0, description="HTTP timeout for webhook delivery")
+    retry_attempts: int = Field(default=2, description="Webhook retry attempts before failure")
+    retry_backoff_seconds: float = Field(
+        default=0.25,
+        description="Base exponential backoff between webhook retries",
+    )
+    webhook_allowlist: str = Field(
+        default="",
+        description="Comma-separated allowed webhook hostnames or suffixes",
+    )
+    allow_private_targets: bool = Field(
+        default=False,
+        description="Permit localhost/private network webhook targets",
+    )
+    history_max_entries: int = Field(
+        default=1000,
+        description="Maximum notification delivery records retained in memory",
+    )
+
+
+class AdoptionConfig(BaseSettings):
+    """Employee AI adoption analytics configuration."""
+
+    model_config = {"env_prefix": "ACI_ADOPTION_"}
+
+    backend: str = Field(
+        default="memory",
+        description="Adoption analytics backend (memory|redis)",
+    )
+    redis_prefix: str = Field(
+        default="aci:adoption",
+        description="Redis key prefix for durable adoption analytics state",
+    )
+    retention_days: int = Field(
+        default=180,
+        description="Number of days of employee adoption activity retained for rollups",
+    )
+    repeat_user_request_threshold: int = Field(
+        default=5,
+        description="Requests in the analysis window required to classify a repeat user",
+    )
+    power_user_request_threshold: int = Field(
+        default=20,
+        description="Requests in the analysis window required to classify a power user",
+    )
+
+
+class AuthConfig(BaseSettings):
+    """Service-to-service API authentication configuration."""
+
+    model_config = {"env_prefix": "ACI_AUTH_"}
+
+    enabled: bool = Field(default=True, description="Enable bearer-token auth for API routes")
+    allow_dev_bypass: bool = Field(
+        default=True,
+        description="Allow unauthenticated requests in development only",
+    )
+    jwt_algorithm: str = Field(default="HS256", description="JWT signing algorithm")
+    jwt_issuer: str = Field(default="aci-control-plane", description="Expected JWT issuer")
+    jwt_audience: str = Field(default="aci-api", description="Expected JWT audience")
+    jwt_hs256_secret: SecretStr = Field(
+        default=SecretStr("dev-only-secret"),
+        description="Shared HMAC secret for HS256",
+    )
+    jwt_public_key_pem: SecretStr = Field(
+        default=SecretStr(""),
+        description="PEM-encoded public key for asymmetric JWT validation",
+    )
+    required_scope: str = Field(default="aci.api", description="Required service scope")
+    pricing_write_scope: str = Field(
+        default="aci.pricing.write",
+        description="Additional scope required for pricing catalog mutation",
+    )
+    intervention_write_scope: str = Field(
+        default="aci.interventions.write",
+        description="Additional scope required for intervention lifecycle mutation",
+    )
+    notification_live_scope: str = Field(
+        default="aci.integrations.notify.live",
+        description="Additional scope required for live outbound notification delivery",
+    )
+    tenant_claim: str = Field(default="tenant_id", description="JWT claim holding tenant id")
+    clock_skew_seconds: int = Field(default=60, description="Allowed JWT clock skew in seconds")
+
+
+class PlatformConfig(BaseSettings):
+    """Top-level platform configuration aggregating all subsystem configs."""
+
+    model_config = {"env_prefix": "ACI_"}
+
+    # Deployment identification.
+    tenant_id: str = Field(default="default", description="Customer tenant identifier")
+    environment: str = Field(default="development", description="Deployment environment")
+    runtime_role: str = Field(
+        default="all",
+        description="Runtime role (all|gateway|processor)",
+    )
+    interceptor_mode: str = Field(
+        default="advisory",
+        description="Interceptor deployment mode (passive|advisory|active)",
+    )
+    api_ingest_rate_limit_per_minute: int = Field(
+        default=600,
+        description="Per-caller ingestion request budget per minute",
+    )
+    api_ingest_rate_limit_backend: str = Field(
+        default="auto",
+        description="Rate-limit backend (auto|memory|redis)",
+    )
+    api_ingest_rate_limit_redis_prefix: str = Field(
+        default="aci:ratelimit",
+        description="Redis key prefix for distributed ingestion rate limiting",
+    )
+    api_ingest_max_batch_size: int = Field(
+        default=1000,
+        description="Maximum accepted events per batch ingestion request",
+    )
+    api_max_request_bytes: int = Field(
+        default=1_048_576,
+        description="Maximum accepted HTTP request body size in bytes for ingestion routes",
+    )
+    api_event_max_json_depth: int = Field(
+        default=8,
+        description="Maximum accepted nested JSON depth for event attributes",
+    )
+    api_event_max_json_keys: int = Field(
+        default=512,
+        description="Maximum accepted JSON object key count for event attributes",
+    )
+    api_trusted_proxy_cidrs: str = Field(
+        default="",
+        description="Comma-separated CIDRs/IPs allowed to supply trusted forwarding headers",
+    )
+    api_cors_allowed_origins: str = Field(
+        default="",
+        description="Comma-separated CORS allowlist for browser clients",
+    )
+    api_cors_allow_credentials: bool = Field(
+        default=False,
+        description="Whether CORS responses allow credentials",
+    )
+
+    # Subsystem configs.
+    interceptor: InterceptorConfig = Field(default_factory=InterceptorConfig)
+    confidence: ConfidenceConfig = Field(default_factory=ConfidenceConfig)
+    trac: TRACConfig = Field(default_factory=TRACConfig)
+    carbon: CarbonConfig = Field(default_factory=CarbonConfig)
+    equivalence: EquivalenceConfig = Field(default_factory=EquivalenceConfig)
+    fbp: FBPConfig = Field(default_factory=FBPConfig)
+    auth: AuthConfig = Field(default_factory=AuthConfig)
+    notifications: NotificationConfig = Field(default_factory=NotificationConfig)
+    adoption: AdoptionConfig = Field(default_factory=AdoptionConfig)
+
+    # Infrastructure endpoints.
+    index_max_entries: int = Field(
+        default=250_000,
+        description="Max attribution index entries retained in memory",
+    )
+    index_backend: str = Field(
+        default="memory",
+        description="Attribution index backend (memory|redis)",
+    )
+    pricing_backend: str = Field(
+        default="memory",
+        description="Pricing catalog backend (memory|redis)",
+    )
+    pricing_redis_prefix: str = Field(
+        default="aci:pricing",
+        description="Redis key prefix for durable pricing rules",
+    )
+    reconciliation_backend: str = Field(
+        default="memory",
+        description="Synthetic-vs-reconciled ledger backend (memory|redis)",
+    )
+    reconciliation_redis_prefix: str = Field(
+        default="aci:reconciliation",
+        description="Redis key prefix for durable reconciliation records",
+    )
+    interventions_backend: str = Field(
+        default="memory",
+        description="Intervention registry backend (memory|redis)",
+    )
+    interventions_redis_prefix: str = Field(
+        default="aci:interventions",
+        description="Redis key prefix for durable intervention records",
+    )
+    graph_backend: str = Field(
+        default="memory",
+        description="Authoritative graph backend (memory|neo4j)",
+    )
+    index_redis_prefix: str = Field(
+        default="aci:index",
+        description="Redis key prefix for durable index entries",
+    )
+    index_redis_ttl_s: int = Field(
+        default=1800,
+        description="TTL for Redis-backed index entries (seconds)",
+    )
+
+    event_bus_backend: str = Field(
+        default="memory",
+        description="Event bus backend (memory|kafka)",
+    )
+    event_bus_topic: str = Field(default="aci.events", description="Primary event topic")
+    event_bus_dlq_topic: str = Field(default="aci.events.dlq", description="Dead-letter topic")
+    event_bus_consumer_group: str = Field(
+        default="aci-processor",
+        description="Consumer group for processor subscribers",
+    )
+    event_bus_dedup_ttl_s: int = Field(
+        default=86_400,
+        description="Idempotency dedup retention (seconds) for durable bus backends",
+    )
+
+    kafka_bootstrap: str = Field(default="localhost:9092", description="Kafka bootstrap servers")
+    redis_url: str = Field(default="redis://localhost:6379/0", description="Redis URL")
+    neo4j_uri: str = Field(default="bolt://localhost:7687", description="Neo4j connection URI")
+    neo4j_user: str = Field(default="neo4j")
+    neo4j_password: SecretStr = Field(
+        default=SecretStr(""),
+        description="Neo4j password",
+    )
+
+    @model_validator(mode="after")
+    def _validate_runtime_settings(self) -> PlatformConfig:
+        valid_roles = {"all", "gateway", "processor"}
+        if self.runtime_role not in valid_roles:
+            raise ValueError(f"runtime_role must be one of {sorted(valid_roles)}")
+
+        valid_interceptor_modes = {"passive", "advisory", "active"}
+        if self.interceptor_mode.lower() not in valid_interceptor_modes:
+            raise ValueError(
+                f"interceptor_mode must be one of {sorted(valid_interceptor_modes)}"
+            )
+
+        valid_bus_backends = {"memory", "kafka"}
+        if self.event_bus_backend not in valid_bus_backends:
+            raise ValueError(f"event_bus_backend must be one of {sorted(valid_bus_backends)}")
+
+        valid_index_backends = {"memory", "redis"}
+        if self.index_backend not in valid_index_backends:
+            raise ValueError(f"index_backend must be one of {sorted(valid_index_backends)}")
+        if self.index_redis_ttl_s <= 0:
+            raise ValueError("index_redis_ttl_s must be > 0")
+
+        valid_durable_state_backends = {"memory", "redis"}
+        if self.pricing_backend not in valid_durable_state_backends:
+            raise ValueError(
+                "pricing_backend must be one of "
+                f"{sorted(valid_durable_state_backends)}"
+            )
+        if self.reconciliation_backend not in valid_durable_state_backends:
+            raise ValueError(
+                f"reconciliation_backend must be one of {sorted(valid_durable_state_backends)}"
+            )
+        if self.interventions_backend not in valid_durable_state_backends:
+            raise ValueError(
+                f"interventions_backend must be one of {sorted(valid_durable_state_backends)}"
+            )
+        if self.adoption.backend not in valid_durable_state_backends:
+            raise ValueError(
+                f"adoption.backend must be one of {sorted(valid_durable_state_backends)}"
+            )
+
+        valid_graph_backends = {"memory", "neo4j"}
+        if self.graph_backend not in valid_graph_backends:
+            raise ValueError(f"graph_backend must be one of {sorted(valid_graph_backends)}")
+
+        if self.api_ingest_rate_limit_per_minute <= 0:
+            raise ValueError("api_ingest_rate_limit_per_minute must be > 0")
+        valid_rate_limit_backends = {"auto", "memory", "redis"}
+        if self.api_ingest_rate_limit_backend not in valid_rate_limit_backends:
+            raise ValueError(
+                "api_ingest_rate_limit_backend must be one of "
+                f"{sorted(valid_rate_limit_backends)}"
+            )
+        if self.api_ingest_max_batch_size <= 0:
+            raise ValueError("api_ingest_max_batch_size must be > 0")
+        if self.api_max_request_bytes <= 0:
+            raise ValueError("api_max_request_bytes must be > 0")
+        if self.api_event_max_json_depth <= 0:
+            raise ValueError("api_event_max_json_depth must be > 0")
+        if self.api_event_max_json_keys <= 0:
+            raise ValueError("api_event_max_json_keys must be > 0")
+
+        valid_circuit_backends = {"local", "redis"}
+        if self.interceptor.circuit_state_backend not in valid_circuit_backends:
+            raise ValueError(
+                f"interceptor.circuit_state_backend must be one of {sorted(valid_circuit_backends)}"
+            )
+
+        production_like = self.environment.lower() in {"production", "staging"}
+        if production_like and not _secret_value(self.neo4j_password):
+            raise ValueError("neo4j_password must be configured in production/staging")
+
+        non_production_envs = {"development", "dev", "test", "testing", "local", "demo"}
+        env_name = self.environment.lower()
+        if production_like and not self.auth.enabled:
+            raise ValueError("auth.enabled must be true in production/staging")
+        if self.auth.allow_dev_bypass and env_name not in non_production_envs:
+            raise ValueError(
+                "auth.allow_dev_bypass may only be enabled in non-production environments"
+            )
+
+        cors_origins = [
+            origin.strip()
+            for origin in self.api_cors_allowed_origins.split(",")
+            if origin.strip()
+        ]
+        if self.api_cors_allow_credentials and "*" in cors_origins:
+            raise ValueError(
+                "api_cors_allow_credentials cannot be true when api_cors_allowed_origins "
+                "contains '*'"
+            )
+
+        if self.notifications.timeout_seconds <= 0:
+            raise ValueError("notifications.timeout_seconds must be > 0")
+        if self.notifications.retry_attempts <= 0:
+            raise ValueError("notifications.retry_attempts must be > 0")
+        if self.notifications.retry_backoff_seconds < 0:
+            raise ValueError("notifications.retry_backoff_seconds must be >= 0")
+        if self.notifications.history_max_entries <= 0:
+            raise ValueError("notifications.history_max_entries must be > 0")
+        if self.adoption.retention_days <= 0:
+            raise ValueError("adoption.retention_days must be > 0")
+        if self.adoption.repeat_user_request_threshold <= 0:
+            raise ValueError("adoption.repeat_user_request_threshold must be > 0")
+        if self.adoption.power_user_request_threshold <= 0:
+            raise ValueError("adoption.power_user_request_threshold must be > 0")
+        if (
+            self.adoption.power_user_request_threshold
+            < self.adoption.repeat_user_request_threshold
+        ):
+            raise ValueError(
+                "adoption.power_user_request_threshold must be greater than or equal to "
+                "adoption.repeat_user_request_threshold"
+            )
+
+        algorithm = self.auth.jwt_algorithm.upper()
+        if self.auth.enabled:
+            bypass_allowed = env_name in non_production_envs and self.auth.allow_dev_bypass
+            if (
+                algorithm.startswith("HS")
+                and not _secret_value(self.auth.jwt_hs256_secret)
+                and not bypass_allowed
+            ):
+                raise ValueError("auth.jwt_hs256_secret is required for HS* auth algorithms")
+            if (
+                algorithm.startswith("RS")
+                and not _secret_value(self.auth.jwt_public_key_pem)
+                and not bypass_allowed
+            ):
+                raise ValueError("auth.jwt_public_key_pem is required for RS* auth algorithms")
+
+        if production_like and algorithm.startswith("HS"):
+            weak_defaults = {"", "dev-only-secret"}
+            if _secret_value(self.auth.jwt_hs256_secret) in weak_defaults:
+                raise ValueError(
+                    "auth.jwt_hs256_secret must be set to a strong non-default "
+                    "value in production/staging"
+                )
+
+        if self.event_bus_backend == "kafka" and not self.kafka_bootstrap:
+            raise ValueError("kafka_bootstrap must be configured when event_bus_backend='kafka'")
+
+        if (
+            production_like
+            and self.runtime_role in {"all", "gateway"}
+            and self.interceptor.shadow_events_enabled
+            and self.event_bus_backend != "kafka"
+        ):
+            raise ValueError(
+                "event_bus_backend must be 'kafka' when shadow_events_enabled is true "
+                "for gateway-capable production/staging runtimes"
+            )
+
+        if (
+            self.index_backend == "redis"
+            or self.pricing_backend == "redis"
+            or self.reconciliation_backend == "redis"
+            or self.interventions_backend == "redis"
+            or self.adoption.backend == "redis"
+            or self.interceptor.circuit_state_backend == "redis"
+            or self.event_bus_backend == "kafka"
+        ) and not self.redis_url:
+            raise ValueError(
+                "redis_url must be configured for redis-backed state or kafka dedup backend"
+            )
+
+        resolved_rate_limit_backend = self.api_ingest_rate_limit_backend
+        if resolved_rate_limit_backend == "auto":
+            resolved_rate_limit_backend = "redis" if production_like else "memory"
+        if (
+            production_like
+            and self.runtime_role in {"all", "processor"}
+            and resolved_rate_limit_backend != "redis"
+        ):
+            raise ValueError(
+                "api_ingest_rate_limit_backend must resolve to 'redis' in production/staging"
+            )
+        if resolved_rate_limit_backend == "redis" and not self.redis_url:
+            raise ValueError(
+                "redis_url must be configured when api_ingest_rate_limit_backend='redis'"
+            )
+
+        if production_like and (
+            self.index_backend == "redis"
+            or self.pricing_backend == "redis"
+            or self.reconciliation_backend == "redis"
+            or self.interventions_backend == "redis"
+            or self.adoption.backend == "redis"
+            or self.interceptor.circuit_state_backend == "redis"
+            or self.event_bus_backend == "kafka"
+        ) and not self.redis_url.startswith("rediss://"):
+            raise ValueError("redis_url must use rediss:// in production/staging")
+
+        if production_like and not self.fbp.use_secure_noise:
+            raise ValueError("fbp.use_secure_noise must be true in production/staging")
+
+        if production_like and self.notifications.allow_private_targets:
+            raise ValueError(
+                "notifications.allow_private_targets may not be enabled in production/staging"
+            )
+        if (
+            production_like
+            and self.notifications.live_network
+            and not self.notifications.webhook_allowlist.strip()
+        ):
+            raise ValueError(
+                "notifications.webhook_allowlist must be configured when live_network is "
+                "enabled in production/staging"
+            )
+
+        if (
+            production_like
+            and self.runtime_role in {"all", "processor"}
+            and self.graph_backend != "neo4j"
+        ):
+            raise ValueError(
+                "graph_backend must be 'neo4j' in production/staging for processor workloads"
+            )
+
+        return self
+
+
+def _secret_value(value: SecretStr | str) -> str:
+    """Support SecretStr-backed settings without breaking existing assignments in tests."""
+    if isinstance(value, SecretStr):
+        return value.get_secret_value()
+    return value

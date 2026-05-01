@@ -1,0 +1,3772 @@
+{
+  "meta": {
+    "tenant": "NovaTech Industries",
+    "environment": "demo",
+    "runtime_role": "all",
+    "default_mode": "advisory",
+    "period_label": "February 2026",
+    "watermark": "SIMULATED DATA",
+    "environment_label": "Synthetic enterprise operating profile",
+    "tenant_profile_label": "Cross-functional AI program spanning engineering, support, data, and operations"
+  },
+  "overview": {
+    "attribution_coverage_pct": 87.4,
+    "total_spend_usd": 847000,
+    "requests_30d": 44240000,
+    "spend_trend_k_usd": [
+      {
+        "month": "Aug",
+        "total": 412,
+        "attributed": 298,
+        "captured": 0
+      },
+      {
+        "month": "Sep",
+        "total": 489,
+        "attributed": 367,
+        "captured": 0
+      },
+      {
+        "month": "Oct",
+        "total": 567,
+        "attributed": 453,
+        "captured": 0
+      },
+      {
+        "month": "Nov",
+        "total": 634,
+        "attributed": 521,
+        "captured": 12
+      },
+      {
+        "month": "Dec",
+        "total": 718,
+        "attributed": 646,
+        "captured": 39
+      },
+      {
+        "month": "Jan",
+        "total": 791,
+        "attributed": 735,
+        "captured": 67
+      },
+      {
+        "month": "Feb",
+        "total": 847,
+        "attributed": 813,
+        "captured": 112
+      }
+    ],
+    "data_freshness": [
+      {
+        "name": "Ingestion latency p95",
+        "target": "< 60s",
+        "actual": "41s",
+        "status": "green"
+      },
+      {
+        "name": "Graph refresh",
+        "target": "<= 60m",
+        "actual": "34m",
+        "status": "green"
+      },
+      {
+        "name": "Index materialization",
+        "target": "<= 5m",
+        "actual": "2m 18s",
+        "status": "green"
+      },
+      {
+        "name": "Policy bundle propagation",
+        "target": "<= 3m",
+        "actual": "1m 12s",
+        "status": "green"
+      }
+    ]
+  },
+  "adoption": {
+    "hierarchy": {
+      "organization": {
+        "organization_id": "org-novatech",
+        "organization_name": "NovaTech Industries",
+        "eligible_employees": 812,
+        "business_units": [
+          {
+            "business_unit_id": "bu-product-platform",
+            "business_unit_name": "Product and Platform",
+            "eligible_employees": 268,
+            "teams": [
+              {
+                "team_id": "team-platform-engineering",
+                "team_name": "Platform Engineering",
+                "eligible_employees": 268
+              }
+            ]
+          },
+          {
+            "business_unit_id": "bu-customer-operations",
+            "business_unit_name": "Customer Operations",
+            "eligible_employees": 214,
+            "teams": [
+              {
+                "team_id": "team-customer-engineering",
+                "team_name": "Customer Engineering",
+                "eligible_employees": 214
+              }
+            ]
+          },
+          {
+            "business_unit_id": "bu-risk-and-trust",
+            "business_unit_name": "Risk and Trust",
+            "eligible_employees": 156,
+            "teams": [
+              {
+                "team_id": "team-security",
+                "team_name": "Security",
+                "eligible_employees": 156
+              }
+            ]
+          },
+          {
+            "business_unit_id": "bu-finance-and-ops",
+            "business_unit_name": "Finance and Operations",
+            "eligible_employees": 174,
+            "teams": [
+              {
+                "team_id": "team-finance-systems",
+                "team_name": "Finance Systems",
+                "eligible_employees": 174
+              }
+            ]
+          }
+        ]
+      },
+      "default_scope_type": "organization",
+      "default_scope_id": "org-novatech"
+    },
+    "dashboards": {
+      "organization:org-novatech:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "organization",
+        "scope_id": "org-novatech",
+        "scope_label": "NovaTech Industries",
+        "parent_scope_label": null,
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 812,
+          "active_employees_7d": 341,
+          "active_employees_30d": 486,
+          "adoption_penetration_pct": 59.9,
+          "repeat_user_rate_pct": 64.2,
+          "power_user_rate_pct": 17.8,
+          "governed_usage_pct": 82.4,
+          "intervention_rate_pct": 9.7,
+          "requests_30d": 142380,
+          "spend_30d_usd": 468200,
+          "spend_per_active_employee_usd": 963.4,
+          "requests_per_active_employee": 293.0,
+          "growth_vs_prior_pct": 22.6
+        },
+        "child_scopes": [
+          {
+            "scope_type": "business_unit",
+            "scope_id": "bu-product-platform",
+            "label": "Product and Platform",
+            "eligible_employees": 268,
+            "active_employees_30d": 188,
+            "adoption_penetration_pct": 70.1,
+            "growth_vs_prior_pct": 28.0,
+            "requests_30d": 61240,
+            "spend_30d_usd": 214600,
+            "governed_usage_pct": 85.3,
+            "top_entry_point": "developer-copilot"
+          },
+          {
+            "scope_type": "business_unit",
+            "scope_id": "bu-customer-operations",
+            "label": "Customer Operations",
+            "eligible_employees": 214,
+            "active_employees_30d": 126,
+            "adoption_penetration_pct": 58.9,
+            "growth_vs_prior_pct": 19.3,
+            "requests_30d": 34410,
+            "spend_30d_usd": 98600,
+            "governed_usage_pct": 87.4,
+            "top_entry_point": "support-copilot"
+          },
+          {
+            "scope_type": "business_unit",
+            "scope_id": "bu-risk-and-trust",
+            "label": "Risk and Trust",
+            "eligible_employees": 156,
+            "active_employees_30d": 82,
+            "adoption_penetration_pct": 52.6,
+            "growth_vs_prior_pct": 14.2,
+            "requests_30d": 22180,
+            "spend_30d_usd": 101400,
+            "governed_usage_pct": 91.0,
+            "top_entry_point": "security-workbench"
+          },
+          {
+            "scope_type": "business_unit",
+            "scope_id": "bu-finance-and-ops",
+            "label": "Finance and Operations",
+            "eligible_employees": 174,
+            "active_employees_30d": 90,
+            "adoption_penetration_pct": 51.7,
+            "growth_vs_prior_pct": 11.8,
+            "requests_30d": 24550,
+            "spend_30d_usd": 53600,
+            "governed_usage_pct": 72.8,
+            "top_entry_point": "finance-ops-assistant"
+          }
+        ],
+        "top_employees": [
+          {
+            "employee_id": "alice.ng",
+            "name": "Alice Ng",
+            "title": "VP Platform Engineering",
+            "team_name": "Platform Engineering",
+            "business_unit_name": "Product and Platform",
+            "requests_30d": 1420,
+            "spend_30d_usd": 12140,
+            "governed_usage_pct": 96.2,
+            "last_active_at": "2026-02-27T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Mistral AI / mistral-large",
+            "top_entry_point": "developer-copilot"
+          },
+          {
+            "employee_id": "maya.ford",
+            "name": "Maya Ford",
+            "title": "Customer Success Operations Lead",
+            "team_name": "Customer Engineering",
+            "business_unit_name": "Customer Operations",
+            "requests_30d": 1084,
+            "spend_30d_usd": 6480,
+            "governed_usage_pct": 98.0,
+            "last_active_at": "2026-02-28T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Cohere / command-r+",
+            "top_entry_point": "support-copilot"
+          },
+          {
+            "employee_id": "helen.ward",
+            "name": "Helen Ward",
+            "title": "Security Operations Manager",
+            "team_name": "Security",
+            "business_unit_name": "Risk and Trust",
+            "requests_30d": 860,
+            "spend_30d_usd": 7230,
+            "governed_usage_pct": 99.0,
+            "last_active_at": "2026-02-27T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Alibaba / qwen-2.5",
+            "top_entry_point": "security-workbench"
+          },
+          {
+            "employee_id": "lena.price",
+            "name": "Lena Price",
+            "title": "Finance Systems Director",
+            "team_name": "Finance Systems",
+            "business_unit_name": "Finance and Operations",
+            "requests_30d": 544,
+            "spend_30d_usd": 2480,
+            "governed_usage_pct": 84.1,
+            "last_active_at": "2026-02-26T17:00:00Z",
+            "adoption_stage": "Embedded",
+            "top_model": "DeepSeek / deepseek-r1",
+            "top_entry_point": "finance-ops-assistant"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "OpenAI / gpt-4o",
+            "requests": 52480,
+            "spend_usd": 141700,
+            "pct_of_requests": 36.9
+          },
+          {
+            "label": "Anthropic / claude-3.7-sonnet",
+            "requests": 40210,
+            "spend_usd": 101900,
+            "pct_of_requests": 28.2
+          },
+          {
+            "label": "Google / gemini-2.0-flash",
+            "requests": 28340,
+            "spend_usd": 152600,
+            "pct_of_requests": 19.9
+          },
+          {
+            "label": "Meta / llama-3.3-70b",
+            "requests": 21350,
+            "spend_usd": 72000,
+            "pct_of_requests": 15.0
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "developer-copilot",
+            "requests": 45860,
+            "spend_usd": 149400,
+            "pct_of_requests": 32.2
+          },
+          {
+            "label": "support-copilot",
+            "requests": 33840,
+            "spend_usd": 95300,
+            "pct_of_requests": 23.8
+          },
+          {
+            "label": "security-workbench",
+            "requests": 22180,
+            "spend_usd": 101400,
+            "pct_of_requests": 15.6
+          },
+          {
+            "label": "finance-ops-assistant",
+            "requests": 19640,
+            "spend_usd": 45800,
+            "pct_of_requests": 13.8
+          },
+          {
+            "label": "self-serve-chat",
+            "requests": 20860,
+            "spend_usd": 76300,
+            "pct_of_requests": 14.6
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 301,
+            "requests": 96210,
+            "spend_usd": 332400,
+            "governed_usage_pct": 74.2
+          },
+          {
+            "label": "Oct",
+            "active_employees": 338,
+            "requests": 108440,
+            "spend_usd": 361900,
+            "governed_usage_pct": 76.1
+          },
+          {
+            "label": "Nov",
+            "active_employees": 384,
+            "requests": 121300,
+            "spend_usd": 399600,
+            "governed_usage_pct": 79.5
+          },
+          {
+            "label": "Dec",
+            "active_employees": 421,
+            "requests": 129810,
+            "spend_usd": 428300,
+            "governed_usage_pct": 80.6
+          },
+          {
+            "label": "Jan",
+            "active_employees": 452,
+            "requests": 136920,
+            "spend_usd": 448900,
+            "governed_usage_pct": 81.8
+          },
+          {
+            "label": "Feb",
+            "active_employees": 486,
+            "requests": 142380,
+            "spend_usd": 468200,
+            "governed_usage_pct": 82.4
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Nearly sixty percent of AI-eligible employees are active, showing that AI is moving beyond pilot behavior into enterprise workflow adoption.",
+            "detail": "Adoption is strongest in Product and Platform, but Customer Operations is also demonstrating meaningful embedment in day-to-day work.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "59.9%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "Spend per active employee is under one thousand dollars over the period, with more than eighty percent of usage already running under governed context.",
+            "detail": "That combination indicates adoption is scaling without losing economic visibility and control.",
+            "metric_label": "30d spend",
+            "metric_value": "$468K"
+          },
+          {
+            "audience": "COO",
+            "headline": "Repeat usage shows that AI is becoming part of recurring workflows rather than remaining occasional experimentation.",
+            "detail": "The strongest operating embedment appears in platform engineering, customer operations, and security workbenches.",
+            "metric_label": "Repeat usage",
+            "metric_value": "64.2%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "Model concentration remains manageable, with the largest share of usage routed through lower-cost or latency-optimized families instead of a single premium model.",
+            "detail": "This suggests the organization is adopting AI with some architectural discipline rather than pure model sprawl.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+22.6%"
+          }
+        ]
+      },
+      "business_unit:bu-product-platform:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "business_unit",
+        "scope_id": "bu-product-platform",
+        "scope_label": "Product and Platform",
+        "parent_scope_label": "NovaTech Industries",
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 268,
+          "active_employees_7d": 134,
+          "active_employees_30d": 188,
+          "adoption_penetration_pct": 70.1,
+          "repeat_user_rate_pct": 71.8,
+          "power_user_rate_pct": 24.5,
+          "governed_usage_pct": 85.3,
+          "intervention_rate_pct": 8.2,
+          "requests_30d": 61240,
+          "spend_30d_usd": 214600,
+          "spend_per_active_employee_usd": 1141.5,
+          "requests_per_active_employee": 325.7,
+          "growth_vs_prior_pct": 28.0
+        },
+        "child_scopes": [
+          {
+            "scope_type": "team",
+            "scope_id": "team-platform-engineering",
+            "label": "Platform Engineering",
+            "eligible_employees": 268,
+            "active_employees_30d": 188,
+            "adoption_penetration_pct": 70.1,
+            "growth_vs_prior_pct": 28.0,
+            "requests_30d": 61240,
+            "spend_30d_usd": 214600,
+            "governed_usage_pct": 85.3,
+            "top_entry_point": "developer-copilot"
+          }
+        ],
+        "top_employees": [
+          {
+            "employee_id": "alice.ng",
+            "name": "Alice Ng",
+            "title": "VP Platform Engineering",
+            "team_name": "Platform Engineering",
+            "business_unit_name": "Product and Platform",
+            "requests_30d": 1420,
+            "spend_30d_usd": 12140,
+            "governed_usage_pct": 96.2,
+            "last_active_at": "2026-02-27T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Anthropic / claude-3.7-sonnet",
+            "top_entry_point": "developer-copilot"
+          },
+          {
+            "employee_id": "devon.ross",
+            "name": "Devon Ross",
+            "title": "Engineering Director",
+            "team_name": "Platform Engineering",
+            "business_unit_name": "Product and Platform",
+            "requests_30d": 1180,
+            "spend_30d_usd": 9780,
+            "governed_usage_pct": 94.0,
+            "last_active_at": "2026-02-28T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Google / gemini-2.0-flash",
+            "top_entry_point": "developer-copilot"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "IBM / granite-3.2",
+            "requests": 30180,
+            "spend_usd": 81100,
+            "pct_of_requests": 49.3
+          },
+          {
+            "label": "AWS / titan-text-premier",
+            "requests": 16410,
+            "spend_usd": 96200,
+            "pct_of_requests": 26.8
+          },
+          {
+            "label": "OpenAI / gpt-4o",
+            "requests": 14650,
+            "spend_usd": 37300,
+            "pct_of_requests": 23.9
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "developer-copilot",
+            "requests": 45860,
+            "spend_usd": 149400,
+            "pct_of_requests": 74.9
+          },
+          {
+            "label": "self-serve-chat",
+            "requests": 15380,
+            "spend_usd": 65200,
+            "pct_of_requests": 25.1
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 106,
+            "requests": 41340,
+            "spend_usd": 151300,
+            "governed_usage_pct": 78.2
+          },
+          {
+            "label": "Oct",
+            "active_employees": 121,
+            "requests": 45820,
+            "spend_usd": 166800,
+            "governed_usage_pct": 80.1
+          },
+          {
+            "label": "Nov",
+            "active_employees": 146,
+            "requests": 50260,
+            "spend_usd": 181900,
+            "governed_usage_pct": 82.9
+          },
+          {
+            "label": "Dec",
+            "active_employees": 162,
+            "requests": 54180,
+            "spend_usd": 191600,
+            "governed_usage_pct": 83.6
+          },
+          {
+            "label": "Jan",
+            "active_employees": 174,
+            "requests": 58320,
+            "spend_usd": 203400,
+            "governed_usage_pct": 84.7
+          },
+          {
+            "label": "Feb",
+            "active_employees": 188,
+            "requests": 61240,
+            "spend_usd": 214600,
+            "governed_usage_pct": 85.3
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Product and Platform is the strongest adoption engine in the company and sets the pacing signal for broader enterprise rollout.",
+            "detail": "This is where the platform can prove that internal AI usage is translating into recurring operating behavior instead of isolated technical experiments.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "70.1%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "This business unit accounts for the largest share of employee AI spend, but usage is also comparatively well governed.",
+            "detail": "High spend here is not automatically bad; it may reflect concentrated leverage in engineering workflows that serve the rest of the business.",
+            "metric_label": "30d spend",
+            "metric_value": "$214.6K"
+          },
+          {
+            "audience": "COO",
+            "headline": "Repeat usage indicates AI is embedded in engineering workflows, especially around developer copilots and self-serve technical assistance.",
+            "detail": "Operationally, this is the strongest evidence that AI is changing day-to-day behavior in the organization.",
+            "metric_label": "Repeat usage",
+            "metric_value": "71.8%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "Most usage is clustered on the lower-latency Gemini family and developer copilot surfaces rather than scattered across many disconnected tools.",
+            "detail": "That reduces architecture sprawl and makes optimization easier.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+28.0%"
+          }
+        ]
+      },
+      "business_unit:bu-customer-operations:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "business_unit",
+        "scope_id": "bu-customer-operations",
+        "scope_label": "Customer Operations",
+        "parent_scope_label": "NovaTech Industries",
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 214,
+          "active_employees_7d": 91,
+          "active_employees_30d": 126,
+          "adoption_penetration_pct": 58.9,
+          "repeat_user_rate_pct": 68.3,
+          "power_user_rate_pct": 18.1,
+          "governed_usage_pct": 87.4,
+          "intervention_rate_pct": 7.2,
+          "requests_30d": 34410,
+          "spend_30d_usd": 98600,
+          "spend_per_active_employee_usd": 782.5,
+          "requests_per_active_employee": 273.1,
+          "growth_vs_prior_pct": 19.3
+        },
+        "child_scopes": [
+          {
+            "scope_type": "team",
+            "scope_id": "team-customer-engineering",
+            "label": "Customer Engineering",
+            "eligible_employees": 214,
+            "active_employees_30d": 126,
+            "adoption_penetration_pct": 58.9,
+            "growth_vs_prior_pct": 19.3,
+            "requests_30d": 34410,
+            "spend_30d_usd": 98600,
+            "governed_usage_pct": 87.4,
+            "top_entry_point": "support-copilot"
+          }
+        ],
+        "top_employees": [
+          {
+            "employee_id": "maya.ford",
+            "name": "Maya Ford",
+            "title": "Customer Success Operations Lead",
+            "team_name": "Customer Engineering",
+            "business_unit_name": "Customer Operations",
+            "requests_30d": 1084,
+            "spend_30d_usd": 6480,
+            "governed_usage_pct": 98.0,
+            "last_active_at": "2026-02-28T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Alibaba / qwen-2.5",
+            "top_entry_point": "support-copilot"
+          },
+          {
+            "employee_id": "soren.lee",
+            "name": "Soren Lee",
+            "title": "Support Automation Lead",
+            "team_name": "Customer Engineering",
+            "business_unit_name": "Customer Operations",
+            "requests_30d": 892,
+            "spend_30d_usd": 5120,
+            "governed_usage_pct": 96.1,
+            "last_active_at": "2026-02-28T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "DeepSeek / deepseek-r1",
+            "top_entry_point": "support-copilot"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "Meta / llama-3.3-70b",
+            "requests": 17820,
+            "spend_usd": 49200,
+            "pct_of_requests": 51.8
+          },
+          {
+            "label": "Mistral AI / mistral-large",
+            "requests": 11640,
+            "spend_usd": 35700,
+            "pct_of_requests": 33.8
+          },
+          {
+            "label": "Cohere / command-r+",
+            "requests": 4950,
+            "spend_usd": 13700,
+            "pct_of_requests": 14.4
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "support-copilot",
+            "requests": 23840,
+            "spend_usd": 70100,
+            "pct_of_requests": 69.3
+          },
+          {
+            "label": "self-serve-chat",
+            "requests": 10570,
+            "spend_usd": 28500,
+            "pct_of_requests": 30.7
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 81,
+            "requests": 24110,
+            "spend_usd": 70300,
+            "governed_usage_pct": 79.8
+          },
+          {
+            "label": "Oct",
+            "active_employees": 88,
+            "requests": 26140,
+            "spend_usd": 74800,
+            "governed_usage_pct": 82.6
+          },
+          {
+            "label": "Nov",
+            "active_employees": 97,
+            "requests": 28420,
+            "spend_usd": 80100,
+            "governed_usage_pct": 84.3
+          },
+          {
+            "label": "Dec",
+            "active_employees": 108,
+            "requests": 30810,
+            "spend_usd": 86900,
+            "governed_usage_pct": 85.2
+          },
+          {
+            "label": "Jan",
+            "active_employees": 117,
+            "requests": 32780,
+            "spend_usd": 93200,
+            "governed_usage_pct": 86.5
+          },
+          {
+            "label": "Feb",
+            "active_employees": 126,
+            "requests": 34410,
+            "spend_usd": 98600,
+            "governed_usage_pct": 87.4
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Customer Operations shows that AI adoption is moving into front-line execution, not staying confined to engineering functions.",
+            "detail": "This is important because customer-facing workflow adoption tends to be the strongest proof that AI is operational, not experimental.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "58.9%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "Customer Operations has broad, relatively low-cost usage with strong governance coverage.",
+            "detail": "That pattern suggests AI is creating frequent operational leverage without requiring outsized per-user spend.",
+            "metric_label": "30d spend",
+            "metric_value": "$98.6K"
+          },
+          {
+            "audience": "COO",
+            "headline": "Repeat usage is strong and centered on support copilots, indicating real workflow embedment in customer-facing teams.",
+            "detail": "This is a strong operational signal for response quality, resolution speed, and consistency improvements.",
+            "metric_label": "Repeat usage",
+            "metric_value": "68.3%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "Most of the usage is concentrated in a narrow tool surface, which is easier to optimize and govern than a fragmented tool estate.",
+            "detail": "This keeps architecture sprawl under control while adoption grows.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+19.3%"
+          }
+        ]
+      },
+      "business_unit:bu-risk-and-trust:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "business_unit",
+        "scope_id": "bu-risk-and-trust",
+        "scope_label": "Risk and Trust",
+        "parent_scope_label": "NovaTech Industries",
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 156,
+          "active_employees_7d": 58,
+          "active_employees_30d": 82,
+          "adoption_penetration_pct": 52.6,
+          "repeat_user_rate_pct": 62.1,
+          "power_user_rate_pct": 19.5,
+          "governed_usage_pct": 91.0,
+          "intervention_rate_pct": 12.4,
+          "requests_30d": 22180,
+          "spend_30d_usd": 101400,
+          "spend_per_active_employee_usd": 1236.6,
+          "requests_per_active_employee": 270.5,
+          "growth_vs_prior_pct": 14.2
+        },
+        "child_scopes": [
+          {
+            "scope_type": "team",
+            "scope_id": "team-security",
+            "label": "Security",
+            "eligible_employees": 156,
+            "active_employees_30d": 82,
+            "adoption_penetration_pct": 52.6,
+            "growth_vs_prior_pct": 14.2,
+            "requests_30d": 22180,
+            "spend_30d_usd": 101400,
+            "governed_usage_pct": 91.0,
+            "top_entry_point": "security-workbench"
+          }
+        ],
+        "top_employees": [
+          {
+            "employee_id": "helen.ward",
+            "name": "Helen Ward",
+            "title": "Security Operations Manager",
+            "team_name": "Security",
+            "business_unit_name": "Risk and Trust",
+            "requests_30d": 860,
+            "spend_30d_usd": 7230,
+            "governed_usage_pct": 99.0,
+            "last_active_at": "2026-02-27T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Anthropic / claude-3.7-sonnet",
+            "top_entry_point": "security-workbench"
+          },
+          {
+            "employee_id": "rafael.mora",
+            "name": "Rafael Mora",
+            "title": "Threat Detection Engineer",
+            "team_name": "Security",
+            "business_unit_name": "Risk and Trust",
+            "requests_30d": 708,
+            "spend_30d_usd": 6110,
+            "governed_usage_pct": 98.0,
+            "last_active_at": "2026-02-28T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Google / gemini-2.0-flash",
+            "top_entry_point": "security-workbench"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "IBM / granite-3.2",
+            "requests": 13420,
+            "spend_usd": 70800,
+            "pct_of_requests": 60.5
+          },
+          {
+            "label": "AWS / titan-text-premier",
+            "requests": 4660,
+            "spend_usd": 11900,
+            "pct_of_requests": 21.0
+          },
+          {
+            "label": "OpenAI / gpt-4o",
+            "requests": 4100,
+            "spend_usd": 18700,
+            "pct_of_requests": 18.5
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "security-workbench",
+            "requests": 15280,
+            "spend_usd": 73300,
+            "pct_of_requests": 68.9
+          },
+          {
+            "label": "self-serve-chat",
+            "requests": 6900,
+            "spend_usd": 28100,
+            "pct_of_requests": 31.1
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 57,
+            "requests": 16820,
+            "spend_usd": 75200,
+            "governed_usage_pct": 87.2
+          },
+          {
+            "label": "Oct",
+            "active_employees": 61,
+            "requests": 18110,
+            "spend_usd": 81100,
+            "governed_usage_pct": 88.6
+          },
+          {
+            "label": "Nov",
+            "active_employees": 67,
+            "requests": 19340,
+            "spend_usd": 87600,
+            "governed_usage_pct": 89.4
+          },
+          {
+            "label": "Dec",
+            "active_employees": 72,
+            "requests": 20420,
+            "spend_usd": 92200,
+            "governed_usage_pct": 90.0
+          },
+          {
+            "label": "Jan",
+            "active_employees": 78,
+            "requests": 21410,
+            "spend_usd": 97200,
+            "governed_usage_pct": 90.7
+          },
+          {
+            "label": "Feb",
+            "active_employees": 82,
+            "requests": 22180,
+            "spend_usd": 101400,
+            "governed_usage_pct": 91.0
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Risk and Trust adoption is narrower than engineering, but it is still growing and becoming structurally embedded.",
+            "detail": "That matters because security and trust functions are often where organizations demand the highest governance maturity from AI systems.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "52.6%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "Per-user spend is comparatively high, but governance coverage is the strongest in the company.",
+            "detail": "That tradeoff can be reasonable when the use cases are high-value and control-sensitive.",
+            "metric_label": "30d spend",
+            "metric_value": "$101.4K"
+          },
+          {
+            "audience": "COO",
+            "headline": "The security workflow surface is concentrated, repeat, and clearly operational rather than ad hoc.",
+            "detail": "This is a sign of targeted workflow adoption rather than unfocused experimentation.",
+            "metric_label": "Repeat usage",
+            "metric_value": "62.1%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "The model mix is concentrated in stronger reasoning models, which aligns with the complexity of security analysis work.",
+            "detail": "The platform makes that concentration visible so optimization can happen deliberately rather than accidentally.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+14.2%"
+          }
+        ]
+      },
+      "business_unit:bu-finance-and-ops:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "business_unit",
+        "scope_id": "bu-finance-and-ops",
+        "scope_label": "Finance and Operations",
+        "parent_scope_label": "NovaTech Industries",
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 174,
+          "active_employees_7d": 58,
+          "active_employees_30d": 90,
+          "adoption_penetration_pct": 51.7,
+          "repeat_user_rate_pct": 56.7,
+          "power_user_rate_pct": 11.1,
+          "governed_usage_pct": 72.8,
+          "intervention_rate_pct": 10.5,
+          "requests_30d": 24550,
+          "spend_30d_usd": 53600,
+          "spend_per_active_employee_usd": 595.6,
+          "requests_per_active_employee": 272.8,
+          "growth_vs_prior_pct": 11.8
+        },
+        "child_scopes": [
+          {
+            "scope_type": "team",
+            "scope_id": "team-finance-systems",
+            "label": "Finance Systems",
+            "eligible_employees": 174,
+            "active_employees_30d": 90,
+            "adoption_penetration_pct": 51.7,
+            "growth_vs_prior_pct": 11.8,
+            "requests_30d": 24550,
+            "spend_30d_usd": 53600,
+            "governed_usage_pct": 72.8,
+            "top_entry_point": "finance-ops-assistant"
+          }
+        ],
+        "top_employees": [
+          {
+            "employee_id": "lena.price",
+            "name": "Lena Price",
+            "title": "Finance Systems Director",
+            "team_name": "Finance Systems",
+            "business_unit_name": "Finance and Operations",
+            "requests_30d": 544,
+            "spend_30d_usd": 2480,
+            "governed_usage_pct": 84.1,
+            "last_active_at": "2026-02-26T17:00:00Z",
+            "adoption_stage": "Embedded",
+            "top_model": "Alibaba / qwen-2.5",
+            "top_entry_point": "finance-ops-assistant"
+          },
+          {
+            "employee_id": "samir.bose",
+            "name": "Samir Bose",
+            "title": "Operations Program Manager",
+            "team_name": "Finance Systems",
+            "business_unit_name": "Finance and Operations",
+            "requests_30d": 482,
+            "spend_30d_usd": 2110,
+            "governed_usage_pct": 76.8,
+            "last_active_at": "2026-02-27T17:00:00Z",
+            "adoption_stage": "Embedded",
+            "top_model": "DeepSeek / deepseek-r1",
+            "top_entry_point": "operations-briefing"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "Meta / llama-3.3-70b",
+            "requests": 16420,
+            "spend_usd": 32800,
+            "pct_of_requests": 66.9
+          },
+          {
+            "label": "Mistral AI / mistral-large",
+            "requests": 4180,
+            "spend_usd": 13200,
+            "pct_of_requests": 17.0
+          },
+          {
+            "label": "Cohere / command-r+",
+            "requests": 3950,
+            "spend_usd": 7600,
+            "pct_of_requests": 16.1
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "finance-ops-assistant",
+            "requests": 14210,
+            "spend_usd": 30800,
+            "pct_of_requests": 57.9
+          },
+          {
+            "label": "operations-briefing",
+            "requests": 6820,
+            "spend_usd": 14100,
+            "pct_of_requests": 27.8
+          },
+          {
+            "label": "self-serve-chat",
+            "requests": 3520,
+            "spend_usd": 8700,
+            "pct_of_requests": 14.3
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 49,
+            "requests": 18320,
+            "spend_usd": 40100,
+            "governed_usage_pct": 65.8
+          },
+          {
+            "label": "Oct",
+            "active_employees": 58,
+            "requests": 19680,
+            "spend_usd": 43200,
+            "governed_usage_pct": 67.4
+          },
+          {
+            "label": "Nov",
+            "active_employees": 67,
+            "requests": 21010,
+            "spend_usd": 45800,
+            "governed_usage_pct": 69.9
+          },
+          {
+            "label": "Dec",
+            "active_employees": 74,
+            "requests": 22190,
+            "spend_usd": 48300,
+            "governed_usage_pct": 70.8
+          },
+          {
+            "label": "Jan",
+            "active_employees": 83,
+            "requests": 23560,
+            "spend_usd": 50900,
+            "governed_usage_pct": 72.0
+          },
+          {
+            "label": "Feb",
+            "active_employees": 90,
+            "requests": 24550,
+            "spend_usd": 53600,
+            "governed_usage_pct": 72.8
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Finance and Operations is adopting AI more cautiously, but the usage that exists is increasingly recurring and workflow-specific.",
+            "detail": "This is often the normal pattern for enterprise functions that optimize for control and accuracy over speed of experimentation.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "51.7%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "Per-user spend is low, which is healthy, but governed coverage still trails the rest of the company.",
+            "detail": "That suggests room to tighten controls as adoption broadens.",
+            "metric_label": "30d spend",
+            "metric_value": "$53.6K"
+          },
+          {
+            "audience": "COO",
+            "headline": "Repeat usage indicates AI is moving into planning, brief generation, and finance operations workflows, not just ad hoc prompts.",
+            "detail": "This matters because workflow embedment is what drives durable productivity gains.",
+            "metric_label": "Repeat usage",
+            "metric_value": "56.7%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "The model mix is economical and relatively concentrated, which should make optimization and governance straightforward as adoption grows.",
+            "detail": "The remaining gap is control maturity, not architecture sprawl.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+11.8%"
+          }
+        ]
+      },
+      "team:team-platform-engineering:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "team",
+        "scope_id": "team-platform-engineering",
+        "scope_label": "Platform Engineering",
+        "parent_scope_label": "Product and Platform",
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 268,
+          "active_employees_7d": 134,
+          "active_employees_30d": 188,
+          "adoption_penetration_pct": 70.1,
+          "repeat_user_rate_pct": 71.8,
+          "power_user_rate_pct": 24.5,
+          "governed_usage_pct": 85.3,
+          "intervention_rate_pct": 8.2,
+          "requests_30d": 61240,
+          "spend_30d_usd": 214600,
+          "spend_per_active_employee_usd": 1141.5,
+          "requests_per_active_employee": 325.7,
+          "growth_vs_prior_pct": 28.0
+        },
+        "child_scopes": [],
+        "top_employees": [
+          {
+            "employee_id": "alice.ng",
+            "name": "Alice Ng",
+            "title": "VP Platform Engineering",
+            "team_name": "Platform Engineering",
+            "business_unit_name": "Product and Platform",
+            "requests_30d": 1420,
+            "spend_30d_usd": 12140,
+            "governed_usage_pct": 96.2,
+            "last_active_at": "2026-02-27T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "OpenAI / gpt-4o",
+            "top_entry_point": "developer-copilot"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "IBM / granite-3.2",
+            "requests": 30180,
+            "spend_usd": 81100,
+            "pct_of_requests": 49.3
+          },
+          {
+            "label": "AWS / titan-text-premier",
+            "requests": 16410,
+            "spend_usd": 96200,
+            "pct_of_requests": 26.8
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "developer-copilot",
+            "requests": 45860,
+            "spend_usd": 149400,
+            "pct_of_requests": 74.9
+          },
+          {
+            "label": "self-serve-chat",
+            "requests": 15380,
+            "spend_usd": 65200,
+            "pct_of_requests": 25.1
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 106,
+            "requests": 41340,
+            "spend_usd": 151300,
+            "governed_usage_pct": 78.2
+          },
+          {
+            "label": "Oct",
+            "active_employees": 121,
+            "requests": 45820,
+            "spend_usd": 166800,
+            "governed_usage_pct": 80.1
+          },
+          {
+            "label": "Nov",
+            "active_employees": 146,
+            "requests": 50260,
+            "spend_usd": 181900,
+            "governed_usage_pct": 82.9
+          },
+          {
+            "label": "Dec",
+            "active_employees": 162,
+            "requests": 54180,
+            "spend_usd": 191600,
+            "governed_usage_pct": 83.6
+          },
+          {
+            "label": "Jan",
+            "active_employees": 174,
+            "requests": 58320,
+            "spend_usd": 203400,
+            "governed_usage_pct": 84.7
+          },
+          {
+            "label": "Feb",
+            "active_employees": 188,
+            "requests": 61240,
+            "spend_usd": 214600,
+            "governed_usage_pct": 85.3
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Platform Engineering is the clearest proof that AI is embedded in high-frequency internal work.",
+            "detail": "This team is both the earliest adopter and the strongest signal of whether AI workflow value is real.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "70.1%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "Spend is concentrated but governed, which is what you want to see in a high-leverage internal engineering surface.",
+            "detail": "The cost is visible, attributable, and paired with repeat usage.",
+            "metric_label": "30d spend",
+            "metric_value": "$214.6K"
+          },
+          {
+            "audience": "COO",
+            "headline": "The workflow is clearly embedded in recurring developer activity rather than being an optional side tool.",
+            "detail": "That indicates operational dependency, not novelty.",
+            "metric_label": "Repeat usage",
+            "metric_value": "71.8%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "This team shows the architecture pattern leadership should want: strong adoption, concentrated entry points, and model selection that is visible enough to optimize.",
+            "detail": "It is a tractable operating surface, not a black box.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+28.0%"
+          }
+        ]
+      },
+      "team:team-customer-engineering:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "team",
+        "scope_id": "team-customer-engineering",
+        "scope_label": "Customer Engineering",
+        "parent_scope_label": "Customer Operations",
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 214,
+          "active_employees_7d": 91,
+          "active_employees_30d": 126,
+          "adoption_penetration_pct": 58.9,
+          "repeat_user_rate_pct": 68.3,
+          "power_user_rate_pct": 18.1,
+          "governed_usage_pct": 87.4,
+          "intervention_rate_pct": 7.2,
+          "requests_30d": 34410,
+          "spend_30d_usd": 98600,
+          "spend_per_active_employee_usd": 782.5,
+          "requests_per_active_employee": 273.1,
+          "growth_vs_prior_pct": 19.3
+        },
+        "child_scopes": [],
+        "top_employees": [
+          {
+            "employee_id": "maya.ford",
+            "name": "Maya Ford",
+            "title": "Customer Success Operations Lead",
+            "team_name": "Customer Engineering",
+            "business_unit_name": "Customer Operations",
+            "requests_30d": 1084,
+            "spend_30d_usd": 6480,
+            "governed_usage_pct": 98.0,
+            "last_active_at": "2026-02-28T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Meta / llama-3.3-70b",
+            "top_entry_point": "support-copilot"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "Anthropic / claude-3.7-sonnet",
+            "requests": 17820,
+            "spend_usd": 49200,
+            "pct_of_requests": 51.8
+          },
+          {
+            "label": "Google / gemini-2.0-flash",
+            "requests": 11640,
+            "spend_usd": 35700,
+            "pct_of_requests": 33.8
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "support-copilot",
+            "requests": 23840,
+            "spend_usd": 70100,
+            "pct_of_requests": 69.3
+          },
+          {
+            "label": "self-serve-chat",
+            "requests": 10570,
+            "spend_usd": 28500,
+            "pct_of_requests": 30.7
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 81,
+            "requests": 24110,
+            "spend_usd": 70300,
+            "governed_usage_pct": 79.8
+          },
+          {
+            "label": "Oct",
+            "active_employees": 88,
+            "requests": 26140,
+            "spend_usd": 74800,
+            "governed_usage_pct": 82.6
+          },
+          {
+            "label": "Nov",
+            "active_employees": 97,
+            "requests": 28420,
+            "spend_usd": 80100,
+            "governed_usage_pct": 84.3
+          },
+          {
+            "label": "Dec",
+            "active_employees": 108,
+            "requests": 30810,
+            "spend_usd": 86900,
+            "governed_usage_pct": 85.2
+          },
+          {
+            "label": "Jan",
+            "active_employees": 117,
+            "requests": 32780,
+            "spend_usd": 93200,
+            "governed_usage_pct": 86.5
+          },
+          {
+            "label": "Feb",
+            "active_employees": 126,
+            "requests": 34410,
+            "spend_usd": 98600,
+            "governed_usage_pct": 87.4
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Customer Engineering proves that AI adoption is showing up in front-line operational work, not just internal platform teams.",
+            "detail": "That is a critical signal for whether AI usage is becoming enterprise behavior.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "58.9%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "Usage is broad and fairly efficient on a per-employee basis, with strong governance coverage already attached.",
+            "detail": "This is the profile of scalable operational adoption rather than unchecked experimentation.",
+            "metric_label": "30d spend",
+            "metric_value": "$98.6K"
+          },
+          {
+            "audience": "COO",
+            "headline": "Support copilots are becoming part of recurring operating rhythm, which is where customer-facing leverage tends to show up first.",
+            "detail": "The repeat-rate signal is what separates meaningful adoption from curiosity.",
+            "metric_label": "Repeat usage",
+            "metric_value": "68.3%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "The tool and model mix is concentrated enough to optimize without creating a fragmented technical estate.",
+            "detail": "That keeps technical and governance debt manageable as usage grows.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+19.3%"
+          }
+        ]
+      },
+      "team:team-security:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "team",
+        "scope_id": "team-security",
+        "scope_label": "Security",
+        "parent_scope_label": "Risk and Trust",
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 156,
+          "active_employees_7d": 58,
+          "active_employees_30d": 82,
+          "adoption_penetration_pct": 52.6,
+          "repeat_user_rate_pct": 62.1,
+          "power_user_rate_pct": 19.5,
+          "governed_usage_pct": 91.0,
+          "intervention_rate_pct": 12.4,
+          "requests_30d": 22180,
+          "spend_30d_usd": 101400,
+          "spend_per_active_employee_usd": 1236.6,
+          "requests_per_active_employee": 270.5,
+          "growth_vs_prior_pct": 14.2
+        },
+        "child_scopes": [],
+        "top_employees": [
+          {
+            "employee_id": "helen.ward",
+            "name": "Helen Ward",
+            "title": "Security Operations Manager",
+            "team_name": "Security",
+            "business_unit_name": "Risk and Trust",
+            "requests_30d": 860,
+            "spend_30d_usd": 7230,
+            "governed_usage_pct": 99.0,
+            "last_active_at": "2026-02-27T17:00:00Z",
+            "adoption_stage": "Power user",
+            "top_model": "Alibaba / qwen-2.5",
+            "top_entry_point": "security-workbench"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "Mistral AI / mistral-large",
+            "requests": 13420,
+            "spend_usd": 70800,
+            "pct_of_requests": 60.5
+          },
+          {
+            "label": "Cohere / command-r+",
+            "requests": 4660,
+            "spend_usd": 11900,
+            "pct_of_requests": 21.0
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "security-workbench",
+            "requests": 15280,
+            "spend_usd": 73300,
+            "pct_of_requests": 68.9
+          },
+          {
+            "label": "self-serve-chat",
+            "requests": 6900,
+            "spend_usd": 28100,
+            "pct_of_requests": 31.1
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 57,
+            "requests": 16820,
+            "spend_usd": 75200,
+            "governed_usage_pct": 87.2
+          },
+          {
+            "label": "Oct",
+            "active_employees": 61,
+            "requests": 18110,
+            "spend_usd": 81100,
+            "governed_usage_pct": 88.6
+          },
+          {
+            "label": "Nov",
+            "active_employees": 67,
+            "requests": 19340,
+            "spend_usd": 87600,
+            "governed_usage_pct": 89.4
+          },
+          {
+            "label": "Dec",
+            "active_employees": 72,
+            "requests": 20420,
+            "spend_usd": 92200,
+            "governed_usage_pct": 90.0
+          },
+          {
+            "label": "Jan",
+            "active_employees": 78,
+            "requests": 21410,
+            "spend_usd": 97200,
+            "governed_usage_pct": 90.7
+          },
+          {
+            "label": "Feb",
+            "active_employees": 82,
+            "requests": 22180,
+            "spend_usd": 101400,
+            "governed_usage_pct": 91.0
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Security adoption is narrower than engineering adoption, but it is clearly real and increasingly embedded.",
+            "detail": "This shows the platform can measure AI uptake in high-control functions, not only in permissive ones.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "52.6%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "This is a high-control, higher-cost usage pattern, but governance coverage is strongest here.",
+            "detail": "That suggests cost concentration is paired with legitimate control-sensitive work.",
+            "metric_label": "30d spend",
+            "metric_value": "$101.4K"
+          },
+          {
+            "audience": "COO",
+            "headline": "The team is using AI repeatedly inside one primary workflow, which is a sign of actual embedment.",
+            "detail": "That is a more meaningful signal than raw request counts alone.",
+            "metric_label": "Repeat usage",
+            "metric_value": "62.1%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "The technical posture is concentrated, auditable, and relatively easy to govern.",
+            "detail": "The model mix is visible and the entry points are narrow enough for active optimization later.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+14.2%"
+          }
+        ]
+      },
+      "team:team-finance-systems:30": {
+        "generated_at": "2026-02-28T17:00:00Z",
+        "scope_type": "team",
+        "scope_id": "team-finance-systems",
+        "scope_label": "Finance Systems",
+        "parent_scope_label": "Finance and Operations",
+        "window_days": 30,
+        "summary": {
+          "eligible_employees": 174,
+          "active_employees_7d": 58,
+          "active_employees_30d": 90,
+          "adoption_penetration_pct": 51.7,
+          "repeat_user_rate_pct": 56.7,
+          "power_user_rate_pct": 11.1,
+          "governed_usage_pct": 72.8,
+          "intervention_rate_pct": 10.5,
+          "requests_30d": 24550,
+          "spend_30d_usd": 53600,
+          "spend_per_active_employee_usd": 595.6,
+          "requests_per_active_employee": 272.8,
+          "growth_vs_prior_pct": 11.8
+        },
+        "child_scopes": [],
+        "top_employees": [
+          {
+            "employee_id": "lena.price",
+            "name": "Lena Price",
+            "title": "Finance Systems Director",
+            "team_name": "Finance Systems",
+            "business_unit_name": "Finance and Operations",
+            "requests_30d": 544,
+            "spend_30d_usd": 2480,
+            "governed_usage_pct": 84.1,
+            "last_active_at": "2026-02-26T17:00:00Z",
+            "adoption_stage": "Embedded",
+            "top_model": "AWS / titan-text-premier",
+            "top_entry_point": "finance-ops-assistant"
+          }
+        ],
+        "model_mix": [
+          {
+            "label": "DeepSeek / deepseek-r1",
+            "requests": 16420,
+            "spend_usd": 32800,
+            "pct_of_requests": 66.9
+          },
+          {
+            "label": "IBM / granite-3.2",
+            "requests": 4180,
+            "spend_usd": 13200,
+            "pct_of_requests": 17.0
+          }
+        ],
+        "entry_point_mix": [
+          {
+            "label": "finance-ops-assistant",
+            "requests": 14210,
+            "spend_usd": 30800,
+            "pct_of_requests": 57.9
+          },
+          {
+            "label": "operations-briefing",
+            "requests": 6820,
+            "spend_usd": 14100,
+            "pct_of_requests": 27.8
+          }
+        ],
+        "trend": [
+          {
+            "label": "Sep",
+            "active_employees": 49,
+            "requests": 18320,
+            "spend_usd": 40100,
+            "governed_usage_pct": 65.8
+          },
+          {
+            "label": "Oct",
+            "active_employees": 58,
+            "requests": 19680,
+            "spend_usd": 43200,
+            "governed_usage_pct": 67.4
+          },
+          {
+            "label": "Nov",
+            "active_employees": 67,
+            "requests": 21010,
+            "spend_usd": 45800,
+            "governed_usage_pct": 69.9
+          },
+          {
+            "label": "Dec",
+            "active_employees": 74,
+            "requests": 22190,
+            "spend_usd": 48300,
+            "governed_usage_pct": 70.8
+          },
+          {
+            "label": "Jan",
+            "active_employees": 83,
+            "requests": 23560,
+            "spend_usd": 50900,
+            "governed_usage_pct": 72.0
+          },
+          {
+            "label": "Feb",
+            "active_employees": 90,
+            "requests": 24550,
+            "spend_usd": 53600,
+            "governed_usage_pct": 72.8
+          }
+        ],
+        "executive_lenses": [
+          {
+            "audience": "CEO",
+            "headline": "Finance Systems adoption is rising, but this remains a relatively early-stage operating surface compared with engineering and support.",
+            "detail": "That is expected for more control-sensitive business functions and is still useful to track explicitly.",
+            "metric_label": "Adoption penetration",
+            "metric_value": "51.7%"
+          },
+          {
+            "audience": "CFO",
+            "headline": "Per-user spend is low and therefore economically healthy, but governance maturity still has room to improve.",
+            "detail": "This is the kind of business unit where disciplined adoption can scale cleanly if control posture catches up.",
+            "metric_label": "30d spend",
+            "metric_value": "$53.6K"
+          },
+          {
+            "audience": "COO",
+            "headline": "Usage is starting to embed in finance and operations workflows, especially recurring briefing and assistant tasks.",
+            "detail": "That suggests the team is crossing from experimentation into process support.",
+            "metric_label": "Repeat usage",
+            "metric_value": "56.7%"
+          },
+          {
+            "audience": "CTO",
+            "headline": "The model and entry-point surface remains narrow, which is a good position for scaling governance and optimization later.",
+            "detail": "This is not yet a sprawl problem.",
+            "metric_label": "Growth vs prior",
+            "metric_value": "+11.8%"
+          }
+        ]
+      }
+    }
+  },
+  "teams": [
+    {
+      "id": "plat",
+      "name": "Platform Engineering",
+      "lead": "Sarah Chen",
+      "headcount": 42,
+      "spend_usd": 218400,
+      "previous_spend_usd": 198200,
+      "budget_usd": 250000,
+      "optimization_potential_usd": 31200,
+      "optimization_pct": 14.3,
+      "top_workload": "Code Intelligence",
+      "top_models": [
+        "claude-3.7-sonnet",
+        "llama-3.3-70b",
+        "mistral-large"
+      ],
+      "cloud": "AWS",
+      "trac_usd": 226900
+    },
+    {
+      "id": "ml",
+      "name": "ML Engineering",
+      "lead": "David Kim",
+      "headcount": 28,
+      "spend_usd": 187600,
+      "previous_spend_usd": 172100,
+      "budget_usd": 200000,
+      "optimization_potential_usd": 42800,
+      "optimization_pct": 22.8,
+      "top_workload": "Training Pipeline",
+      "top_models": [
+        "gpt-4o",
+        "gemini-2.0-flash",
+        "deepseek-r1"
+      ],
+      "cloud": "GCP",
+      "trac_usd": 198400
+    },
+    {
+      "id": "prod",
+      "name": "Product",
+      "lead": "Maria Santos",
+      "headcount": 35,
+      "spend_usd": 134200,
+      "previous_spend_usd": 108900,
+      "budget_usd": 150000,
+      "optimization_potential_usd": 18900,
+      "optimization_pct": 14.1,
+      "top_workload": "Customer Copilot",
+      "top_models": [
+        "gpt-4o-mini",
+        "command-r+",
+        "titan-text-premier"
+      ],
+      "cloud": "AWS",
+      "trac_usd": 139800
+    },
+    {
+      "id": "data",
+      "name": "Data Science",
+      "lead": "James Walsh",
+      "headcount": 22,
+      "spend_usd": 98700,
+      "previous_spend_usd": 87400,
+      "budget_usd": 120000,
+      "optimization_potential_usd": 15200,
+      "optimization_pct": 15.4,
+      "top_workload": "Analytics Engine",
+      "top_models": [
+        "gemini-2.0-flash",
+        "deepseek-r1",
+        "qwen-2.5"
+      ],
+      "cloud": "Azure",
+      "trac_usd": 104200
+    },
+    {
+      "id": "cust",
+      "name": "Customer Engineering",
+      "lead": "Priya Patel",
+      "headcount": 18,
+      "spend_usd": 76300,
+      "previous_spend_usd": 71200,
+      "budget_usd": 90000,
+      "optimization_potential_usd": 22100,
+      "optimization_pct": 29.0,
+      "top_workload": "Support Automation",
+      "top_models": [
+        "claude-3.7-sonnet",
+        "command-r+",
+        "titan-text-premier"
+      ],
+      "cloud": "AWS",
+      "trac_usd": 82100
+    },
+    {
+      "id": "sec",
+      "name": "Security",
+      "lead": "Alex Okafor",
+      "headcount": 15,
+      "spend_usd": 52400,
+      "previous_spend_usd": 48700,
+      "budget_usd": 70000,
+      "optimization_potential_usd": 8400,
+      "optimization_pct": 16.0,
+      "top_workload": "Threat Analysis",
+      "top_models": [
+        "claude-3.7-sonnet",
+        "granite-3.2",
+        "gpt-4o"
+      ],
+      "cloud": "Azure",
+      "trac_usd": 55900
+    },
+    {
+      "id": "res",
+      "name": "Research",
+      "lead": "Dr. Lin Zhang",
+      "headcount": 12,
+      "spend_usd": 43800,
+      "previous_spend_usd": 39200,
+      "budget_usd": 60000,
+      "optimization_potential_usd": 6900,
+      "optimization_pct": 15.8,
+      "top_workload": "Literature Analysis",
+      "top_models": [
+        "deepseek-r1",
+        "llama-3.3-70b",
+        "gemini-1.5-pro"
+      ],
+      "cloud": "GCP",
+      "trac_usd": 49200
+    },
+    {
+      "id": "mkt",
+      "name": "Marketing",
+      "lead": "Rachel Green",
+      "headcount": 20,
+      "spend_usd": 35600,
+      "previous_spend_usd": 28400,
+      "budget_usd": 45000,
+      "optimization_potential_usd": 9200,
+      "optimization_pct": 25.8,
+      "top_workload": "Content Generation",
+      "top_models": [
+        "gpt-4o-mini",
+        "gemini-2.0-flash",
+        "mistral-large"
+      ],
+      "cloud": "AWS",
+      "trac_usd": 38100
+    }
+  ],
+  "models": [
+    {
+      "name": "gpt-4o",
+      "provider": "OpenAI",
+      "spend_usd": 173000,
+      "requests": 5600000,
+      "latency_p95_ms": 1180,
+      "cost_per_1k_tokens_usd": 0.046,
+      "teams": 6,
+      "trend_pct": 11.2,
+      "optimization_potential_usd": 18100,
+      "cost_variance": "2.8x"
+    },
+    {
+      "name": "gpt-4o-mini",
+      "provider": "OpenAI",
+      "spend_usd": 59000,
+      "requests": 10400000,
+      "latency_p95_ms": 540,
+      "cost_per_1k_tokens_usd": 0.012,
+      "teams": 7,
+      "trend_pct": 16.8,
+      "optimization_potential_usd": 6200,
+      "cost_variance": "1.0x"
+    },
+    {
+      "name": "claude-3.7-sonnet",
+      "provider": "Anthropic",
+      "spend_usd": 128000,
+      "requests": 4100000,
+      "latency_p95_ms": 1320,
+      "cost_per_1k_tokens_usd": 0.041,
+      "teams": 5,
+      "trend_pct": 19.4,
+      "optimization_potential_usd": 14900,
+      "cost_variance": "2.4x"
+    },
+    {
+      "name": "gemini-2.0-flash",
+      "provider": "Google",
+      "spend_usd": 119000,
+      "requests": 4600000,
+      "latency_p95_ms": 920,
+      "cost_per_1k_tokens_usd": 0.028,
+      "teams": 6,
+      "trend_pct": 14.1,
+      "optimization_potential_usd": 12100,
+      "cost_variance": "1.7x"
+    },
+    {
+      "name": "gemini-1.5-pro",
+      "provider": "Google",
+      "spend_usd": 47000,
+      "requests": 1400000,
+      "latency_p95_ms": 1410,
+      "cost_per_1k_tokens_usd": 0.031,
+      "teams": 4,
+      "trend_pct": 8.6,
+      "optimization_potential_usd": 5200,
+      "cost_variance": "1.9x"
+    },
+    {
+      "name": "llama-3.3-70b",
+      "provider": "Meta",
+      "spend_usd": 76000,
+      "requests": 3200000,
+      "latency_p95_ms": 870,
+      "cost_per_1k_tokens_usd": 0.019,
+      "teams": 5,
+      "trend_pct": 22.1,
+      "optimization_potential_usd": 9300,
+      "cost_variance": "1.2x"
+    },
+    {
+      "name": "mistral-large",
+      "provider": "Mistral AI",
+      "spend_usd": 54000,
+      "requests": 2800000,
+      "latency_p95_ms": 760,
+      "cost_per_1k_tokens_usd": 0.017,
+      "teams": 4,
+      "trend_pct": 17.2,
+      "optimization_potential_usd": 7600,
+      "cost_variance": "1.1x"
+    },
+    {
+      "name": "command-r+",
+      "provider": "Cohere",
+      "spend_usd": 43000,
+      "requests": 1700000,
+      "latency_p95_ms": 980,
+      "cost_per_1k_tokens_usd": 0.022,
+      "teams": 3,
+      "trend_pct": 13.5,
+      "optimization_potential_usd": 5100,
+      "cost_variance": "1.3x"
+    },
+    {
+      "name": "qwen-2.5",
+      "provider": "Alibaba",
+      "spend_usd": 29000,
+      "requests": 1500000,
+      "latency_p95_ms": 810,
+      "cost_per_1k_tokens_usd": 0.016,
+      "teams": 3,
+      "trend_pct": 11.9,
+      "optimization_potential_usd": 3600,
+      "cost_variance": "1.1x"
+    },
+    {
+      "name": "deepseek-r1",
+      "provider": "DeepSeek",
+      "spend_usd": 51000,
+      "requests": 5700000,
+      "latency_p95_ms": 690,
+      "cost_per_1k_tokens_usd": 0.009,
+      "teams": 4,
+      "trend_pct": 24.8,
+      "optimization_potential_usd": 6700,
+      "cost_variance": "0.8x"
+    },
+    {
+      "name": "granite-3.2",
+      "provider": "IBM",
+      "spend_usd": 31000,
+      "requests": 900000,
+      "latency_p95_ms": 1040,
+      "cost_per_1k_tokens_usd": 0.024,
+      "teams": 2,
+      "trend_pct": 9.3,
+      "optimization_potential_usd": 2900,
+      "cost_variance": "1.4x"
+    },
+    {
+      "name": "titan-text-premier",
+      "provider": "AWS",
+      "spend_usd": 37000,
+      "requests": 2340000,
+      "latency_p95_ms": 840,
+      "cost_per_1k_tokens_usd": 0.018,
+      "teams": 4,
+      "trend_pct": 12.7,
+      "optimization_potential_usd": 4300,
+      "cost_variance": "1.2x"
+    }
+  ],
+  "optimization_categories": [
+    {
+      "name": "Model over-provisioning",
+      "value_usd": 62800,
+      "description": "High-cost models used where validated lower-cost equivalents exist",
+      "color": "#ef4545"
+    },
+    {
+      "name": "Duplicate requests",
+      "value_usd": 29100,
+      "description": "Repeated inference payloads without semantic-cache policy",
+      "color": "#9166f0"
+    },
+    {
+      "name": "Staging and dev sprawl",
+      "value_usd": 22800,
+      "description": "Non-production workloads consuming production-tier models",
+      "color": "#eda82e"
+    },
+    {
+      "name": "Prompt inefficiency",
+      "value_usd": 13900,
+      "description": "Token inflation from verbose templates and repeated context",
+      "color": "#4a8cf7"
+    },
+    {
+      "name": "Batch mispricing",
+      "value_usd": 6300,
+      "description": "Eligible deferred workloads still running on on-demand pricing",
+      "color": "#17bec8"
+    }
+  ],
+  "attribution_requests": [
+    {
+      "id": "req_7f3a9b2e",
+      "time": "14:23:17",
+      "model": "gpt-4o",
+      "input_tokens": 3847,
+      "output_tokens": 512,
+      "cost_usd": 0.0234,
+      "latency_ms": 11,
+      "mode": "Advisory",
+      "confidence": 0.96,
+      "trac_usd": 0.0248,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0234,
+        "confidence_risk_premium_usd": 0.0014,
+        "total_usd": 0.0248
+      },
+      "enrichment": {
+        "alternate_model": "gpt-4o-mini (equivalence verified, -72% cost)",
+        "headers": "X-ACI-Est-Cost-USD: 0.0234 | X-ACI-Alternative-Model: gpt-4o-mini | X-ACI-Confidence: 0.96"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "gpt-4o (OpenAI) via AWS Bedrock",
+          "source": "Cloud telemetry",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "customer-copilot-prod (EKS us-east-1)",
+          "source": "CI/CD deployment run #4821",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "copilot-service/src/chains/support.py",
+          "source": "GitHub CODEOWNERS",
+          "method": "R1: direct match",
+          "confidence": 0.98
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "maria.santos@novatech.example",
+          "source": "Okta SSO and service-account map",
+          "method": "R2: temporal correlation",
+          "confidence": 0.94
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Product Engineering",
+          "source": "HR hierarchy sync",
+          "method": "R1: direct match",
+          "confidence": 0.96
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-4200 | GL 6120-AI-Services",
+          "source": "ERP cost center map",
+          "method": "R1: direct match",
+          "confidence": 0.96
+        }
+      ]
+    },
+    {
+      "id": "req_2c8d4e1f",
+      "time": "14:23:14",
+      "model": "gemini-2.0-flash",
+      "input_tokens": 8421,
+      "output_tokens": 1204,
+      "cost_usd": 0.0583,
+      "latency_ms": 8,
+      "mode": "Advisory",
+      "confidence": 0.91,
+      "trac_usd": 0.0637,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0583,
+        "confidence_risk_premium_usd": 0.0054,
+        "total_usd": 0.0637
+      },
+      "enrichment": {
+        "alternate_model": "No verified equivalent for this code-review workload",
+        "headers": "X-ACI-Est-Cost-USD: 0.0583 | X-ACI-Confidence: 0.91"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "gemini-2.0-flash (Google) direct API",
+          "source": "API gateway logs",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "code-intel-prod (EKS us-west-2)",
+          "source": "CI/CD run #1247",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "code-intelligence/src/review/patch.py",
+          "source": "GitHub commit lineage",
+          "method": "R2: temporal correlation",
+          "confidence": 0.89
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "sarah.chen@novatech.example",
+          "source": "GitHub actor and Okta identity join",
+          "method": "R2: temporal correlation",
+          "confidence": 0.86
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Platform Engineering",
+          "source": "Org hierarchy graph",
+          "method": "R1: direct match",
+          "confidence": 0.94
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-3100 | GL 6120-AI-Services",
+          "source": "ERP allocation policy",
+          "method": "R1: direct match",
+          "confidence": 0.91
+        }
+      ]
+    },
+    {
+      "id": "req_e4f21a8c",
+      "time": "14:23:11",
+      "model": "gpt-4o-mini",
+      "input_tokens": 1284,
+      "output_tokens": 89,
+      "cost_usd": 0.0009,
+      "latency_ms": 4,
+      "mode": "Advisory",
+      "confidence": 0.72,
+      "trac_usd": 0.0013,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0009,
+        "confidence_risk_premium_usd": 0.0004,
+        "total_usd": 0.0013
+      },
+      "enrichment": {
+        "alternate_model": "Already on lowest-cost verified model",
+        "headers": "X-ACI-Est-Cost-USD: 0.0009 | X-ACI-Confidence: 0.72 | X-ACI-Confidence-Flag: provisional"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "gpt-4o-mini (OpenAI) via Azure OpenAI",
+          "source": "Azure monitor",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "support-bot-staging",
+          "source": "Kubernetes metadata",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "support-bot/src/router.ts",
+          "source": "Git path ownership",
+          "method": "R1: direct match",
+          "confidence": 0.93
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "svc.support@novatech.example",
+          "source": "Service identity map",
+          "method": "R3: naming heuristic",
+          "confidence": 0.69
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Customer Engineering",
+          "source": "Org hierarchy map",
+          "method": "R1: direct match",
+          "confidence": 0.75
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-2800 | GL 6120-AI-Services",
+          "source": "Cost center policy",
+          "method": "R2: temporal correlation",
+          "confidence": 0.72
+        }
+      ]
+    },
+    {
+      "id": "req_c9a18d42",
+      "time": "14:23:08",
+      "model": "gemini-1.5-pro",
+      "input_tokens": 12540,
+      "output_tokens": 1410,
+      "cost_usd": 0.0418,
+      "latency_ms": 13,
+      "mode": "Advisory",
+      "confidence": 0.88,
+      "trac_usd": 0.0454,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0418,
+        "confidence_risk_premium_usd": 0.0036,
+        "total_usd": 0.0454
+      },
+      "enrichment": {
+        "alternate_model": "gemini-2.0-flash (candidate for lower-latency analytics workloads)",
+        "headers": "X-ACI-Est-Cost-USD: 0.0418 | X-ACI-Confidence: 0.88 | X-ACI-Optimization-Flag: review"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "gemini-1.5-pro (Google) via Vertex AI",
+          "source": "Vertex request telemetry",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "research-assistant-prod (GKE us-central1)",
+          "source": "Deployment metadata and runtime tags",
+          "method": "R1: direct match",
+          "confidence": 0.97
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "research-assistant/src/analysis/briefing.py",
+          "source": "GitHub CODEOWNERS and recent merge lineage",
+          "method": "R2: temporal correlation",
+          "confidence": 0.86
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "helen.ward@novatech.example",
+          "source": "Okta SSO and workload service-account join",
+          "method": "R2: temporal correlation",
+          "confidence": 0.83
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Research",
+          "source": "Org hierarchy graph",
+          "method": "R1: direct match",
+          "confidence": 0.9
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-5400 | GL 6120-AI-Services",
+          "source": "Research chargeback policy",
+          "method": "R2: temporal correlation",
+          "confidence": 0.88
+        }
+      ]
+    },
+    {
+      "id": "req_5ab71e0c",
+      "time": "14:23:04",
+      "model": "gpt-4.1",
+      "input_tokens": 6240,
+      "output_tokens": 944,
+      "cost_usd": 0.0331,
+      "latency_ms": 16,
+      "mode": "Advisory",
+      "confidence": 0.81,
+      "trac_usd": 0.0366,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0331,
+        "confidence_risk_premium_usd": 0.0035,
+        "total_usd": 0.0366
+      },
+      "enrichment": {
+        "alternate_model": "gpt-4o (candidate after policy review and equivalence verification)",
+        "headers": "X-ACI-Est-Cost-USD: 0.0331 | X-ACI-Confidence: 0.81 | X-ACI-Confidence-Flag: review"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "gpt-4.1 (OpenAI) via Azure OpenAI",
+          "source": "Azure request logs",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "finance-ops-assistant-prod",
+          "source": "Kubernetes metadata and CI provenance",
+          "method": "R1: direct match",
+          "confidence": 0.94
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "finance-assistant/src/close/variance_review.ts",
+          "source": "Git path ownership",
+          "method": "R1: direct match",
+          "confidence": 0.91
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "rachel.green@novatech.example",
+          "source": "Okta actor join and session correlation",
+          "method": "R2: temporal correlation",
+          "confidence": 0.78
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Finance Systems",
+          "source": "Workday hierarchy sync",
+          "method": "R1: direct match",
+          "confidence": 0.84
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-6100 | GL 6120-AI-Services",
+          "source": "Finance operating plan mapping",
+          "method": "R3: naming heuristic",
+          "confidence": 0.81
+        }
+      ]
+    }
+  ],
+  "interventions": [
+    {
+      "id": "INT-401",
+      "title": "Route fallback traffic from gpt-4o to gpt-4o-mini",
+      "type": "Model Routing",
+      "status": "recommended",
+      "savings_usd_month": 31200,
+      "confidence_pct": 94,
+      "risk": "low",
+      "team": "Product",
+      "detail": "2.1M fallback requests analyzed. 97.3% quality parity in Mode 2a shadow evaluation.",
+      "equivalence_mode": "Empirical (Mode 2a)",
+      "equivalence_status": "verified",
+      "methodology": {
+        "category": "Model over-provisioning",
+        "threshold": "Triggered by 2.1M monthly fallback requests and a 72% cost differential",
+        "rule": "Route candidate when cost differential > 50% and equivalence confidence >= 0.93"
+      }
+    },
+    {
+      "id": "INT-402",
+      "title": "Apply input-token guardrail to analytics-batch",
+      "type": "Token Governance",
+      "status": "review",
+      "savings_usd_month": 14800,
+      "confidence_pct": 89,
+      "risk": "medium",
+      "team": "ML Engineering",
+      "detail": "95th percentile prompt size is 4.2K. Capping at 3.5K removes outlier spend without quality regression.",
+      "equivalence_mode": "Policy floor",
+      "equivalence_status": "conditional",
+      "methodology": {
+        "category": "Prompt inefficiency",
+        "threshold": "Triggered when p95 input tokens exceed policy floor by more than 20%",
+        "rule": "Recommend prompt compaction and gate at 3.5K tokens when p95 > 4K"
+      }
+    },
+    {
+      "id": "INT-403",
+      "title": "Enable semantic cache for deterministic support prompts",
+      "type": "Semantic Cache",
+      "status": "implemented",
+      "savings_usd_month": 10200,
+      "confidence_pct": 92,
+      "risk": "low",
+      "team": "Customer Engineering",
+      "detail": "Cache hit rate stabilized at 38% with no measurable quality drop for deterministic FAQ patterns.",
+      "equivalence_mode": "Empirical (Mode 2a)",
+      "equivalence_status": "verified",
+      "methodology": {
+        "category": "Duplicate requests",
+        "threshold": "Triggered by > 30% semantically duplicate prompts in a 7-day window",
+        "rule": "Recommend semantic cache when duplicate ratio exceeds 0.30 and latency budget remains under 20ms"
+      }
+    },
+    {
+      "id": "INT-404",
+      "title": "Restrict staging model allowlist to low-cost equivalents",
+      "type": "Policy Enforcement",
+      "status": "recommended",
+      "savings_usd_month": 22800,
+      "confidence_pct": 87,
+      "risk": "medium",
+      "team": "Platform Engineering",
+      "detail": "Staging traffic is using production-tier models for integration tests without quality benefit.",
+      "equivalence_mode": "Policy (Mode 1)",
+      "equivalence_status": "policy",
+      "methodology": {
+        "category": "Staging and dev sprawl",
+        "threshold": "Triggered by > 25% of staging requests using frontier-tier models",
+        "rule": "Apply staging allowlist when non-production frontier use exceeds 20%"
+      }
+    },
+    {
+      "id": "INT-405",
+      "title": "Batch low-priority nightly summarization jobs",
+      "type": "Workload Scheduling",
+      "status": "recommended",
+      "savings_usd_month": 17400,
+      "confidence_pct": 84,
+      "risk": "medium",
+      "team": "Data Science",
+      "detail": "Deferred execution window unlocks lower-priced provider batch lanes for non-latency workloads.",
+      "equivalence_mode": "Not required",
+      "equivalence_status": "n/a",
+      "methodology": {
+        "category": "Batch mispricing",
+        "threshold": "Triggered when > 70% of jobs run off-peak but still on on-demand pricing",
+        "rule": "Recommend batch lane migration when latency tolerance > 30 minutes"
+      }
+    },
+    {
+      "id": "INT-406",
+      "title": "Prompt template compaction for secops-assistant",
+      "type": "Prompt Optimization",
+      "status": "review",
+      "savings_usd_month": 9200,
+      "confidence_pct": 90,
+      "risk": "low",
+      "team": "Security",
+      "detail": "Removes repetitive context boilerplate while preserving the incident triage rubric and output structure.",
+      "equivalence_mode": "Empirical (Mode 2a)",
+      "equivalence_status": "verified",
+      "methodology": {
+        "category": "Prompt inefficiency",
+        "threshold": "Triggered by > 15% template token redundancy across repeated flows",
+        "rule": "Recommend template minimization when token redundancy > 0.15 and confidence >= 0.85"
+      }
+    }
+  ],
+  "governance": {
+    "modes": [
+      {
+        "key": "passive",
+        "label": "Passive Observation",
+        "description": "Sidecar observer mode. Logs telemetry and attribution evidence only.",
+        "impact": "No request shaping or routing. Zero operational risk."
+      },
+      {
+        "key": "advisory",
+        "label": "Advisory",
+        "description": "Enriches request/response path with X-ACI cost and attribution headers.",
+        "impact": "Applications decide whether to act on optimization guidance."
+      },
+      {
+        "key": "active",
+        "label": "Active",
+        "description": "Allows controlled routing and policy gates with explicit workload opt-in.",
+        "impact": "Requires equivalence verification, fail-open circuit breaker, and policy controls."
+      }
+    ],
+    "policies": [
+      {
+        "policy_id": "POL-600",
+        "name": "Production Model Allowlist",
+        "status": "active",
+        "scope": "All production workloads",
+        "mode": "active",
+        "rule": "Only approved models may execute in production.",
+        "violations_7d": 0
+      },
+      {
+        "policy_id": "POL-601",
+        "name": "Staging Cost Ceiling",
+        "status": "active",
+        "scope": "Team + environment",
+        "mode": "advisory",
+        "rule": "Alert when staging spend trajectory exceeds configured monthly budget.",
+        "violations_7d": 6
+      },
+      {
+        "policy_id": "POL-602",
+        "name": "Token Size Guardrail",
+        "status": "active",
+        "scope": "Per request",
+        "mode": "active",
+        "rule": "Enforce max input token envelope for high-cost workloads.",
+        "violations_7d": 17
+      },
+      {
+        "policy_id": "POL-603",
+        "name": "High-Cost Model Approval Gate",
+        "status": "active",
+        "scope": "Pre-deploy",
+        "mode": "active",
+        "rule": "CI checks projected monthly cost before merge and requires approver override.",
+        "violations_7d": 3
+      },
+      {
+        "policy_id": "POL-605",
+        "name": "Attribution Confidence Floor",
+        "status": "monitoring",
+        "scope": "Global",
+        "mode": "advisory",
+        "rule": "Flag requests below confidence floor and exclude from automated chargeback.",
+        "violations_7d": 7
+      }
+    ],
+    "fail_open_matrix": [
+      {
+        "test_id": "FO-01",
+        "scenario": "Timeout budget breached",
+        "expected": "Fail-open forward and timeout telemetry"
+      },
+      {
+        "test_id": "FO-02",
+        "scenario": "Policy engine crash",
+        "expected": "Fail-open forward and error counter"
+      },
+      {
+        "test_id": "FO-03",
+        "scenario": "Index miss",
+        "expected": "Pass-through plus shadow warming event"
+      },
+      {
+        "test_id": "FO-04",
+        "scenario": "Malformed payload",
+        "expected": "Skip enrichment; upstream handles error"
+      },
+      {
+        "test_id": "FO-10",
+        "scenario": "90% memory pressure",
+        "expected": "Fail-open and bounded index eviction telemetry"
+      }
+    ],
+    "trust_boundary_summary": [
+      "Raw prompts and outputs are never persisted by the platform.",
+      "The interceptor hot path reads only local cache and index data; no synchronous external calls.",
+      "Deployment runs inside the customer trust boundary with explicit egress control policies.",
+      "Any hot-path fault degrades to unmodified pass-through via fail-open semantics.",
+      "Every policy decision emits immutable audit telemetry."
+    ]
+  },
+  "glossary": [
+    {
+      "category": "Platform Foundation",
+      "term": "Argmin",
+      "aka": "Decision-time AI cost governance platform",
+      "definition": "Decision-time cost governance platform that attributes AI spend to accountable owners and turns that attribution into policy controls, interventions, and planning signals.",
+      "why_it_matters": "It is not just a reporting layer. The platform is designed to influence request-time behavior, planning, and governance using the same underlying attribution system."
+    },
+    {
+      "category": "Platform Foundation",
+      "term": "Graph Store",
+      "aka": "Tier 1",
+      "definition": "Authoritative attribution graph that stores entities, relationships, and time-valid evidence connecting requests to services, teams, budgets, and owners.",
+      "why_it_matters": "This is where attribution logic becomes rebuildable and explainable instead of being trapped in one-off joins or dashboard logic."
+    },
+    {
+      "category": "Platform Foundation",
+      "term": "Materialization",
+      "aka": null,
+      "definition": "Process that converts graph evidence into precomputed serving keys and request-time attribution records for low-latency lookup.",
+      "why_it_matters": "Materialization is what allows complex reconciliation to happen asynchronously while the hot path remains O(1)."
+    },
+    {
+      "category": "Platform Foundation",
+      "term": "Attribution Index",
+      "aka": "Tier 2",
+      "definition": "Low-latency serving layer that stores the latest attributed state needed by the interceptor, dashboards, and policy surfaces.",
+      "why_it_matters": "It separates expensive evidence resolution from decision-time enforcement so the system can stay within tight latency budgets."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Attribution Coverage",
+      "aka": null,
+      "definition": "Percentage of AI spend or request volume that can be assigned to an accountable owner above the configured confidence floor.",
+      "why_it_matters": "High coverage means the platform can support trustworthy chargeback, budgeting, and intervention prioritization."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Attribution Chain",
+      "aka": null,
+      "definition": "Structured evidence path that links a model request to the workload, codebase, identity, team, budget owner, and cost center responsible for it.",
+      "why_it_matters": "The chain is what lets a reviewer see not only the answer, but the evidence used to produce it."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Heuristic Reconciliation Engine",
+      "aka": "HRE",
+      "definition": "Engine that combines multiple evidence methods, such as direct mappings, temporal joins, naming patterns, historical behavior, and identity signals, into a unified attribution result.",
+      "why_it_matters": "Most enterprise AI usage cannot be attributed through a single perfect key. The HRE is the core mechanism for resolving messy real-world evidence."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Provenance",
+      "aka": null,
+      "definition": "Record of which source systems, methods, and timestamps contributed to an attribution decision.",
+      "why_it_matters": "Provenance is necessary for auditability, reviewer trust, and human remediation when evidence is weak or conflicting."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Resource Fingerprint",
+      "aka": null,
+      "definition": "Stable key derived from request or workload characteristics that the platform uses to look up previously materialized attribution state.",
+      "why_it_matters": "A stable serving key is what lets the interceptor attach governance context without re-running reconciliation on every request."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Ground Truth",
+      "aka": null,
+      "definition": "Verified attribution examples collected from manual review, known ownership records, or confirmed operational data.",
+      "why_it_matters": "Ground truth is how the system improves confidence calibration instead of relying permanently on hand-tuned heuristics."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Manual Mapping",
+      "aka": null,
+      "definition": "Explicit human correction that binds a workload, service, or request pattern to the correct organizational owner when automated evidence is insufficient.",
+      "why_it_matters": "Manual mapping closes the gap between observable telemetry and business reality, especially for legacy or ambiguous workloads."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Budget Owner",
+      "aka": null,
+      "definition": "Named business or engineering owner accountable for the spend attached to a workload or intervention domain.",
+      "why_it_matters": "This is the person or team who can approve spend, absorb chargeback, or execute remediation."
+    },
+    {
+      "category": "Attribution and Evidence",
+      "term": "Cost Center",
+      "aka": null,
+      "definition": "Financial grouping used to allocate AI spend into budgeting, reporting, and enterprise accounting structures.",
+      "why_it_matters": "Cost center alignment is what makes platform attribution useful to finance and operating reviews, not just engineering dashboards."
+    },
+    {
+      "category": "Confidence and Economics",
+      "term": "Confidence Score",
+      "aka": null,
+      "definition": "Calibrated probability-like score representing how strongly the evidence supports a given attribution result.",
+      "why_it_matters": "The platform does not treat all attribution equally. Confidence determines which results are safe for chargeback, routing, or human escalation."
+    },
+    {
+      "category": "Confidence and Economics",
+      "term": "Confidence Tier",
+      "aka": null,
+      "definition": "Simplified high, medium, or low band assigned to a calibrated confidence score for governance and user interpretation.",
+      "why_it_matters": "Tiers make the confidence model operationally legible to finance, engineering, and reviewers who do not want to reason in raw decimals."
+    },
+    {
+      "category": "Confidence and Economics",
+      "term": "Confidence Floor",
+      "aka": null,
+      "definition": "Minimum confidence required before the platform treats attribution as strong enough for automated governance or financial roll-up.",
+      "why_it_matters": "This protects the business from automating actions on evidence that is directionally useful but not yet defensible."
+    },
+    {
+      "category": "Confidence and Economics",
+      "term": "TRAC",
+      "aka": "Total Risk-Adjusted Cost",
+      "definition": "MVP decision metric computed as billed request cost plus a confidence risk premium, allowing low-certainty activity to be compared against high-certainty alternatives.",
+      "why_it_matters": "TRAC makes uncertainty economically visible, which is useful when comparing optimization candidates or deciding where governance effort should go first."
+    },
+    {
+      "category": "Confidence and Economics",
+      "term": "Confidence Risk Premium",
+      "aka": null,
+      "definition": "Incremental cost penalty added when attribution confidence is weak, reflecting the governance and decision risk of uncertain ownership.",
+      "why_it_matters": "Two requests with identical billed cost are not equally actionable if one can be attributed confidently and the other cannot."
+    },
+    {
+      "category": "Confidence and Economics",
+      "term": "Addressable Spend",
+      "aka": null,
+      "definition": "Portion of observed AI spend that the platform believes can be reduced, rerouted, or governed through identified interventions.",
+      "why_it_matters": "Addressable spend is the starting pool for savings analysis; it is not the same thing as realized savings."
+    },
+    {
+      "category": "Confidence and Economics",
+      "term": "Realized Savings",
+      "aka": null,
+      "definition": "Portion of estimated savings that has actually converted into lower run-rate spend because an intervention was approved and executed.",
+      "why_it_matters": "This distinguishes modeled upside from operationally captured value."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Interceptor",
+      "aka": null,
+      "definition": "Decision-time service that looks up attribution state, evaluates policy, and returns pass-through guidance or controls under a strict latency budget.",
+      "why_it_matters": "The interceptor is the bridge between offline attribution work and real-time governance."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Policy Engine",
+      "aka": null,
+      "definition": "Evaluation layer that applies allowlists, budget ceilings, confidence floors, and routing conditions to attributed requests.",
+      "why_it_matters": "It centralizes governance logic so controls are consistent, inspectable, and not buried in custom application code."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Advisory Mode",
+      "aka": "Deployment Mode",
+      "definition": "Mode where the platform computes and returns guidance but does not automatically change request behavior.",
+      "why_it_matters": "This is the safest starting posture because it proves the system and its economics before any automatic enforcement is enabled."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Active Mode",
+      "aka": "Deployment Mode",
+      "definition": "Mode where approved policies can actively route, gate, or constrain requests when safety and equivalence conditions are satisfied.",
+      "why_it_matters": "Active mode is where attribution turns into operational savings and policy enforcement, but only after evidence quality is acceptable."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Fail-Open",
+      "aka": null,
+      "definition": "Availability guarantee that if the governance layer times out or errors, the request proceeds without enforcement rather than blocking the workload.",
+      "why_it_matters": "This is critical for production trust. The platform cannot be allowed to become a single point of failure in the inference path."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Circuit Breaker",
+      "aka": null,
+      "definition": "Protective mechanism that suppresses repeated governance failures by temporarily bypassing slow or unhealthy decision logic.",
+      "why_it_matters": "It preserves low latency and predictable service behavior during outages or degraded upstream conditions."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Shadow Warming",
+      "aka": null,
+      "definition": "Background refresh pattern that records cache misses and uses them to repopulate attribution state asynchronously without blocking live traffic.",
+      "why_it_matters": "This improves hot-path hit rates while keeping reconciliation off the request path."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Soft Stop",
+      "aka": null,
+      "definition": "Policy outcome that warns, flags, or requests review while still allowing the request to proceed.",
+      "why_it_matters": "Soft stops let operators surface risky or expensive behavior before they are ready to hard-enforce it."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Hard Stop",
+      "aka": null,
+      "definition": "Policy outcome that prevents a request or planned action from proceeding because it violates a non-negotiable control.",
+      "why_it_matters": "Hard stops are reserved for conditions where the business has decided that cost, compliance, or quality risk outweighs convenience."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Capability Equivalence Verification",
+      "aka": "CEV",
+      "definition": "Verification process used before automated model downgrades or reroutes to show that a lower-cost alternative preserves acceptable task quality.",
+      "why_it_matters": "Savings claims are not credible if the cheaper model silently degrades the workload."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Intervention",
+      "aka": null,
+      "definition": "Actionable recommendation generated by the platform, such as a routing change, caching improvement, spend guardrail, or duplicate-request reduction.",
+      "why_it_matters": "Interventions are the operational output of the platform; they turn attribution into business action."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Optimization Category",
+      "aka": null,
+      "definition": "Named class of opportunity such as model oversizing, duplicate requests, staging sprawl, budget drift, or routing inefficiency.",
+      "why_it_matters": "Categorization makes the intervention portfolio legible and easier to prioritize across teams and programs."
+    },
+    {
+      "category": "Interventions and Policy",
+      "term": "Threshold Condition",
+      "aka": null,
+      "definition": "Specific signal or rule boundary that must be crossed before a recommendation is emitted.",
+      "why_it_matters": "Thresholds keep the system explainable. A reviewer should be able to see why a recommendation appeared when it did."
+    },
+    {
+      "category": "Forecasting and Planning",
+      "term": "Planning Horizon",
+      "aka": null,
+      "definition": "Forward-looking forecast window used to project AI spend under a chosen scenario, such as 3, 6, 9, 12, 18, or 24 months.",
+      "why_it_matters": "Different operating decisions matter at different time scales. Near-term controls and long-range capacity planning are not the same conversation."
+    },
+    {
+      "category": "Forecasting and Planning",
+      "term": "Baseline Forecast",
+      "aka": "Forecast Scenario",
+      "definition": "Reference planning case that extends current spend, demand growth, and governance posture without assuming incremental optimization capture.",
+      "why_it_matters": "Baseline is the comparison point for every other scenario; it answers what happens if the organization simply continues as-is."
+    },
+    {
+      "category": "Forecasting and Planning",
+      "term": "Growth Push",
+      "aka": "Forecast Scenario",
+      "definition": "Upside-demand case where adoption accelerates, request volume grows faster, and current control posture does not offset the added usage.",
+      "why_it_matters": "It stress-tests how quickly AI spend can expand when product demand or internal adoption rises."
+    },
+    {
+      "category": "Forecasting and Planning",
+      "term": "Policy Hardened",
+      "aka": "Forecast Scenario",
+      "definition": "Control case where budget ceilings, allowlists, confidence floors, and governance discipline constrain outlier usage and moderate growth.",
+      "why_it_matters": "It shows the value of stronger controls even before major optimization programs are fully implemented."
+    },
+    {
+      "category": "Forecasting and Planning",
+      "term": "Optimization Capture",
+      "aka": "Forecast Scenario",
+      "definition": "Execution case where approved interventions convert into sustained run-rate savings over the selected planning horizon.",
+      "why_it_matters": "This is the scenario that answers whether the platform can translate identified optimization opportunities into actually captured value."
+    },
+    {
+      "category": "Deployment and Trust Boundary",
+      "term": "Trust Boundary",
+      "aka": null,
+      "definition": "Deliberate separation between customer-controlled data paths and the services permitted to observe or act on that data.",
+      "why_it_matters": "It is central to enterprise adoption because buyers want governance without surrendering raw telemetry unnecessarily."
+    },
+    {
+      "category": "Deployment and Trust Boundary",
+      "term": "Decision-Time Governance",
+      "aka": null,
+      "definition": "Application of attribution, economics, and policy at the moment a request is about to execute rather than only after spend has already occurred.",
+      "why_it_matters": "This is what makes the platform operational rather than purely analytical."
+    },
+    {
+      "category": "Employee Adoption",
+      "term": "Active AI Employee",
+      "aka": null,
+      "definition": "Employee who has generated at least one attributable AI request in the selected reporting window.",
+      "why_it_matters": "This is the basic numerator for understanding whether AI usage is broad-based or still confined to a small technical cohort."
+    },
+    {
+      "category": "Employee Adoption",
+      "term": "Adoption Penetration",
+      "aka": null,
+      "definition": "Share of AI-eligible employees in the selected scope who were active in the reporting window.",
+      "why_it_matters": "A CEO or business-unit leader cares less about raw request counts than whether adoption is actually spreading through the workforce."
+    },
+    {
+      "category": "Employee Adoption",
+      "term": "Repeat Usage Rate",
+      "aka": null,
+      "definition": "Percentage of active employees whose request volume is high enough to imply recurring AI-assisted workflow usage rather than sporadic experimentation.",
+      "why_it_matters": "This distinguishes novelty from behavioral change."
+    },
+    {
+      "category": "Employee Adoption",
+      "term": "Power User",
+      "aka": null,
+      "definition": "Employee whose request volume crosses the configured high-usage threshold for the selected window.",
+      "why_it_matters": "Power users can indicate concentrated leverage, concentrated spend, or both. Leadership needs to know whether adoption is broad or concentrated."
+    },
+    {
+      "category": "Employee Adoption",
+      "term": "Governed Usage",
+      "aka": null,
+      "definition": "Share of observed employee AI requests that executed with governance context attached, such as policy evaluation, attribution, or intervention awareness.",
+      "why_it_matters": "High adoption with weak governed usage is not yet operationally mature."
+    },
+    {
+      "category": "Employee Adoption",
+      "term": "Entry Point",
+      "aka": null,
+      "definition": "The product surface or workflow through which an employee accessed AI, such as a developer copilot, support assistant, or finance operations tool.",
+      "why_it_matters": "Entry-point mix shows where AI is actually embedded in the business, not just which models are spending money."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Multi-Model Strategy",
+      "aka": "Model Orchestration",
+      "definition": "Operating model in which different AI requests are routed to different model families based on reasoning need, privacy posture, multimodal requirements, and unit cost.",
+      "why_it_matters": "Large enterprises rarely standardize on one model. Cost governance only works when model choice is treated as infrastructure, not as a one-time tool decision."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Model Router",
+      "aka": null,
+      "definition": "Decision layer that chooses which model family should handle a given request based on policy, economics, latency, and expected quality.",
+      "why_it_matters": "Routing is how enterprises combine frontier models for complex tasks with lower-cost models for routine work."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "OpenAI GPT Family",
+      "aka": "GPT-4o / GPT-5",
+      "definition": "Frontier general-purpose models widely used for reasoning, coding, support automation, and internal copilots.",
+      "why_it_matters": "They are among the most common enterprise baselines and are often accessed through Azure OpenAI or the OpenAI API."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Anthropic Claude",
+      "aka": "Claude Sonnet / Opus",
+      "definition": "Model family known for long context windows, strong alignment, and high-quality document and coding performance.",
+      "why_it_matters": "Claude is a leading enterprise choice for long-document analysis and safety-sensitive reasoning workloads."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Google Gemini",
+      "aka": "Gemini 1.5 / 2.0 / 3 Pro",
+      "definition": "Multimodal model family with strong document, analytics, and Google Workspace integration.",
+      "why_it_matters": "Gemini is often selected where enterprises need text, image, and large-context reasoning in one stack."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Meta Llama",
+      "aka": "Llama 3",
+      "definition": "Open-weight model family that can be self-hosted and fine-tuned for private internal deployments.",
+      "why_it_matters": "Llama is frequently the default open model when enterprises need stronger privacy or infrastructure control."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Mistral",
+      "aka": "Mistral Large / Mixtral",
+      "definition": "Efficient open-model family known for strong performance per dollar.",
+      "why_it_matters": "Mistral often appears in cost-sensitive enterprise stacks where teams want open models with solid reasoning quality."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Cohere Command",
+      "aka": "Command-R / Command-R+",
+      "definition": "Enterprise-focused model family optimized for retrieval-augmented generation, enterprise search, and multilingual workflows.",
+      "why_it_matters": "It is commonly used in knowledge assistants and compliance-sensitive search experiences."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Alibaba Qwen",
+      "aka": "Qwen",
+      "definition": "Model family with strong multilingual performance and open plus commercial deployment options.",
+      "why_it_matters": "Qwen is often relevant in international and China-facing deployments."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "DeepSeek",
+      "aka": "DeepSeek-R1 / V3",
+      "definition": "Reasoning-focused model family used in cost-optimized enterprise stacks.",
+      "why_it_matters": "Enterprises often pair DeepSeek with larger models to reduce inference cost without giving up reasoning quality on internal tooling."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "IBM Granite",
+      "aka": "Granite",
+      "definition": "IBM enterprise model family designed around governance-heavy use cases and watsonx integration.",
+      "why_it_matters": "Granite is particularly relevant in regulated industries where governance posture matters as much as model quality."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Amazon Titan",
+      "aka": "Titan",
+      "definition": "AWS-native model family exposed through Bedrock for secure enterprise workflows.",
+      "why_it_matters": "Titan is a common option when organizations want Bedrock-native internal document and assistant flows."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Azure OpenAI",
+      "aka": null,
+      "definition": "Microsoft-hosted enterprise access path for OpenAI models with Azure security, compliance, and platform integration.",
+      "why_it_matters": "It is one of the most common ways enterprises operationalize GPT models at scale."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "AWS Bedrock",
+      "aka": null,
+      "definition": "Multi-model enterprise platform that exposes models such as Claude, Llama, Mistral, and Titan through one managed control plane.",
+      "why_it_matters": "Bedrock makes multi-model adoption an infrastructure choice instead of a bespoke integration problem."
+    },
+    {
+      "category": "Enterprise Model Landscape",
+      "term": "Google Vertex AI",
+      "aka": null,
+      "definition": "Google Cloud platform for Gemini and custom ML workflows, including MLOps and multimodal AI operations.",
+      "why_it_matters": "Vertex AI is a common choice in data-heavy enterprises that want analytics, model operations, and Gemini access in one stack."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Enterprise AI Stack",
+      "aka": null,
+      "definition": "Layered enterprise AI operating model spanning data, AI infrastructure, models, agents, and user-facing applications.",
+      "why_it_matters": "It is the clearest way to understand where Argmin fits: at the control layer that observes, attributes, governs, and optimizes spend across that stack."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Data Layer",
+      "aka": null,
+      "definition": "Foundational enterprise data systems including warehouses, lakes, operational databases, documents, and internal knowledge repositories.",
+      "why_it_matters": "This is the raw material AI systems need in order to do useful work inside an enterprise rather than generic public-internet tasks."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "AI Infrastructure Layer",
+      "aka": null,
+      "definition": "Middleware layer that prepares enterprise data for model use through orchestration, pipelines, embeddings, vector search, prompt tooling, and workflow control.",
+      "why_it_matters": "It is where retrieval, model routing, and tool-use become repeatable enterprise capabilities instead of one-off prototypes."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Vector Database",
+      "aka": null,
+      "definition": "Database optimized for storing and searching embeddings so AI systems can retrieve information by meaning instead of keyword match alone.",
+      "why_it_matters": "Vector search is a common backbone for retrieval-augmented generation and enterprise knowledge assistants."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Retrieval-Augmented Generation",
+      "aka": "RAG",
+      "definition": "Pattern where a model is given relevant enterprise documents or facts at query time so responses stay grounded in current enterprise knowledge.",
+      "why_it_matters": "RAG is one of the most common ways enterprises make models useful without retraining them on private data."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Model Layer",
+      "aka": null,
+      "definition": "Layer where multiple foundation models such as GPT, Claude, Gemini, Llama, Mistral, or DeepSeek are selected for different tasks.",
+      "why_it_matters": "This is where AI economics become an infrastructure problem: the best model for one task is often the wrong model for another."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Agent Layer",
+      "aka": null,
+      "definition": "Layer where models are combined with tools, memory, and workflow logic to act more like digital workers than isolated chat interfaces.",
+      "why_it_matters": "This is the step from model access to task execution, which is why it matters to operations, finance, and governance."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Application Layer",
+      "aka": null,
+      "definition": "Employee-facing or customer-facing products such as copilots, chatbots, workflow automation tools, and analytics surfaces.",
+      "why_it_matters": "This is where AI adoption becomes visible to the business and where usage starts to produce measurable spend and operating outcomes."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Knowledge Agent",
+      "aka": null,
+      "definition": "Agent designed to search and explain enterprise knowledge, such as HR policy assistants or internal documentation copilots.",
+      "why_it_matters": "Knowledge agents are one of the earliest and most common AI deployment patterns in large enterprises."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Workflow Agent",
+      "aka": null,
+      "definition": "Agent that executes or automates task sequences, such as invoice handling, report generation, or case-routing workflows.",
+      "why_it_matters": "Workflow agents are where AI starts touching core business operations rather than just answering questions."
+    },
+    {
+      "category": "Enterprise AI Architecture",
+      "term": "Decision Agent",
+      "aka": null,
+      "definition": "Agent that assists leaders or operators with analysis and recommendations for planning, supply chain, finance, or operational tradeoffs.",
+      "why_it_matters": "Decision agents are important because they directly affect business choices and therefore need strong attribution and governance."
+    },
+    {
+      "category": "Enterprise AI Platforms",
+      "term": "Snowflake Cortex AI",
+      "aka": null,
+      "definition": "AI capability layer embedded inside the Snowflake data platform.",
+      "why_it_matters": "It represents the pattern of running AI close to enterprise data instead of exporting data to disconnected tools."
+    },
+    {
+      "category": "Enterprise AI Platforms",
+      "term": "Databricks AI",
+      "aka": null,
+      "definition": "Databricks and MosaicML-based AI stack used for data engineering, custom model workflows, and AI analytics.",
+      "why_it_matters": "It is common in enterprises where data engineering teams own a large share of the AI platform surface."
+    },
+    {
+      "category": "Enterprise AI Platforms",
+      "term": "Microsoft Copilot / Copilot Studio",
+      "aka": null,
+      "definition": "Application-layer AI platform embedded in Microsoft productivity software and workflow tooling.",
+      "why_it_matters": "It is one of the clearest examples of how enterprise AI moves from model access to workforce-wide deployment."
+    },
+    {
+      "category": "Enterprise AI Platforms",
+      "term": "OpenAI Enterprise",
+      "aka": null,
+      "definition": "Enterprise GPT access increasingly positioned as a broader operating surface for agents and business workflows.",
+      "why_it_matters": "It signals that frontier-model providers are moving up the stack toward enterprise operating systems, not just raw inference APIs."
+    }
+  ],
+  "faq": [
+    {
+      "category": "Platform Fundamentals",
+      "description": "What the platform is, what problem it solves, and how to interpret the demo at a high level.",
+      "items": [
+        {
+          "question": "What problem does Argmin actually solve?",
+          "answer": "Most companies can see total AI spend but cannot reliably explain which team, service, budget owner, or policy decision created that spend. Argmin resolves that ownership chain, quantifies confidence, and turns the result into interventions, governance, and planning signals."
+        },
+        {
+          "question": "How is this different from a normal cloud cost dashboard?",
+          "answer": "Traditional dashboards summarize spend after the fact. Argmin is designed to connect request-level behavior to owners and then use that same attribution state for decision-time guidance, policy controls, and intervention prioritization."
+        },
+        {
+          "question": "Who is the primary user of the platform?",
+          "answer": "The platform is built for a cross-functional operating loop: platform engineering, ML infrastructure, finance, security, and leadership all read different parts of the same attribution system. Engineers use it to fix behavior, while finance and leadership use it to understand accountability and savings capture."
+        },
+        {
+          "question": "What should a reviewer focus on first in the demo?",
+          "answer": "Start with Overview for the business posture, then Request Proof for the evidence chain on a single request, Interventions for how the platform converts attribution into action, and Forecasting for how those actions translate into planning scenarios."
+        },
+        {
+          "question": "Is the demo backed by production customer data?",
+          "answer": "No. The demo is fully synthetic and optimized for diligence. It is intended to show how the platform behaves, what it explains, and what decisions it enables without exposing customer data."
+        }
+      ]
+    },
+    {
+      "category": "Employee Adoption and Operating Impact",
+      "description": "How to interpret employee AI adoption metrics at the organization, business-unit, and team level.",
+      "items": [
+        {
+          "question": "What does the Employee Adoption page prove that the spend pages do not?",
+          "answer": "Spend tells you where money is going. Adoption tells you whether AI is actually spreading through the workforce, which parts of the business are embedding it in recurring workflows, and whether that uptake is happening in a governed way."
+        },
+        {
+          "question": "Why break adoption down by organization, business unit, and team?",
+          "answer": "Because executives do not manage AI adoption at a single level. CEOs care about enterprise-wide penetration, business-unit leaders care about uneven uptake across functions, and team leaders care about whether specific workflows are being adopted or still need enablement."
+        },
+        {
+          "question": "What should a CFO look for on the adoption dashboard?",
+          "answer": "Spend per active employee, governed usage, repeat usage, and whether the most active areas of the business are also the most controlled. Those signals indicate whether growth in AI usage is translating into disciplined operating behavior."
+        },
+        {
+          "question": "What should a CTO or COO look for on the adoption dashboard?",
+          "answer": "The CTO should focus on model concentration, power-user concentration, and which entry points are driving usage. The COO should focus on repeat usage, workflow embedment, and whether adoption is spreading beyond early technical champions."
+        },
+        {
+          "question": "Does a high number of active AI employees automatically mean success?",
+          "answer": "No. A good adoption profile combines breadth, repeat behavior, governed usage, and reasonable spend efficiency. The dashboard is designed to show whether adoption is real and sustainable, not merely high-volume."
+        }
+      ]
+    },
+    {
+      "category": "Attribution and Confidence",
+      "description": "How the platform resolves ownership, what confidence means, and when humans stay in the loop.",
+      "items": [
+        {
+          "question": "How does the platform determine who owns a request?",
+          "answer": "It combines cloud telemetry, CI/CD data, source control ownership, runtime context, org hierarchy, and prior mappings into a structured attribution chain. The HRE weighs those signals, calibrates the result, and materializes the latest state into the low-latency index."
+        },
+        {
+          "question": "What does the confidence score represent?",
+          "answer": "Confidence is a calibrated measure of how strongly the available evidence supports the selected owner. It is not a cosmetic score. It governs whether the result is safe for chargeback, routing, intervention prioritization, or human review."
+        },
+        {
+          "question": "What happens when the evidence is weak or conflicting?",
+          "answer": "The platform still surfaces the best-supported chain, but it downgrades the confidence tier and keeps the result out of fully automated financial or control flows when it falls below the configured confidence floor. That is why the UI distinguishes between strong attribution and requests that still need review."
+        },
+        {
+          "question": "When would an operator use Manual Mapping?",
+          "answer": "Manual Mapping is used when a workload is business-critical but the available telemetry is ambiguous, legacy, or incomplete. It lets an operator correct ownership explicitly, which then becomes part of the operating state instead of an external spreadsheet note."
+        },
+        {
+          "question": "Can the platform support chargeback on low-confidence requests?",
+          "answer": "Not automatically. Low-confidence activity is still visible and measurable, but the platform is intentionally conservative about turning uncertain attribution into automated financial allocation."
+        }
+      ]
+    },
+    {
+      "category": "Interventions and Policy Controls",
+      "description": "How the system turns attribution into concrete action while preserving safety and operator control.",
+      "items": [
+        {
+          "question": "What is the practical difference between Advisory and Active mode?",
+          "answer": "Advisory mode computes guidance and exposes what the platform would do without mutating live traffic. Active mode allows approved policies and verified alternatives to actually influence routing or enforcement. Advisory proves trust; Active captures value."
+        },
+        {
+          "question": "Why is fail-open treated as a feature rather than a weakness?",
+          "answer": "Because the platform sits near a latency-sensitive request path. If governance logic is unavailable, it is safer for inference to continue than for Argmin to become a single point of failure. The business tradeoff is explicit: preserve workload availability while logging and alerting on degraded governance."
+        },
+        {
+          "question": "What is the difference between a Soft Stop and a Hard Stop?",
+          "answer": "A Soft Stop flags or warns but still allows the request to continue. A Hard Stop blocks the request or planned action because the organization has decided the violation is non-negotiable, such as a disallowed model, a hard budget ceiling, or a control the team is not permitted to override automatically."
+        },
+        {
+          "question": "How does the platform decide which interventions to recommend?",
+          "answer": "It evaluates deterministic threshold conditions across attributed spend, model selection, duplicate behavior, staging sprawl, and policy posture. Each recommendation includes its category, expected savings, confidence, and operational risk so a reviewer can understand both the upside and the tradeoff."
+        },
+        {
+          "question": "Can teams override or dismiss recommendations?",
+          "answer": "Yes. Recommendations are designed to be reviewed, approved, kept in observation, or dismissed. The platform is not built on the assumption that every identified opportunity should be enforced mechanically."
+        }
+      ]
+    },
+    {
+      "category": "Forecasting and Scenario Planning",
+      "description": "How to read the planning views and what each forecast scenario is intended to demonstrate.",
+      "items": [
+        {
+          "question": "What does the Baseline forecast mean?",
+          "answer": "Baseline is the reference case. It projects what happens if observed demand and current governance posture continue without assuming that additional intervention work converts into savings."
+        },
+        {
+          "question": "What does Growth Push mean?",
+          "answer": "Growth Push assumes adoption accelerates, request volume rises faster than the current trend, and the organization absorbs that added demand without materially changing its control posture."
+        },
+        {
+          "question": "What does Policy Hardened mean?",
+          "answer": "Policy Hardened assumes budget ceilings, allowlists, and confidence gates are applied more aggressively, reducing outlier behavior and dampening the growth rate of spend."
+        },
+        {
+          "question": "What does Optimization Capture mean?",
+          "answer": "Optimization Capture assumes approved recommendations actually get implemented and stick. It is the scenario where identified opportunities convert into durable run-rate savings rather than remaining notional upside."
+        },
+        {
+          "question": "How should an investor interpret these scenarios?",
+          "answer": "Treat them as disciplined planning lenses rather than opaque model outputs. Baseline shows inertia, Growth Push shows upside pressure, Policy Hardened shows governance leverage, and Optimization Capture shows whether the product can convert insight into realized value."
+        }
+      ]
+    },
+    {
+      "category": "Deployment, Security, and Trust Boundary",
+      "description": "What an enterprise buyer would want to know about control surfaces, runtime posture, and production deployment assumptions.",
+      "items": [
+        {
+          "question": "Where is the platform intended to run?",
+          "answer": "The target posture is inside the customer trust boundary, with customer-controlled infrastructure handling the event bus, graph store, and serving index. The demo runs locally, but the architecture is organized around enterprise-controlled deployment."
+        },
+        {
+          "question": "How are API calls authenticated?",
+          "answer": "The platform uses service-to-service bearer authentication for protected `/v1/*` routes. In the local demo, development-friendly shortcuts exist only for the explicit demo profile; they are not the intended production posture."
+        },
+        {
+          "question": "What does a production deployment need before Active mode is credible?",
+          "answer": "Reliable ingestion, a durable event bus, the graph and index backends, validated ownership signals, and explicit policy configuration. Active mode only makes sense when the evidence chain and safety controls are already trusted."
+        },
+        {
+          "question": "What happens if a dependency fails during request handling?",
+          "answer": "The interceptor is designed to fail open under timeout or internal error so it does not break inference traffic. That behavior is paired with logging, metrics, and explicit policy state so degraded governance is observable rather than hidden."
+        },
+        {
+          "question": "Why does the architecture separate event bus, graph store, and attribution index?",
+          "answer": "Because they solve different problems. The event bus is the rebuildable system of record, the graph store is the authoritative reasoning surface, and the attribution index is the low-latency serving layer for operational reads."
+        }
+      ]
+    },
+    {
+      "category": "Integrations and Operating Model",
+      "description": "How the platform fits into existing tooling, how quickly it updates, and what the demo surfaces are intended to prove.",
+      "items": [
+        {
+          "question": "Which systems does the platform integrate with?",
+          "answer": "The core model assumes cloud telemetry, CI/CD systems, source control, identity systems, and finance or budget metadata. The demo uses synthetic representations of those signals so the attribution and governance flows can be reviewed without depending on a live enterprise stack."
+        },
+        {
+          "question": "How quickly does the attribution index update after new evidence arrives?",
+          "answer": "The design assumes asynchronous reconciliation followed by materialization into a low-latency serving layer. That means the request path reads precomputed state rather than waiting for graph resolution at request time."
+        },
+        {
+          "question": "What is the purpose of the Request Proof page?",
+          "answer": "It is a diligence surface, not an operator debug console. Its job is to show a reviewer what the platform knew about a request, what decision it produced, and why that decision is credible."
+        },
+        {
+          "question": "What is the purpose of the Guided Demo panel?",
+          "answer": "It compresses the product narrative into a small number of explainable scenarios: an attributed request, a policy intervention, and fail-open safety. The goal is to make the product legible in a live walkthrough without exposing internal debug noise."
+        },
+        {
+          "question": "How should someone run the demo locally?",
+          "answer": "Clone or unzip the repository, change into the repo root, run `./scripts/run_demo.sh`, and open `http://localhost:8000/platform/`. The README and demo guide now spell out those steps directly instead of assuming the user is already in the correct directory."
+        }
+      ]
+    },
+    {
+      "category": "Enterprise Model Strategy and Platforms",
+      "description": "How large enterprises actually choose models and platforms in production AI stacks.",
+      "items": [
+        {
+          "question": "Why do large enterprises run multiple AI model families instead of standardizing on one?",
+          "answer": "Because different workloads need different tradeoffs. GPT and Claude often handle reasoning-heavy work, Gemini handles multimodal analysis, open-weight models such as Llama cover private deployments, and lower-cost models such as Mistral or DeepSeek reduce run-rate for routine tasks."
+        },
+        {
+          "question": "Which model families are most common in enterprise AI today?",
+          "answer": "A practical enterprise stack usually includes some combination of OpenAI GPT, Anthropic Claude, Google Gemini, Meta Llama, Mistral, Cohere Command, Alibaba Qwen, DeepSeek, IBM Granite, and Amazon Titan."
+        },
+        {
+          "question": "How should we think about GPT, Claude, Gemini, Llama, and lower-cost models in one architecture?",
+          "answer": "Think of model selection as infrastructure. Frontier models cover harder reasoning and coding tasks, Gemini covers multimodal analysis, private open-weight models support sensitive internal work, and lower-cost models absorb routine generation so the overall unit economics stay under control."
+        },
+        {
+          "question": "Which enterprise AI platforms are most common for accessing these models?",
+          "answer": "Azure OpenAI, AWS Bedrock, and Google Vertex AI are the most common hyperscaler access paths. Enterprises also use watsonx, Snowflake Cortex AI, Databricks AI, and direct vendor APIs depending on governance and data-locality requirements."
+        },
+        {
+          "question": "Why does this matter to Argmin specifically?",
+          "answer": "Because the platform is designed for multi-model enterprises. It helps attribute spend, compare alternatives, and enforce policy across a model estate instead of assuming one provider or one model family will dominate forever."
+        },
+        {
+          "question": "What strategic trend is the demo trying to reflect?",
+          "answer": "Enterprise AI is moving from single-model experimentation to orchestrated multi-model operations. The control problem is no longer just whether a team uses AI, but whether it is choosing the right model, through the right platform, for the right economic and governance outcome."
+        }
+      ]
+    },
+    {
+      "category": "Fortune 500 AI Operating Patterns",
+      "description": "What large enterprises are actually doing with AI in production, beyond the hype cycle.",
+      "items": [
+        {
+          "question": "What is the core market pattern the demo is trying to reflect?",
+          "answer": "Large enterprises are not standardizing on one model. They are deploying a small set of foundation models through a few major cloud and data platforms, then routing work across them by task, privacy, cost, and workflow fit."
+        },
+        {
+          "question": "What does the 67-company workforce deployment signal mean?",
+          "answer": "It means enterprise LLM deployment has already moved into workforce-scale operating reality. The important problem is no longer whether companies will use AI, but how they will govern cost, ownership, and platform sprawl once they do."
+        },
+        {
+          "question": "Why does the demo emphasize multi-model operations so heavily?",
+          "answer": "Because recent enterprise operating patterns show that most large organizations use three or more model families simultaneously. The hard problem is orchestration and governance across a model estate, not picking a single vendor once."
+        },
+        {
+          "question": "Which model families show up most often in Fortune 500 internal deployments?",
+          "answer": "OpenAI GPT, Anthropic Claude, Google Gemini, Meta Llama, Mistral, Cohere Command, DeepSeek, and in some environments IBM Granite or Amazon Titan. Each serves a different role in the portfolio."
+        },
+        {
+          "question": "Why are Azure OpenAI, AWS Bedrock, and Google Vertex AI so prominent?",
+          "answer": "Because enterprises usually want model access through platforms that already provide security controls, data-locality options, and operational tooling. Those platforms reduce integration friction and make governance easier than using many model APIs independently."
+        },
+        {
+          "question": "Why include workforce products like Copilot in a cost-governance demo?",
+          "answer": "Because broad workforce AI adoption is one of the fastest ways enterprise model usage becomes financially material. Productivity agents, internal chat, and coding assistants are where AI demand often scales first."
+        }
+      ]
+    },
+    {
+      "category": "Enterprise AI Stack Architecture",
+      "description": "How large organizations structure AI from enterprise data through models and agents to end-user applications.",
+      "items": [
+        {
+          "question": "What does the canonical enterprise AI stack look like?",
+          "answer": "A typical stack has five layers: data, AI infrastructure, models, agents, and applications. That layered view is useful because it shows where cost is created, where control belongs, and where Argmin fits as a governance and attribution layer."
+        },
+        {
+          "question": "What belongs in the data layer?",
+          "answer": "ERP, CRM, financial systems, operational databases, data lakes, warehouses, documents, knowledge bases, and internal collaboration content. Enterprises are ultimately trying to make those information assets usable by AI safely."
+        },
+        {
+          "question": "What is the AI infrastructure layer doing?",
+          "answer": "It handles retrieval, embeddings, vector search, pipelines, orchestration frameworks, prompt management, and workflow wiring. In practical terms, it is the middleware that makes enterprise data usable by models."
+        },
+        {
+          "question": "Why do enterprises use agents instead of just chat interfaces?",
+          "answer": "Because agents can execute workflows, call tools, retrieve data, and complete business tasks. That is how AI moves from experimentation into operating leverage."
+        },
+        {
+          "question": "How should executives think about application-layer AI?",
+          "answer": "It is the visible expression of the underlying stack: copilots, chatbots, automation tools, AI analytics dashboards, and internal assistants. This is where adoption becomes measurable and where spend becomes a board-level topic."
+        },
+        {
+          "question": "Why does this architecture matter to Argmin?",
+          "answer": "Because AI cost, ownership, and policy decisions do not originate from one layer alone. They emerge from the interaction between data, platforms, models, agents, and user-facing applications. Argmin is designed to make that system economically legible and governable."
+        }
+      ]
+    }
+  ],
+  "forecast_scenarios": {
+    "baseline": {
+      "label": "Baseline",
+      "summary": "Current trajectory with no incremental governance capture.",
+      "definition": "Reference case that carries forward observed demand growth, current routing patterns, and existing governance posture.",
+      "demand_shift_pct": 0.0,
+      "trend_ramp_pct": 0.0,
+      "governance_drag_pct": 0.0,
+      "capture_realization_pct": 0.0,
+      "volatility_band_pct": 7.0,
+      "assumptions": [
+        "Observed month-over-month demand growth continues without intervention-driven savings.",
+        "No additional policy tightening is assumed beyond current controls.",
+        "Previously identified savings remain unimplemented."
+      ]
+    },
+    "growth_push": {
+      "label": "Growth Push",
+      "summary": "Assumes accelerated adoption and elevated request growth.",
+      "definition": "Upside demand case where product rollouts, higher request volumes, and expanded model usage increase monthly spend faster than the current baseline.",
+      "demand_shift_pct": 3.5,
+      "trend_ramp_pct": 13.0,
+      "governance_drag_pct": 0.0,
+      "capture_realization_pct": 0.0,
+      "volatility_band_pct": 10.0,
+      "assumptions": [
+        "New product launches and broader internal adoption increase request volume above the observed trend.",
+        "Model mix stays broadly constant, so incremental demand lands directly on spend.",
+        "Governance posture remains unchanged."
+      ]
+    },
+    "policy_hardened": {
+      "label": "Policy Hardened",
+      "summary": "Assumes enforcement hardens and outlier spend is constrained.",
+      "definition": "Control scenario where stricter allowlists, budget ceilings, and confidence floors suppress outlier usage and reduce demand growth.",
+      "demand_shift_pct": -1.5,
+      "trend_ramp_pct": -6.0,
+      "governance_drag_pct": 7.5,
+      "capture_realization_pct": 0.2,
+      "volatility_band_pct": 5.5,
+      "assumptions": [
+        "Outlier usage is curtailed through stronger policy enforcement and budget gates.",
+        "Higher-confidence routing and entitlement checks reduce noisy non-production spend.",
+        "Only a modest portion of identified savings is assumed to convert into durable run-rate reduction."
+      ]
+    },
+    "optimization_capture": {
+      "label": "Optimization Capture",
+      "summary": "Assumes approved interventions are implemented and stick.",
+      "definition": "Execution scenario where approved routing, caching, and duplicate-request interventions convert into realized run-rate savings over the planning horizon.",
+      "demand_shift_pct": -2.5,
+      "trend_ramp_pct": -9.0,
+      "governance_drag_pct": 4.0,
+      "capture_realization_pct": 0.75,
+      "volatility_band_pct": 4.5,
+      "assumptions": [
+        "Approved interventions move into implementation and produce durable run-rate savings.",
+        "Duplicate requests, oversized model selection, and staging sprawl are actively reduced.",
+        "Savings compound gradually rather than appearing as a single one-time drop."
+      ]
+    }
+  },
+  "demo_scenarios": {
+    "enriched": {
+      "label": "Scenario A: Enriched",
+      "payload": {
+        "model": "gpt-4o-mini",
+        "provider": "openai",
+        "service_name": "customer-support-bot",
+        "input_tokens": 600,
+        "max_tokens": 350,
+        "estimated_cost_usd": 0.0032,
+        "environment": "staging"
+      }
+    },
+    "soft_stop": {
+      "label": "Scenario B: Soft Stop",
+      "payload": {
+        "model": "gpt-4o",
+        "provider": "openai",
+        "service_name": "analytics-batch",
+        "input_tokens": 5200,
+        "max_tokens": 1400,
+        "estimated_cost_usd": 0.014,
+        "environment": "staging"
+      }
+    },
+    "fail_open": {
+      "label": "Scenario C: Fail-Open",
+      "payload": {
+        "model": "gpt-4o",
+        "provider": "openai",
+        "service_name": "unknown-service",
+        "input_tokens": 400,
+        "max_tokens": 300,
+        "estimated_cost_usd": 0.004,
+        "environment": "staging"
+      }
+    }
+  },
+  "manual_mapping": [
+    {
+      "id": "mm_001",
+      "request_id": "req_e4f21a8c",
+      "workload_label": "support-bot-staging",
+      "scope": "Shared service account in staging namespace",
+      "current_owner": "Customer Engineering",
+      "suggested_owner": "Platform Engineering",
+      "candidate_teams": [
+        "Platform Engineering",
+        "Customer Engineering",
+        "Product Engineering"
+      ],
+      "confidence_pct": 72,
+      "spend_at_risk_usd": 18400,
+      "reason_code": "shared identity",
+      "reason": "Shared service account masks durable owner",
+      "recommendation": "Confirm whether the staging path should inherit platform ownership before using it in automated financial workflows.",
+      "evidence": [
+        "Runtime identity is svc.support@novatech.example, which is shared across multiple services.",
+        "Deployment evidence points to support-bot-staging rather than a single product team repository.",
+        "The ownership chain is directionally useful but below the automatic chargeback threshold."
+      ],
+      "note": "This is the kind of case where manual mapping improves coverage without pretending the automated signal was stronger than it was.",
+      "status": "needs_review",
+      "resolved_team": "Customer Engineering"
+    },
+    {
+      "id": "mm_002",
+      "request_id": null,
+      "workload_label": "analytics-batch",
+      "scope": "Nightly summarization workflow",
+      "current_owner": "Data Science",
+      "suggested_owner": "ML Engineering",
+      "candidate_teams": [
+        "ML Engineering",
+        "Data Science",
+        "Platform Engineering"
+      ],
+      "confidence_pct": 76,
+      "spend_at_risk_usd": 22600,
+      "reason_code": "legacy budget",
+      "reason": "Deployment path moved but the inherited budget mapping did not",
+      "recommendation": "Reassign to the team operating the production workflow, then update the durable budget owner in the graph.",
+      "evidence": [
+        "Recent CI/CD evidence ties the workload to the training pipeline maintained by ML Engineering.",
+        "Historical billing still lands on an older Data Science budget center.",
+        "The current automated path is useful for routing but too weak for durable chargeback."
+      ],
+      "note": "This demonstrates that manual mapping is not only for request-level anomalies; it also resolves durable ownership drift in long-running workloads.",
+      "status": "needs_review",
+      "resolved_team": "Data Science"
+    },
+    {
+      "id": "mm_003",
+      "request_id": null,
+      "workload_label": "ml-evals-sandbox",
+      "scope": "Shared experimentation namespace",
+      "current_owner": "Research",
+      "suggested_owner": "Product Engineering",
+      "candidate_teams": [
+        "Product Engineering",
+        "Research",
+        "Security"
+      ],
+      "confidence_pct": 68,
+      "spend_at_risk_usd": 9700,
+      "reason_code": "sandbox sprawl",
+      "reason": "Experiment traffic is inheriting an outdated org mapping",
+      "recommendation": "Assign the sandbox to the accountable production sponsor before enabling automated chargeback or budget enforcement.",
+      "evidence": [
+        "Recent request growth came from a shared evaluation namespace with rotating service identities.",
+        "The legacy research mapping no longer reflects who is sponsoring the spend.",
+        "Without a manual correction, the platform should continue treating this usage as provisional."
+      ],
+      "note": "This queue item shows investors that low-confidence attribution is surfaced explicitly instead of being hidden inside a blended cost number.",
+      "status": "needs_review",
+      "resolved_team": "Research"
+    }
+  ],
+  "enterprise_model_landscape": [
+    {
+      "provider": "OpenAI",
+      "model_family": "GPT-4o / GPT-5",
+      "typical_access": "Azure OpenAI or OpenAI API",
+      "strength": "Frontier reasoning, coding, and broad enterprise ecosystem coverage.",
+      "enterprise_fit": "Used for general-purpose copilots, support automation, and internal knowledge assistants."
+    },
+    {
+      "provider": "Anthropic",
+      "model_family": "Claude Sonnet / Opus",
+      "typical_access": "Anthropic API or AWS Bedrock",
+      "strength": "Long context, strong alignment, and high-quality document and coding performance.",
+      "enterprise_fit": "Common for large document analysis, enterprise coding copilots, and safety-sensitive workflows."
+    },
+    {
+      "provider": "Google",
+      "model_family": "Gemini 1.5 / 2.0 / 3 Pro",
+      "typical_access": "Vertex AI and Google Workspace",
+      "strength": "Multimodal analysis with strong document and analytics performance.",
+      "enterprise_fit": "Well suited for Workspace-heavy environments and image-plus-text reasoning."
+    },
+    {
+      "provider": "Meta",
+      "model_family": "Llama 3",
+      "typical_access": "Self-hosted or Bedrock partner access",
+      "strength": "Open weights and private deployment flexibility.",
+      "enterprise_fit": "Often chosen where data residency or private fine-tuning matters."
+    },
+    {
+      "provider": "Mistral AI",
+      "model_family": "Mistral Large / Mixtral",
+      "typical_access": "Mistral API, Bedrock, or self-managed inference",
+      "strength": "Strong performance-per-dollar with efficient MoE architectures.",
+      "enterprise_fit": "Common in cost-sensitive and European enterprise deployments."
+    },
+    {
+      "provider": "Cohere",
+      "model_family": "Command-R / Command-R+",
+      "typical_access": "Cohere platform or enterprise connectors",
+      "strength": "RAG-oriented behavior and governance-friendly enterprise tooling.",
+      "enterprise_fit": "Frequently used for enterprise search, knowledge assistants, and compliance-heavy workflows."
+    },
+    {
+      "provider": "Alibaba",
+      "model_family": "Qwen",
+      "typical_access": "Qwen open and commercial deployments",
+      "strength": "Strong multilingual coverage and regional flexibility.",
+      "enterprise_fit": "Useful in international and China-market operating environments."
+    },
+    {
+      "provider": "DeepSeek",
+      "model_family": "DeepSeek-R1 / V3",
+      "typical_access": "Managed API or self-hosted deployments",
+      "strength": "Very strong reasoning efficiency at a lower unit cost.",
+      "enterprise_fit": "Common as a cost-optimized reasoning tier in multi-model stacks."
+    },
+    {
+      "provider": "IBM",
+      "model_family": "Granite",
+      "typical_access": "watsonx",
+      "strength": "Enterprise governance orientation and regulated-industry fit.",
+      "enterprise_fit": "Popular in finance, legal, and policy-constrained environments."
+    },
+    {
+      "provider": "AWS",
+      "model_family": "Titan",
+      "typical_access": "AWS Bedrock",
+      "strength": "Tight AWS integration and infrastructure-native deployment posture.",
+      "enterprise_fit": "Useful when organizations want a Bedrock-native stack for internal document workflows."
+    }
+  ],
+  "enterprise_market_signals": [
+    {
+      "label": "Fortune 500 workforce platforms",
+      "value": "67 companies",
+      "context": "Late-2025 market signal reflected in the demo narrative.",
+      "why_it_matters": "Enterprise LLM deployment is no longer experimental. The control problem has shifted from trial usage to governed operating scale."
+    },
+    {
+      "label": "Year-over-year expansion",
+      "value": "3x growth",
+      "context": "Large-enterprise workforce deployment increased sharply in one year.",
+      "why_it_matters": "Investors and buyers should read this as platform adoption pressure: more users, more models, and more cost/governance complexity."
+    },
+    {
+      "label": "Multi-model adoption",
+      "value": "81% use 3+ model families",
+      "context": "Most large organizations run several model families at once.",
+      "why_it_matters": "This is why the product focuses on model routing, attribution, and governance across an estate rather than a single provider."
+    },
+    {
+      "label": "Dominant enterprise access path",
+      "value": "Azure, Bedrock, Vertex",
+      "context": "A few hyperscaler platforms carry most production enterprise model access.",
+      "why_it_matters": "The commercial reality is platform concentration plus model diversity. Both need to be visible in the operating surface."
+    }
+  ],
+  "enterprise_ai_platforms": [
+    {
+      "name": "Microsoft Azure AI / Azure OpenAI",
+      "positioning": "Dominant enterprise access path",
+      "what_it_is": "Enterprise AI control plane tightly connected to Microsoft 365, security controls, and OpenAI model access.",
+      "enterprise_reason": "Frequently chosen when organizations want compliance posture, Microsoft integration, and GPT access in one stack.",
+      "example_fit": "Strong fit for workforce copilots, internal chat, productivity agents, and GPT-based coding assistants."
+    },
+    {
+      "name": "AWS Bedrock",
+      "positioning": "Multi-model hyperscaler platform",
+      "what_it_is": "Single AWS-managed interface to models such as Claude, Llama, Mistral, and Titan.",
+      "enterprise_reason": "Appeals to AWS-native organizations that want provider diversity without building a separate model gateway first.",
+      "example_fit": "Useful for internal document workflows, service operations, and model-routing across one API surface."
+    },
+    {
+      "name": "Google Vertex AI",
+      "positioning": "Multimodal and MLOps-heavy platform",
+      "what_it_is": "Google Cloud AI platform pairing Gemini access with strong ML infrastructure and operational tooling.",
+      "enterprise_reason": "Often favored in data-heavy or analytics-heavy environments that need multimodal reasoning and production ML plumbing together.",
+      "example_fit": "Strong fit for document analysis, analytics copilots, and custom enterprise AI workflows."
+    },
+    {
+      "name": "Snowflake Cortex AI",
+      "positioning": "Data-platform-native AI layer",
+      "what_it_is": "AI capabilities embedded directly into the warehouse and data application surface.",
+      "enterprise_reason": "Attractive where the enterprise wants AI close to governed enterprise data instead of constantly moving data across systems.",
+      "example_fit": "Useful for analytics assistants, enterprise search, and data-centric domain workflows."
+    },
+    {
+      "name": "Microsoft Copilot / Copilot Studio",
+      "positioning": "Application-layer productivity platform",
+      "what_it_is": "Employee-facing AI operating layer embedded into Office, Teams, GitHub, and workflow automation tools.",
+      "enterprise_reason": "Large enterprises adopt it because it brings AI directly into existing productivity surfaces with lower change management cost.",
+      "example_fit": "Summaries, drafting, enterprise agents, and organization-wide employee AI adoption."
+    },
+    {
+      "name": "Databricks AI / MosaicML",
+      "positioning": "Data and model engineering platform",
+      "what_it_is": "Enterprise stack for custom model work, data pipelines, experimentation, and AI analytics.",
+      "enterprise_reason": "Chosen by organizations with stronger in-house data engineering or custom model requirements.",
+      "example_fit": "Model training, lakehouse analytics, evaluation pipelines, and AI operations for data teams."
+    },
+    {
+      "name": "OpenAI Enterprise / Frontier",
+      "positioning": "Frontier model operating layer",
+      "what_it_is": "Enterprise-facing GPT access increasingly positioned as a broader agent and orchestration surface.",
+      "enterprise_reason": "Often used where companies want fast access to frontier capability and are willing to build governance around it.",
+      "example_fit": "Reasoning-intensive internal assistants, advanced coding help, and agent-style enterprise workflows."
+    }
+  ],
+  "enterprise_ai_stack": [
+    {
+      "layer": "Data Layer",
+      "role": "Foundation of enterprise AI",
+      "description": "Structured systems, documents, internal chats, knowledge bases, and operational data that AI systems ultimately need to reason over.",
+      "examples": [
+        "Snowflake",
+        "Databricks",
+        "SAP",
+        "Salesforce",
+        "AWS S3",
+        "BigQuery"
+      ],
+      "why_it_matters": "Without governed enterprise data, AI stays generic and cannot produce durable business value."
+    },
+    {
+      "layer": "AI Infrastructure Layer",
+      "role": "Middleware between data and models",
+      "description": "Pipelines, vector databases, orchestration frameworks, prompt management, and workflow control that prepare enterprise data for model use.",
+      "examples": [
+        "Pinecone",
+        "pgvector",
+        "Airflow",
+        "Kafka",
+        "LangChain",
+        "Semantic Kernel"
+      ],
+      "why_it_matters": "This is where retrieval, orchestration, memory, and tool-use become operational rather than experimental."
+    },
+    {
+      "layer": "Model / Inference Layer",
+      "role": "Foundation model execution",
+      "description": "The multi-model layer where GPT, Claude, Gemini, Llama, Mistral, and other models are selected based on reasoning need, privacy, modality, and unit cost.",
+      "examples": [
+        "GPT",
+        "Claude",
+        "Gemini",
+        "Llama",
+        "Mistral",
+        "DeepSeek"
+      ],
+      "why_it_matters": "Most enterprises are solving a routing and economics problem, not choosing a single permanent model winner."
+    },
+    {
+      "layer": "AI Agent Layer",
+      "role": "Digital worker and automation layer",
+      "description": "Agents that combine models, tools, memory, and workflows to search knowledge, execute tasks, and support decisions.",
+      "examples": [
+        "Knowledge agents",
+        "Workflow agents",
+        "Decision agents",
+        "RAG assistants"
+      ],
+      "why_it_matters": "This is where AI starts affecting business processes directly instead of only answering isolated prompts."
+    },
+    {
+      "layer": "Application Layer",
+      "role": "Employee and customer-facing experience",
+      "description": "The surfaces employees and customers actually use, including copilots, chatbots, automation tools, and AI analytics dashboards.",
+      "examples": [
+        "Microsoft Copilot",
+        "Google Workspace AI",
+        "Internal chatbots",
+        "Developer copilots"
+      ],
+      "why_it_matters": "This is where adoption becomes visible to leadership and where spend, ROI, and governance become executive topics."
+    }
+  ]
+}

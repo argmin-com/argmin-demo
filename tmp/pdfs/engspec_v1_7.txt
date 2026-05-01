@@ -1,0 +1,1431 @@
+Engineering Specification
+Argmin Platform
+Version 1.7 | March 7, 2026
+CONFIDENTIAL: Internal Use Only
+
+Companion to Product Requirements Document v2.0
+
+Document Status
+
+Working Draft
+
+Audiences
+
+CTO candidates, engineering team, design partner security reviewers
+
+Scope
+
+Implementation-grade specs for: fail-open acceptance tests, Active-Lite, deployment topology,
+canonical schemas, latency budget, component interface contracts, data classification, UI
+component specifications
+
+Version 1.7 Changes
+
+UI component specifications added (Section 11): manual attribution mapping, dynamic
+recalculation, collapsible request stream, scenario-based forecasting, mode switching,
+technical diagnostics separation. Architecture visualization simplified to L0. Codebase bugs
+documented. Carbon/benchmarking exclusions noted.
+
+Table of Contents
+1. Fail-Open Acceptance Test Matrix
+2. Active-Lite Specification
+3. Latency Budget Table
+4. Deployment Topology
+5. Canonical Event Schemas
+6. Attribution Index (Redis) Data Model
+7. Data Freshness Operational Targets
+8. Design Partner Installation Milestones
+9. Component Interface Contract
+10. Data Classification and Security Review Packet
+11. UI Component Specifications (v1.7)
+12. Known Codebase Issues (v1.7)
+
+1. Fail-Open Acceptance Test Matrix
+The interceptor sits in the critical path of the customer's production AI applications. The fail-open guarantee dictates
+that under no internal failure condition will the platform drop, delay, or mutate a legitimate client request. This matrix
+defines the mandatory chaos engineering tests for the Phase 0 Glass Jaw validation suite (PRD NFR-11).
+Principle: if the system cannot evaluate a request safely, it MUST pass the request through unmodified. Every
+fail-open event is logged asynchronously for post-hoc reconciliation.
+
+1.1 Dependency Failure Tests
+Test
+ID
+
+Failure Scenario
+
+Fault Injection
+
+Expected Behavior
+
+Max
+Overhead
+
+FO-01
+
+Timeout budget
+breached
+
+Mock index lookup to
+sleep >20ms
+
+Circuit breaker trips. Abort internal logic. Forward
+raw request to LLM.
+
++20ms
+
+FO-02
+
+Policy engine crash
+
+Inject unhandled
+exception into rule
+evaluation
+
+Global exception handler catches. Bypass
+middleware. Forward original request.
+
++5ms
+
+FO-03
+
+Control plane
+partition
+
+Sever network to
+Kafka/graph backend
+
+Serve from interceptor micro-cache. Queue
+telemetry locally (drop if >50MB).
+
+Standard
+
+FO-04
+
+Malformed app
+payload
+
+Send invalid JSON
+(missing brackets)
+
+Skip enrichment. Act as dumb TCP proxy.
+Upstream LLM returns 400 natively.
+
++2ms
+
+FO-05
+
+Upstream LLM
+outage
+
+Provider returns 503 or
+429
+
+Pass 5xx/4xx back to client exactly as received. Do
+NOT trigger internal fail-open.
+
+None
+
+FO-06
+
+Interceptor OOM
+
+SIGKILL container
+mid-flight
+
+Requires service mesh or Envoy ingress with outlier
+detection. K8s logs OOMKilled.
+
+TCP
+reconnect
+
+1.2 Latency and Load Tests
+Test
+ID
+
+Scenario
+
+Expected Behavior
+
+Pass Criteria
+
+FO-07
+
+Lookup exceeds 15ms P99
+
+Fail-open triggered at 20ms hard timeout
+
+Zero request loss. Shadow event logged.
+
+FO-08
+
+Policy eval timeout
+
+Fail-open. Request forwarded unmodified.
+
+Zero request loss.
+
+FO-09
+
+10x expected RPS burst
+
+Fail-open triggered when resources
+constrained
+
+Zero request loss. Graceful degradation.
+
+FO-10
+
+90% memory pressure
+
+Fail-open triggered. LRU eviction on index.
+
+Zero request loss. Index eviction metrics emitted.
+
+FO-11
+
+72-hour sustained load (500
+users, 50 spawn/s)
+
+System operates within latency budget
+continuously
+
+P99 <= 15ms. Zero failures. Zero client errors.
+
+1.3 Fault Injection Tests
+Test
+ID
+
+Scenario
+
+Expected Behavior
+
+FO-12
+
+Random panic in interceptor process
+
+Fail-open activated. Request forwarded. Event logged.
+
+FO-13
+
+Malformed policy rule injected
+
+Policy eval skipped. Request forwarded. Alert fired.
+
+FO-14
+
+Corrupt attribution index entry
+
+Stale/missing entry treated as cache miss. Fail-open. Shadow event.
+
+FO-15
+
+Network partition: interceptor to index
+
+Serve from local stale cache or fail-open.
+
+FO-16
+
+DNS failure for internal services
+
+Fail-open. No external dependency blocks request.
+
+FO-17
+
+Oversized advisory detail header (>200 chars or
+>1KB)
+
+Truncate/bound to limit. Proceed with bounded header. Never exceed 4KB
+total.
+
+Test
+ID
+
+Scenario
+
+Expected Behavior
+
+FO-18
+
+Forbidden content in request headers (email, API
+key, prompt text)
+
+Interceptor strips/ignores prohibited fields. Log
+WARN_HEADER_POLICY_VIOLATION.
+
+1.4 Monitoring Requirements
+The platform must emit the following metrics for fail-open observability: fail_open_total (counter by reason),
+fail_open_rate (gauge, 1m/5m/15m windows), interceptor_latency_p99 (histogram), circuit_breaker_state (gauge:
+closed/open/half-open). Alert threshold: fail_open_rate > 1% over any 10-minute window triggers PagerDuty/Slack
+notification.
+
+2. Active-Lite Specification
+Active-Lite is a restricted enforcement mode that allows safe request shaping and model routing under a strict Do No
+Harm mandate. It enables the platform to demonstrate real-time control to design partners (proving optimizer, not just
+observability) using only mathematically and semantically safe operations.
+
+2.1 Semantic Safety Bypass (Rule 1)
+Before any payload modification, the interceptor parses the outbound JSON. If the payload contains any of the
+following, ALL Active-Lite modifications are bypassed and the request downgrades to Advisory mode: (a)
+response_format: { type: 'json_object' }, (b) strict JSON schema definitions, (c) tools or functions arrays. Rationale:
+tool-calling schemas and structured generation capabilities vary between models; swapping or capping these
+requests guarantees breakage.
+
+2.2 Environment Gating (Rule 2)
+Active-Lite modifying or blocking actions execute ONLY if request metadata resolves to environment: staging, dev, or
+test. If environment resolves to production (or is null/unresolved), the interceptor defaults to Advisory mode.
+Production opt-in requires explicit per-service configuration override.
+
+2.3 Approved MVP Interventions (Shape vs Gate)
+Intervention
+
+Mechanism
+
+Safety Guarantee
+
+Scope
+
+Same-family
+deterministic routing
+(Shape)
+
+Route to admin-defined 1:1 alias
+within same provider family where
+target context window >= requested
+model.
+
+Identical API schema. No
+cross-provider translation. Context
+window verified.
+
+Staging by default; production
+per-service opt-in
+
+Exact-match semantic
+caching (Shape)
+
+Hash fully canonicalized JSON
+payload + env + tenant_id for
+stateless/deterministic workloads.
+Return cached response on match
+within configurable TTL. Cache
+isolated from attribution index.
+Never cache tool_calls or
+function_call results.
+
+100% safe: verbatim identical prior
+LLM output.
+
+All environments; requires
+X-ACI-Cache-Allowed: true
+
+Pre-flight input token
+gating (Gate)
+
+Measure input token count. If input
+exceeds team policy limit, reject with
+HTTP 413 Payload Too Large.
+
+Clean error before LLM invocation.
+No truncated output.
+
+All environments
+
+Pre-flight semantic
+rejection (Gate)
+
+Block unapproved models (FR-600)
+or over-budget requests (FR-601)
+pre-flight with HTTP 403 or 429 with
+well-formed JSON error body.
+
+Clean HTTP error. Client's native
+retry/fallback logic handles.
+
+Staging by default; production
+requires SEPARATE opt-in from
+Shape
+
+2.4 Explicitly Forbidden Actions
+• Request blocking in production without per-service opt-in
+• Payload rewriting beyond max_tokens injection (and only where semantic safety bypass does not apply)
+• Prompt content modification
+• Response content modification or truncation
+• Automatic service shutdown
+• Rate limiting (handled by customer's own infrastructure)
+• Cross-provider model routing (e.g., OpenAI to Anthropic; deferred to Phase 2)
+
+2.5 Configuration and Rollback
+Active-Lite must be explicitly enabled per service via configuration (default: disabled). Configuration specifies allowed
+actions per service. Immediate disablement: setting active_lite_enabled=false propagates within 60 seconds. All
+modifications include X-ACI-Intervention response header identifying the action taken. Every modification generates
+an intervention_event in the append-only audit log.
+
+2.6-2.10 Additional Active-Lite Specifications
+MVP Provider Scope (2.6): OpenAI models and AWS Bedrock models in MVP. Azure OpenAI, Vertex AI, and
+self-hosted models are Phase 2.
+Environment Trust Model (2.7): X-ACI-Env request header is treated as a hint only. Canonical environment derived
+from trusted deployment metadata (Kubernetes namespace labels, cluster identity, IAM role/account mapping). If
+environment cannot be resolved, treated as production (most restrictive).
+Cache Hard Caps (2.8): max_entry_bytes: default 2MB. max_cache_bytes_per_service: default 100MB.
+max_cache_bytes_total: default 1GB. Cache write sampling rate: default disabled (100%).
+Gate Error Response Schema (2.9): HTTP 413 (token_size_exceeded), HTTP 403 (model_not_allowed), HTTP
+429 (budget_exceeded). All return well-formed JSON error bodies with request_id, policy_id, and actionable details
+(approved_alternatives for 403, retry_after_seconds for 429).
+Confidence Thresholds (2.10): Shape actions require minimum attribution confidence of 0.90. Gate actions require
+0.95 or higher, or explicit admin allowlist waiver.
+
+3. Latency Budget Table
+The interceptor hot path has a strict latency budget. This table reconciles PRD FR-301 (20ms hard timeout) and
+NFR-01 (P99 <= 15ms for lookup + eval, 50ms total) into a single operational reference.
+Stage
+
+Budget (P99)
+
+Fail Behavior
+
+Notes
+
+Attribution index lookup
+
+1-5ms
+
+Fail-open if >15ms (cache miss)
+
+In-process micro-cache (1-5s TTL) with Redis
+HMGET fallback.
+
+Policy/constraint
+evaluation
+
+5-10ms
+
+Skip policy if >15ms cumulative
+
+In-process evaluation of compiled policy bundles.
+No RPC.
+
+Enrichment total (lookup
++ eval)
+
+15ms target
+
+Soft degrade: skip enrichment, emit
+advisory headers only
+
+Shadow event logged for async reconciliation.
+
+Hard fail-open timeout
+
+20ms
+
+Hard fail-open: request forwarded
+completely unmodified
+
+Circuit breaker trips. All internal logic aborted.
+
+Routing decision +
+serialization
+
+1-5ms
+
+N/A (post-decision)
+
+Header injection, model rewrite if Active-Lite.
+
+Total interceptor
+overhead
+
+<=50ms (P99)
+
+N/A
+
+Includes network hops. Well within LLM response
+latency (200ms-5s).
+
+4. Deployment Topology
+4.0 End-to-End System Architecture
+The complete system architecture includes telemetry sources, ingestion and normalization layer, core platform
+components, decision-time interception path, and the optional vendor control plane. The customer trust boundary
+(VPC) is explicitly delineated. Hot path (interceptor) depends only on Attribution Index (Redis) and in-process policy
+bundle evaluator. Cold path (ingestion/graph) is eventually consistent.
+[v1.7: Architecture diagrams in the customer-facing UI should present a Level-0 (L0) overview showing active integrations within
+the specific customer deployment, not the full conceptual architecture. This L0 view belongs in the Integrations tab (PRD
+FR-810), not in the Attribution section. The full architecture diagram remains in this Engineering Specification for technical
+audiences.]
+
+4.1 Customer VPC Deployment (Design Partner)
+All platform components deploy within the customer VPC on Kubernetes (EKS for MVP). The architecture is
+organized into five Kubernetes namespaces with clear isolation boundaries.
+Namespace
+
+Components
+
+Data Sensitivity
+
+Scaling
+
+aci-ingestion
+
+AWS Collector (CUR, CloudWatch, Bedrock
+usage), Okta Collector, GitHub Collector, GitHub
+Actions Collector, Event Bus (Kafka or SQS/NATS),
+Normalizer, Dedup/Idempotency
+
+HIGH: raw operational
+data
+
+Horizontal per collector type
+
+aci-core
+
+Timeseries DB, Attribution Graph (Neo4j/AGE),
+Attribution Index (Redis/KeyDB), HRE Resolver,
+Cost Engine, Recommendations Engine
+
+HIGH: full attribution
+graph + hot-path index
+
+Graph: vertical. Index: Redis in-memory +
+micro-cache.
+
+aci-edge
+
+Interceptor Gateway (standalone), Optional
+Interceptor Sidecars (per-service)
+
+MEDIUM: request
+metadata only
+
+Horizontal. Sub-50ms.
+
+aci-ui
+
+UI Frontend (static + API calls in VPC)
+
+MEDIUM: aggregated
+views
+
+Standard.
+
+aci-system
+
+Operator/Helm Controller, Audit Sink (append-only),
+Config Service, AuthN/Z Adapter (SSO optional)
+
+LOW: operational
+metadata
+
+Standard.
+
+4.2 Optional Vendor Control Plane
+A non-sensitive vendor control plane (hosted outside customer VPC) may optionally provide: license/feature flag
+management, update registry (signed container images, SBOM), version/health metadata collection. No customer
+data, no prompts, no attribution data, no PII transits to vendor. Outbound connection only. Airgapped deployment
+available for regulated environments.
+
+4.3 Network and IAM Requirements
+All pods in private subnets. Egress allowlist: AWS APIs, Okta API, GitHub API. IAM: prefer IRSA. Separate roles for
+collectors (read-only) and interceptor (bedrock:InvokeModel scoped to approved model ARNs only). PII
+pseudonymized via HMAC-SHA256 with KMS-protected customer key. HMAC key rotation: annual minimum. On
+rotation, previous key retained for 30-day transition; graph edges re-derived during transition window.
+
+4.4 Provider Routing Patterns
+Pattern
+
+Mechanism
+
+Pros
+
+Cons
+
+Recommen
+ded For
+
+A: Per-provider
+endpoint
+
+Interceptor exposes
+provider-specific paths (e.g.,
+/openai/v1, /bedrock/invoke).
+
+Simplest. Clear routing.
+
+App must configure multiple
+BASE_URLs if calling multiple
+providers.
+
+MVP.
+
+B: Single endpoint
+with detection
+
+Interceptor detects provider
+from payload shape, model
+name, or X-ACI-Provider
+header.
+
+One BASE_URL per
+service.
+
+More brittle. Detection logic
+adds complexity.
+
+Phase 2.
+
+C: Per-service
+sidecar
+
+Sidecar per service with
+service mesh route rules.
+
+Best for fail-open.
+Per-service isolation.
+
+Requires service mesh.
+Higher resource overhead.
+
+Phase 2+.
+
+MVP uses Pattern A exclusively. For AWS Bedrock, the interceptor preserves SigV4 request signing via the AWS
+SDK (IRSA-based credentials). For OpenAI/Anthropic, API keys are passed through from the application or injected
+at the proxy layer.
+
+4.5 Data Flow Summary (Security Review Reference)
+Components that receive raw operational data: Collectors (aci-ingestion). Components that touch inference traffic:
+Interceptor Gateway only (aci-edge). What never leaves the VPC: all telemetry, attribution data, identity data, cost
+data, audit logs, prompts, model outputs. What goes to optional vendor control plane: license validation, feature flags,
+signed policy bundles, version/health metadata only.
+
+5. Canonical Event Schemas
+All ingested data normalizes into canonical schemas before entering the event bus. These provide a stable internal
+interface regardless of upstream provider format changes.
+Schema
+
+Required Fields
+
+Optional Fields
+
+Source
+
+InvocationEvent
+
+event_id, timestamp, model_id, provider,
+input_tokens, output_tokens, latency_ms,
+service_fingerprint, environment, request_id
+
+cache_read_tokens,
+cache_write_tokens, temperature,
+response_format, tools_present,
+trace_id, span_id, stream_mode
+
+Cloud telemetry,
+interceptor
+
+CostEvent
+
+event_id, timestamp, resource_id, cost_usd,
+cost_type (synthetic|reconciled),
+pricing_snapshot_id
+
+discount_program,
+reserved_instance_id,
+commitment_id,
+variance_from_synthetic
+
+Billing APIs, pricing
+tables
+
+IdentityEdge
+
+edge_id, timestamp, actor_id, group_id,
+edge_type (member|admin|owner), source
+
+valid_from, valid_to, confidence,
+tenant_id
+
+Okta, Azure AD
+
+OwnershipEdge
+
+edge_id, timestamp, repo_or_service_id,
+owner_id, edge_type, source
+
+valid_from, valid_to, confidence,
+codeowners_path
+
+GitHub, GitLab
+
+DeploymentEdge
+
+edge_id, timestamp, service_id, repo_id,
+version, triggering_actor, target_resource
+
+ci_job_id, environment,
+deploy_method
+
+GitHub Actions,
+Jenkins
+
+AttributionResult
+
+result_id, timestamp, resource_fingerprint,
+environment, time_bucket, owner_team,
+owner_cost_center, cost_usd, confidence,
+explanation_ref, index_version
+
+fractional_weight,
+hre_methods_used,
+alternatives_considered,
+conflict_state
+
+Attribution processor
+
+6. Attribution Index (Redis) Data Model
+The Attribution Index is the hot-path serving cache used by the interceptor for O(1) lookups. Deployed as Redis (or
+KeyDB) inside the customer VPC in the aci-core namespace. The graph and timeseries stores are the durable
+sources of truth; the index is derived, rebuildable, and eventually consistent.
+
+6.1 Keying Strategy
+Key format: aci:idx:v1:{env}:{rf_hash}. rf_hash = base32(sha256(resource_fingerprint))[:26] (~130 bits).
+resource_fingerprint = hash(X-ACI-Service-Id + X-ACI-Route + provider_endpoint + [X-ACI-Tenant-Id if multi-tenant]).
+Time-bucketing excluded from hot-path key to prevent thundering-herd cache invalidation.
+
+6.2 Value Model (Redis Hash)
+Field
+
+Type
+
+Description
+
+index_version
+
+int
+
+Monotonically increasing version per key
+
+updated_ms
+
+int
+
+Server-side update timestamp
+
+owner_id
+
+string
+
+Canonical owner identifier (non-PII)
+
+team_id
+
+string
+
+Canonical team ID (org node)
+
+service_id
+
+string
+
+Source service ID
+
+conf
+
+float (string)
+
+Confidence score [0.0-1.0]
+
+reason
+
+string
+
+Attribution reason enum
+
+explain_id
+
+string
+
+Points to durable explanation artifact
+
+constraints_json
+
+string
+
+Bounded JSON array of active execution constraints
+
+price_snapshot_id
+
+string
+
+Pricing snapshot ID
+
+Field
+
+Type
+
+Description
+
+schema_v
+
+int
+
+Payload schema version
+
+Read pattern: HMGET key owner_id team_id conf reason index_version constraints_json updated_ms. One
+round-trip. Pipeline with PTTL.
+
+6.3-6.10 Index Operations
+TTL Strategy (6.3): Every index key MUST have a TTL. Default: 30 minutes. Sliding TTL on write.
+Versioning and Invalidation (6.4): schema_v (data format) and index_version (content changes). index_version
+MUST be monotonically increasing. Updated atomically via Lua script.
+Write Path (6.5): Concurrent writers use Lua script for atomic upsert: TIME, HGET index_version, increment, HSET
+all fields, PEXPIRE.
+Read Path (6.6): Two-tier: (1) local in-process LRU micro-cache (1-5s TTL), (2) on miss, pipelined HMGET + PTTL to
+Redis with strict 15ms timeout. On miss/timeout, fail-open.
+Memory Sizing (6.7): Redis maxmemory policy: allkeys-lru. ~10,000 keys = ~5MB. Well within 256MB budget.
+Semantic cache MUST use separate Redis logical database or dedicated instance.
+Failure Modes (6.8): Redis unavailable: fail-open. Stale entry: TTL bounds staleness. Key collision: negligible at 130
+bits.
+Observability (6.9): aci_idx_lookup_p50/p95/p99_ms, aci_idx_hit_rate (micro-cache), aci_idx_key_count,
+aci_idx_evictions_total, aci_idx_entry_age_ms.
+
+6.10 Recommended MVP Defaults
+Parameter
+
+Default
+
+Notes
+
+bucket_ms
+
+300,000 (5 min)
+
+Cold-path analytics time bucket. Not used in hot-path Redis keying.
+
+index_ttl_ms
+
+1,800,000 (30 min)
+
+Redis key TTL
+
+lookup_timeout_ms
+
+15
+
+Hard timeout for Redis read
+
+policy_timeout_ms
+
+15
+
+Hard timeout for policy eval
+
+active_lite_min_confidence
+
+0.90
+
+Minimum confidence for Active-Lite Shape actions
+
+active_lite_gate_min_confidence
+
+0.95
+
+Minimum confidence for Active-Lite Gate actions
+
+attribution_coverage_min_confidence
+
+0.80
+
+Chargeback threshold
+
+micro_cache_ttl_ms
+
+3,000 (3 sec)
+
+Local interceptor micro-cache TTL
+
+7. Data Freshness Operational Targets
+[v1.7: These operational targets are for platform engineering use. In the customer-facing UI, data freshness metrics are
+displayed in the Technical Diagnostics view (PRD FR-413), not in the primary dashboard.]
+Data Source
+
+Ingestion
+Latency
+
+Refresh Cadence
+
+Notes
+
+Invocation telemetry
+(interceptor)
+
+Real-time (seconds)
+
+Continuous stream
+
+Synthetic cost computed immediately.
+
+Invocation telemetry (cloud
+logs)
+
+1-5 minutes
+
+Continuous polling
+
+CloudWatch Logs subscription or equivalent.
+
+Provider billing (AWS CUR)
+
+12-48 hours
+
+Daily reconciliation
+
+T+24h true-up against synthetic cost. Variance >3% triggers
+investigation.
+
+Identity (Okta/AD)
+
+Hourly
+
+Scheduled pull
+
+User/group membership changes.
+
+Source control (GitHub)
+
+Near real-time
+
+Webhook-driven
+
+CODEOWNERS, repo ownership changes.
+
+CI/CD (GitHub Actions)
+
+Near real-time
+
+Webhook-driven
+
+Deployment events, job metadata.
+
+HR (Workday)
+
+Daily
+
+Scheduled pull
+
+Phase 2. Org hierarchy, cost centers, manager chains.
+
+Attribution index
+
+1-5 min after graph
+change
+
+Incremental
+materialization
+
+Full rebuild on backfill events.
+
+Pricing tables
+
+On provider
+announcement
+
+Manual + automated
+scrape
+
+Versioned snapshots.
+
+Source of truth hierarchy for cost: (1) Provider billing API (reconciled), (2) Provider usage metrics multiplied by pricing
+snapshot (synthetic), (3) Pricing table estimation.
+
+8. Design Partner Installation Milestones
+Week
+
+Milestone
+
+Deliverable
+
+Validation Gate
+
+Prereq
+
+Infrastructure
+prerequisites
+
+Service mesh or Envoy ingress configured. IAM
+roles provisioned. EKS cluster with namespaces
+created.
+
+FO-06 fail-open validated. IAM scoped and
+tested.
+
+Week 1
+
+Deploy aci-system +
+aci-ingestion
+
+Operator, config, audit, metrics infrastructure.
+Collectors deployed.
+
+End-to-end data flow validated.
+
+Week 1-2
+
+Graph construction +
+attribution
+
+HRE resolver running. Attribution graph populating.
+Index materializing.
+
+Attribution coverage > 30%. Explanation
+artifacts visible.
+
+Week 2
+
+Dashboard enabled
+(Passive + Advisory)
+
+UI deployed. Overview, Attribution (Models +
+Teams), Interventions, Governance, Integrations
+views live.
+
+Design partner stakeholders can navigate
+dashboards.
+
+Week 2-3
+
+Attribution coverage
+ramp + manual mapping
+
+Tune HRE methods. Add missing integrations.
+Provide manual attribution interface for unresolved
+attributions.
+
+Coverage > 60%. Manual mapping active.
+
+Week 3-4
+
+Interventions +
+right-sizing
+
+Recommendation engine generating interventions
+with methodology indicators. At least 3 actionable
+recommendations.
+
+Design partner reviews and acts on at least 1
+recommendation.
+
+Week 4
+(opt)
+
+Active-Lite for one
+non-critical service
+
+Active-Lite enabled for staging or one low-risk
+production service.
+
+Zero production incidents. Savings reported.
+
+9. Component Interface Contract
+This section defines the normative API contracts between the interceptor, attribution index, and policy engine. All
+header names use the X-ACI- prefix. Header specifications use MUST/SHOULD/MAY per RFC 2119.
+
+9.1 Interceptor Request Headers (Service to Interceptor)
+Header
+
+Status
+
+Description
+
+X-ACI-Request-Id
+
+Required
+
+Globally unique request ID (UUIDv4 recommended)
+
+X-ACI-Env
+
+Required
+
+Environment: prod, staging, dev
+
+X-ACI-Service-Id
+
+Required
+
+Stable service identifier
+
+X-ACI-Tenant-Id
+
+Required if
+multi-tenant
+
+Internal tenant/business unit identifier
+
+X-ACI-Trace-Id
+
+Recommended
+
+OpenTelemetry distributed trace correlation ID
+
+X-ACI-Span-Id
+
+Recommended
+
+OpenTelemetry span ID
+
+X-ACI-User-Principal
+
+Recommended
+
+Non-PII stable user identifier (not email)
+
+X-ACI-Route
+
+Recommended
+
+Logical route/endpoint name
+
+X-ACI-Workload-Id
+
+Recommended
+
+Stable workload grouping ID
+
+Prohibited: raw prompts, model outputs, email addresses, or access tokens in headers.
+
+9.2 Interceptor Response Headers
+Header
+
+Category
+
+Description
+
+X-ACI-Attribution-Owner-Id
+
+Attribution
+
+Canonical owner ID
+
+X-ACI-Attribution-Confidence
+
+Attribution
+
+Float [0.00-1.00]
+
+X-ACI-Attribution-Reason
+
+Attribution
+
+Enum: DIRECT_OWNER_MAPPING, CI_PROVENANCE_MATCH,
+GATEWAY_INHERITANCE, HEURISTIC_MATCH, UNKNOWN
+
+X-ACI-Est-Cost-USD
+
+Cost
+
+Estimated cost for the request
+
+X-ACI-Model
+
+Cost
+
+Model name observed/requested
+
+X-ACI-Price-Snapshot-Id
+
+Cost
+
+Pricing snapshot identifier
+
+X-ACI-Advisory
+
+Advisory
+
+Boolean: true if advisory exists
+
+X-ACI-Advisory-Code
+
+Advisory
+
+Enum: SUGGEST_MODEL_DOWNGRADE, SUGGEST_TOKEN_CAP
+
+X-ACI-Advisory-Detail
+
+Advisory
+
+Bounded short string (<= 200 chars)
+
+X-ACI-Intervention-Applied
+
+Intervention
+
+Boolean: true if Active-Lite modified request
+
+X-ACI-Intervention-Type
+
+Intervention
+
+Enum: TOKEN_CAP, MODEL_ROUTE, SEMANTIC_CACHE
+
+X-ACI-Intervention-Delta
+
+Intervention
+
+Bounded JSON (<= 512 bytes)
+
+X-ACI-Fail-Open
+
+Fail-open
+
+Boolean: present and true only if fail-open triggered
+
+X-ACI-Fail-Open-Reason
+
+Fail-open
+
+Enum: INDEX_UNAVAILABLE, POLICY_TIMEOUT, LOOKUP_TIMEOUT, etc.
+
+Total added headers MUST be <= 4KB. Any single header value MUST be <= 1KB. All detail fields MUST be
+bounded and non-PII. Carbon header (X-ACI-Carbon-gCO2e) architecturally reserved but not emitted in MVP.
+
+9.3-9.5 Additional Interface Contracts
+Index Lookup (9.3): GET /v1/index/lookup?key={key}. P99 <= 15ms. Returns attribution (owner_id, team_id,
+confidence, reason), constraints[], cache_ttl_ms.
+
+Policy Evaluation (9.4): On hot path, policy evaluation is an in-process function call (not remote RPC). POST
+/v1/policy/evaluate exists for admin/test only. Hard safety: if mode != ACTIVE_LITE, actions MUST be empty.
+Policy Bundle Artifact (9.5): JSON with schema version. Signed with control plane key. Max 1MB. Pushed on
+change; polled every 60s as fallback. Rollback within 60 seconds.
+
+10. Data Classification and Security Review Packet
+This section provides the security review packet for enterprise design partner engagements.
+
+10.1 Data Classification Table
+Data Category
+
+Examples
+
+Classification
+
+Stored Where
+
+Leaves
+VPC?
+
+Inference content
+
+Prompts, completions
+
+Prohibited
+
+Never collected
+
+N/A
+
+Invocation metadata
+
+Model name, token
+counts, latency
+
+Confidential
+
+Timeseries DB
+
+No
+
+Cost data
+
+Estimated/request cost,
+billing line items
+
+Confidential
+
+Timeseries DB
+
+No
+
+Attribution graph
+edges
+
+Service-to-repo,
+repo-to-owner
+
+Confidential
+
+Graph DB
+
+No
+
+Identity directory
+data
+
+Okta user IDs, group
+membership
+
+Restricted
+
+Graph DB (hashed); optional PII
+vault
+
+No
+
+Audit logs
+
+Policy decisions,
+interventions, fail-open
+events
+
+Restricted
+
+Append-only store
+
+No
+
+Customer secrets
+
+API tokens, GitHub App
+keys
+
+Restricted
+
+Customer KMS/Secrets Manager
+
+No
+
+10.2-10.6 Additional Security Specifications
+Connector permissions, network egress, inbound access, and operational access controls are unchanged from v1.6.
+Key assertions: platform runs inside customer VPC; read-only access to enterprise systems; interceptor is fail-open
+and cannot break production inference; Active-Lite is explicit opt-in, fully logged, instantly reversible; prompts and
+model outputs are never collected, stored, or transmitted.
+
+11. UI Component Specifications (v1.7)
+This section defines implementation specifications for UI components introduced or modified in PRD v2.0. These
+specifications complement the functional requirements and provide engineering guidance for the frontend.
+
+11.1 Manual Attribution Mapping Interface
+The Attribution page includes a manual mapping panel that surfaces unresolved or low-confidence attributions. For
+each unresolved item, the interface displays: request or service identifier, the platform's best-guess attribution with
+confidence interval, and fields allowing the user to select or type the correct association.
+
+Supported mapping targets:
+• Teams
+• Services
+• Cloud environments
+• CI/CD pipelines
+• Git repositories
+• Other infrastructure components as configured
+
+Behavior on confirmation:
+When a user confirms a manual attribution: (1) a loading indicator appears (see Section 11.2), (2) the attribution is
+recorded with source='manual' and confidence=1.0 (direct user confirmation), (3) all affected metrics recalculate:
+attribution coverage %, AI spend by team, optimization potential, provider breakdown, cloud breakdown, (4) the
+manual input is fed into the HRE calibration loop (FR-212) as a ground truth sample. (5) The request moves from
+'unresolved' to 'confirmed' status in the mapping interface.
+
+11.2 Dynamic Recalculation Indicator
+When user actions trigger metric recalculation (manual attribution, intervention approval/rejection, policy change), the
+system displays a visible loading indicator:
+• Visual: a centered overlay spinner with the text 'Recalibrating...' displayed over the affected content area.
+• Duration: 0.9 to 1.2 seconds (configurable). This is a deliberate UX decision to signal that computation is
+occurring, not a performance limitation.
+• Scope: the indicator covers the content area being recalculated. Global metrics in the header (if visible) also
+refresh.
+• Completion: on completion, all affected metrics display updated values. No page reload required.
+
+11.3 Collapsible Request Stream Panel
+A slide-out right panel (collapsible drawer) accessible from any page via a persistent icon in the top navigation bar.
+This replaces the inline execution stream that was previously displayed on the Overview dashboard.
+• Default state: collapsed (hidden).
+• Trigger: persistent icon/button in the top navigation bar.
+• Content: most recent N inference requests (configurable, default 50) with: request ID, model, service,
+estimated cost, attribution confidence, attribution status (resolved/unresolved/manual).
+• Layout: panel width approximately 30-40% of viewport. Does not push or disrupt the primary page content.
+• Accessibility: available from every page in the application.
+
+11.4 Scenario-Based Cost Forecasting
+The cost forecasting view (PRD FR-402) supports intervention-based scenario modeling. Implementation
+requirements:
+• Scenario selection: users can toggle individual interventions on/off or use preset buttons: 'No interventions',
+'All interventions'. The forecast chart updates to reflect the selected scenario.
+• Time horizons: selectable from a dropdown or button group: 3, 6, 9, 12, 18, 24 months.
+• Visualization: line chart showing projected spend over the selected horizon with confidence band. Current
+spend trajectory (no interventions) shown as baseline. Selected scenario shown as overlay.
+• Forecast model inputs: removed from the primary forecasting page. Available in a dedicated configuration or
+advanced settings view accessible via a settings icon or link.
+
+11.5 Mode Switching Interface
+The deployment mode selector (Passive Observation / Advisory / Active-Lite) must be visible and accessible from
+primary navigation. Implementation:
+• Location: visible in the top navigation bar as a labeled pill or badge indicating the current mode.
+• Interaction: clickable. Expands to show a brief description of the current mode, what the other available
+modes are, and what each mode means for the customer's AI workloads.
+• Mode descriptions: Passive Observation (log-only, no headers), Advisory (enriches response headers with
+cost and attribution data, no modifications), Active-Lite (may route, cache, or gate requests per policy).
+• Mode change: changing mode triggers the recalculation indicator (Section 11.2) and updates the Governance
+view.
+
+11.6 Technical Diagnostics Separation
+Operational metrics intended for platform engineering users are housed in a dedicated Technical Diagnostics tab,
+separate from the primary user-facing views. This tab includes: data freshness per data source (Section 7), ingestion
+latency, telemetry health, collector status (connected/erroring), event bus throughput, index materialization lag, and
+circuit breaker state. These metrics are not displayed on the Overview, Attribution, or any other primary view.
+
+11.7 Intervention Card Methodology Indicators
+Each intervention card in the Interventions view displays:
+• Optimization category: the predefined class (model over-provisioning, duplicate requests, staging/dev
+sprawl, orphaned resources, prompt inefficiency, batch mispricing).
+• Triggering data threshold: e.g., "Triggered: 2.1M fallback requests detected, 97.3% achieve equivalent
+quality with cheaper model."
+• Rule/condition met: e.g., "Rule: Model cost differential >50% with verified quality equivalence."
+• Visibility: this information is displayed prominently on the card, not hidden behind a 'Show Details' toggle.
+
+11.8 Overview Clickable Navigation
+Every metric card on the Overview page (total AI spend, attribution coverage, optimization potential, savings
+captured) is clickable and navigates directly to the associated detail view. Clicking attribution coverage navigates to
+the Attribution page. Clicking optimization potential navigates to the Interventions page. Clicking savings captured
+navigates to a filtered view of implemented interventions.
+
+11.9 Terminology Standardization
+
+All user-facing instances of "waste" are replaced with "optimization potential." This applies to: variable names in demo
+data (WASTE_CATS renamed to OPTIMIZATION_CATS or OPT_CATS), UI labels, chart labels, tooltip text, table
+column headers, and intervention type names ("Waste Elimination" renamed to "Resource Recovery"). The term
+'waste' may appear in internal code comments or developer documentation where it is not user-facing.
+
+12. Known Codebase Issues (v1.7)
+This section documents known deviations between the codebase
+(github.com/argmin-com/argmin-demo) and the PRD/Engineering Specification. These must be
+resolved before design partner deployment.
+
+12.1 _handle_org_change: Old Team Membership Edge Not Closed
+File: src/aci/core/processor.py, _handle_org_change method
+Bug: When processing an organizational change event (person moves from Team A to Team B), the handler creates
+a new edge from the person to the new team, but does not explicitly close the old edge from the person to the old
+team. The GraphStore.add_edge method closes existing edges with the same (from_id, to_id, edge_type) key, but
+since the new edge has a different to_id (new team), the old edge remains active. The person appears as a member
+of both teams simultaneously until the old edge expires via TTL.
+Impact: Incorrect dual-team attribution. Cost attributed to person may split across both teams. Attribution confidence
+for the affected person's workloads will be inaccurately inflated.
+Fix: Before creating the new edge, explicitly close the old edge by calling graph.add_edge with the old team's to_id,
+which will trigger the existing-edge closure logic. Alternatively, add a close_edge method to GraphStore that closes
+an edge by (from_id, to_id, edge_type) key without creating a replacement.
+Severity: High. First identified in v1.6 codebase audit.
+
+12.2 TRAC Calculator: Carbon Liability in MVP Formula
+File: src/aci/trac/calculator.py
+Issue: The TRAC calculator computes Carbon Liability (emissions_kg_co2e * carbon_price_per_tco2e / 1000.0) and
+includes it in the TRAC sum. PRD v2.0 (FR-704) specifies that the MVP formula is Billed Cost + Confidence Risk
+Premium only, with Carbon Liability deferred to post-MVP.
+Fix: Add a configuration flag (e.g., include_carbon_liability, default False for MVP) that skips the carbon liability
+computation. When False, TRAC = billed_cost_usd + risk_premium.
+Severity: Medium. Code vs. spec divergence. No runtime impact in MVP since carbon data is not ingested, but
+creates a correctness gap if carbon emissions data is provided (e.g., from test fixtures).
+
+12.3 Previously Identified Bugs (Resolved)
+The following bugs identified in the v1.6 audit have been resolved in the current codebase:
+• calibrate_score() vs. calibrate() method name mismatch: Resolved. calibrate_score() now wraps
+calibrate() as an alias.
+• get_nodes_by_type() not implemented on GraphStore: Resolved. Method implemented with
+_nodes_by_type index.
+End of Document. This specification is a companion to the PRD (v2.0) and should be updated in tandem.
+
+

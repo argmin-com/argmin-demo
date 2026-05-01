@@ -1,0 +1,392 @@
+"""
+Federated Benchmarking Protocol (Patent Spec Section 11).
+
+Enables cross-organizational performance comparison with formal privacy guarantees.
+Uses Laplace mechanism with sensitivity bounds, privacy budget accounting, and
+anti-differencing rules.
+
+Privacy accounting: each organization has epsilon_total = 4.0 per quarter.
+Each benchmark release consumes epsilon_release (default 1.0).
+
+Noise mechanism:
+  Development: continuous Laplace via numpy (fast, sufficient for protocol testing).
+  Production: discrete geometric Laplace using secrets module. Eliminates the
+    floating-point LSB leakage inherent in continuous Laplace implementations
+    (Mironov 2012, "On Significance of the Least Significant Bits For
+    Differential Privacy"). Must be enabled before any real organizational
+    data flows through the protocol.
+"""
+
+from __future__ import annotations
+
+import math
+import secrets
+import threading
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+
+import numpy as np
+import structlog
+from prometheus_client import Counter
+
+from aci.config import FBPConfig
+
+logger = structlog.get_logger()
+NoiseFn = Callable[[float], float]
+FBP_BENCHMARK_RELEASE_TOTAL = Counter(
+    "aci_fbp_benchmark_release_total",
+    "Federated benchmark publication attempts.",
+    ["metric_name", "suppressed"],
+)
+
+
+# ---------------------------------------------------------------------------
+# Noise mechanisms
+# ---------------------------------------------------------------------------
+
+
+def _continuous_laplace(scale: float, rng: np.random.Generator) -> float:
+    """
+    Standard continuous Laplace noise via numpy.
+
+    Suitable for development and protocol testing. NOT safe for production
+    differential privacy: IEEE 754 floating-point arithmetic leaks information
+    through least-significant-bit patterns.
+    """
+    return float(rng.laplace(0, scale))
+
+
+def _discrete_laplace(scale: float) -> float:
+    """
+    Cryptographically secure discrete Laplace noise.
+
+    Constructed as the difference of two geometric random variables using
+    the secrets module for CSPRNG. Eliminates the floating-point LSB
+    vulnerability present in continuous Laplace implementations.
+
+    The discrete Laplace with parameter b produces the distribution
+    P(X = k) proportional to exp(-|k|/b) for integer k, achieved by
+    sampling Geom(1 - exp(-1/b)) and taking the difference.
+    """
+    if scale <= 0.0:
+        return 0.0
+
+    # For Geom(1-q), inverse CDF sampling can be done from log(q) directly:
+    # k = floor(log(u) / log(q)).
+    # Using log(q) avoids underflow for very small scales.
+    log_q = -1.0 / scale
+
+    def _secure_geometric(log_q_param: float) -> int:
+        if not math.isfinite(log_q_param) or log_q_param >= 0.0:
+            return 0
+        # CSPRNG uniform [0, 1).
+        u = secrets.SystemRandom().random()
+        if u == 0.0:
+            u = 2.0**-53  # Smallest positive float64.
+        return int(math.floor(math.log(u) / log_q_param))
+
+    return float(_secure_geometric(log_q) - _secure_geometric(log_q))
+
+
+@dataclass
+class CohortMembership:
+    """An organization's membership in a benchmarking cohort."""
+
+    org_id: str
+    cohort_id: str
+    joined_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+
+@dataclass
+class BenchmarkMetric:
+    """A single metric contributed by an organization for benchmarking."""
+
+    org_id: str
+    metric_name: str
+    raw_value: float
+    period: str  # e.g., "2026-Q1"
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+
+@dataclass
+class CohortBenchmark:
+    """Aggregate benchmark result for a cohort, with DP noise."""
+
+    cohort_id: str
+    metric_name: str
+    noisy_mean: float
+    noisy_median: float
+    member_count: int
+    epsilon_consumed: float
+    period: str
+    published_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    suppressed: bool = False
+    suppression_reason: str = ""
+
+
+class PrivacyBudgetExhaustedError(Exception):
+    """Raised when an org's quarterly privacy budget is spent."""
+
+    pass
+
+
+# Alias retained for import convenience.
+PrivacyBudgetExhausted = PrivacyBudgetExhaustedError
+
+
+class FederatedBenchmarkProtocol:
+    """
+    Federated benchmarking with differential privacy (Section 11).
+
+    Key mechanisms:
+    1. Sensitivity bounds: each metric clipped before noise addition.
+    2. Laplace noise: calibrated to sensitivity / epsilon.
+    3. Privacy budget: epsilon_total = 4.0 per quarter per org.
+    4. Anti-differencing rules: prevent overlapping cohort publication.
+    5. Minimum cohort size: k = 5 organizations.
+    """
+
+    def __init__(self, config: FBPConfig | None = None) -> None:
+        self.config = config or FBPConfig()
+        self.cohorts: dict[str, list[CohortMembership]] = {}
+        self.metrics: dict[str, list[BenchmarkMetric]] = {}
+        self.budget_consumed: dict[str, float] = {}  # org_id -> epsilon consumed this quarter
+        self._budget_lock = threading.RLock()
+        self._membership_lock = threading.RLock()
+        self.rng = np.random.default_rng()
+        self._add_noise: NoiseFn
+        self._published_membership_history: dict[tuple[str, str], tuple[str, set[str]]] = {}
+
+        # Select noise mechanism based on config.
+        if self.config.use_secure_noise:
+            self._add_noise = _discrete_laplace
+            logger.info("fbp.noise_mechanism", mechanism="discrete_laplace_csprng")
+        else:
+
+            def _add_continuous_noise(scale: float) -> float:
+                return _continuous_laplace(scale, self.rng)
+
+            self._add_noise = _add_continuous_noise
+            logger.info("fbp.noise_mechanism", mechanism="continuous_laplace_numpy")
+
+        # Sensitivity bounds per metric (Section 11.1).
+        self.sensitivity_bounds: dict[str, float] = {
+            "cost_per_token_usd": self.config.cost_per_token_clip,
+            "carbon_per_inference_gco2e": self.config.carbon_per_inference_clip,
+            "attribution_confidence": 1.0,
+            "waste_pct": 100.0,
+        }
+
+    def create_cohort(self, cohort_id: str) -> None:
+        """Create a new benchmarking cohort."""
+        self.cohorts[cohort_id] = []
+
+    def join_cohort(self, org_id: str, cohort_id: str) -> bool:
+        """Add an organization to a cohort."""
+        if cohort_id not in self.cohorts:
+            return False
+        if any(m.org_id == org_id for m in self.cohorts[cohort_id]):
+            return False  # Already a member.
+        self.cohorts[cohort_id].append(CohortMembership(org_id=org_id, cohort_id=cohort_id))
+        return True
+
+    def submit_metric(self, metric: BenchmarkMetric) -> None:
+        """Submit a metric contribution. Values are clipped to sensitivity bounds."""
+        key = f"{metric.org_id}:{metric.metric_name}:{metric.period}"
+        if key not in self.metrics:
+            self.metrics[key] = []
+
+        # Clip to sensitivity bound.
+        bound = self.sensitivity_bounds.get(metric.metric_name, 1000.0)
+        clipped_value = max(0.0, min(metric.raw_value, bound))
+        clipped_metric = BenchmarkMetric(
+            org_id=metric.org_id,
+            metric_name=metric.metric_name,
+            raw_value=clipped_value,
+            period=metric.period,
+        )
+        self.metrics[key].append(clipped_metric)
+
+    def publish_benchmark(
+        self,
+        cohort_id: str,
+        metric_name: str,
+        period: str,
+    ) -> CohortBenchmark:
+        """
+        Publish a differentially private benchmark for a cohort.
+
+        Applies Laplace noise calibrated to sensitivity / epsilon,
+        enforces minimum cohort size, and checks anti-differencing rules.
+        """
+        members = self.cohorts.get(cohort_id, [])
+
+        # Anti-differencing rule: minimum cohort size.
+        if len(members) < self.config.min_cohort_size:
+            return CohortBenchmark(
+                cohort_id=cohort_id,
+                metric_name=metric_name,
+                noisy_mean=0.0,
+                noisy_median=0.0,
+                member_count=len(members),
+                epsilon_consumed=0.0,
+                period=period,
+                suppressed=True,
+                suppression_reason=(
+                    f"Cohort size {len(members)} < minimum {self.config.min_cohort_size}"
+                ),
+            )
+
+        # Anti-differencing rule: check membership churn.
+        current_member_ids = {member.org_id for member in members}
+        churn_suppression = self._suppress_for_membership_churn(
+            cohort_id=cohort_id,
+            metric_name=metric_name,
+            period=period,
+            member_ids=current_member_ids,
+        )
+        if churn_suppression is not None:
+            FBP_BENCHMARK_RELEASE_TOTAL.labels(metric_name=metric_name, suppressed="true").inc()
+            logger.warning(
+                "fbp.benchmark_suppressed",
+                cohort_id=cohort_id,
+                metric_name=metric_name,
+                period=period,
+                reason=churn_suppression.suppression_reason,
+            )
+            return churn_suppression
+
+        # Collect metric values from all cohort members.
+        values: list[float] = []
+        for member in members:
+            key = f"{member.org_id}:{metric_name}:{period}"
+            org_metrics = self.metrics.get(key, [])
+            if org_metrics:
+                values.append(org_metrics[-1].raw_value)
+
+        if not values:
+            FBP_BENCHMARK_RELEASE_TOTAL.labels(metric_name=metric_name, suppressed="true").inc()
+            return CohortBenchmark(
+                cohort_id=cohort_id,
+                metric_name=metric_name,
+                noisy_mean=0.0,
+                noisy_median=0.0,
+                member_count=len(members),
+                epsilon_consumed=0.0,
+                period=period,
+                suppressed=True,
+                suppression_reason="No metric submissions for this period",
+            )
+
+        # Account for both released statistics (mean + median) from a single
+        # release budget by splitting epsilon across the two mechanisms.
+        epsilon_total = self.config.epsilon_per_release
+        epsilon_per_stat = epsilon_total / 2.0
+        if epsilon_per_stat <= 0:
+            raise ValueError("epsilon_per_release must be greater than 0")
+
+        with self._budget_lock:
+            # Check privacy budgets atomically with updates.
+            for member in members:
+                consumed = self.budget_consumed.get(member.org_id, 0.0)
+                if consumed + epsilon_total > self.config.epsilon_total_quarterly:
+                    raise PrivacyBudgetExhaustedError(
+                        f"Org {member.org_id}: budget {consumed + epsilon_total:.1f} "
+                        f"exceeds quarterly limit {self.config.epsilon_total_quarterly}"
+                    )
+
+            # Compute per-statistic sensitivity:
+            # mean sensitivity scales with 1/n, median remains bounded by clipping range.
+            bound = self.sensitivity_bounds.get(metric_name, 1000.0)
+            mean_sensitivity = bound / len(values)
+            median_sensitivity = bound
+
+            # Add calibrated noise: scale = sensitivity / epsilon.
+            mean_noise_scale = mean_sensitivity / epsilon_per_stat
+            median_noise_scale = median_sensitivity / epsilon_per_stat
+            raw_mean = float(np.mean(values))
+            raw_median = float(np.median(values))
+            noisy_mean = raw_mean + self._add_noise(mean_noise_scale)
+            noisy_median = raw_median + self._add_noise(median_noise_scale)
+
+            # Update privacy budgets.
+            for member in members:
+                self.budget_consumed[member.org_id] = (
+                    self.budget_consumed.get(member.org_id, 0.0) + epsilon_total
+                )
+
+        with self._membership_lock:
+            self._published_membership_history[(cohort_id, metric_name)] = (
+                period,
+                current_member_ids,
+            )
+
+        result = CohortBenchmark(
+            cohort_id=cohort_id,
+            metric_name=metric_name,
+            noisy_mean=round(noisy_mean, 6),
+            noisy_median=round(noisy_median, 6),
+            member_count=len(members),
+            epsilon_consumed=epsilon_total,
+            period=period,
+        )
+        FBP_BENCHMARK_RELEASE_TOTAL.labels(metric_name=metric_name, suppressed="false").inc()
+        logger.info(
+            "fbp.benchmark_published",
+            cohort_id=cohort_id,
+            metric_name=metric_name,
+            period=period,
+            member_count=len(members),
+            epsilon_consumed=epsilon_total,
+        )
+        return result
+
+    def get_remaining_budget(self, org_id: str) -> float:
+        """Get remaining privacy budget for an organization this quarter."""
+        consumed = self.budget_consumed.get(org_id, 0.0)
+        return max(0.0, self.config.epsilon_total_quarterly - consumed)
+
+    def reset_quarterly_budgets(self) -> None:
+        """Reset all privacy budgets at quarter boundary."""
+        self.budget_consumed.clear()
+        logger.info("fbp.budgets_reset")
+
+    def _suppress_for_membership_churn(
+        self,
+        *,
+        cohort_id: str,
+        metric_name: str,
+        period: str,
+        member_ids: set[str],
+    ) -> CohortBenchmark | None:
+        with self._membership_lock:
+            previous = self._published_membership_history.get((cohort_id, metric_name))
+        if previous is None:
+            return None
+
+        previous_period, previous_members = previous
+        if previous_period == period or not previous_members:
+            return None
+
+        departed = previous_members - member_ids
+        joined = member_ids - previous_members
+        denominator = max(len(previous_members), len(member_ids), 1)
+        churn_rate = (len(departed) + len(joined)) / denominator
+        if churn_rate <= self.config.max_churn_rate:
+            return None
+
+        return CohortBenchmark(
+            cohort_id=cohort_id,
+            metric_name=metric_name,
+            noisy_mean=0.0,
+            noisy_median=0.0,
+            member_count=len(member_ids),
+            epsilon_consumed=0.0,
+            period=period,
+            suppressed=True,
+            suppression_reason=(
+                f"Cohort membership churn {churn_rate:.2f} exceeds max "
+                f"{self.config.max_churn_rate:.2f} between {previous_period} and {period}"
+            ),
+        )

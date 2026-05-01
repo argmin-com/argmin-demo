@@ -1,0 +1,443 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#view-root"
+  - generic:
+    - generic: SIMULATED DATA
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img [ref=e7]
+        - generic [ref=e11]:
+          - generic [ref=e12]: Argmin
+          - generic [ref=e13]: Argmin
+      - navigation "Primary navigation" [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]: Platform
+          - button "Overview" [ref=e17] [cursor=pointer]:
+            - img [ref=e18]
+            - generic [ref=e21]: Overview
+          - button "Employee Adoption" [ref=e22] [cursor=pointer]:
+            - img [ref=e23]
+            - generic [ref=e26]: Employee Adoption
+          - button "Request Proof" [ref=e27] [cursor=pointer]:
+            - img [ref=e28]
+            - generic [ref=e33]: Request Proof
+          - button "Models" [ref=e34] [cursor=pointer]:
+            - img [ref=e35]
+            - generic [ref=e38]: Models
+          - button "Teams" [ref=e39] [cursor=pointer]:
+            - img [ref=e40]
+            - generic [ref=e45]: Teams
+          - button "Manual Mapping" [ref=e46] [cursor=pointer]:
+            - img [ref=e47]
+            - generic [ref=e49]: Manual Mapping
+            - generic [ref=e50]: "3"
+          - button "Interventions" [ref=e51] [cursor=pointer]:
+            - img [ref=e52]
+            - generic [ref=e54]: Interventions
+            - generic [ref=e55]: "5"
+          - button "Governance" [ref=e56] [cursor=pointer]:
+            - img [ref=e57]
+            - generic [ref=e60]: Governance
+        - generic [ref=e61]:
+          - generic [ref=e62]: Operational
+          - button "Forecasting" [ref=e63] [cursor=pointer]:
+            - img [ref=e64]
+            - generic [ref=e67]: Forecasting
+          - button "Integrations" [ref=e68] [cursor=pointer]:
+            - img [ref=e69]
+            - generic [ref=e72]: Integrations
+          - button "Glossary" [ref=e73] [cursor=pointer]:
+            - img [ref=e74]
+            - generic [ref=e77]: Glossary
+          - button "FAQ" [ref=e78] [cursor=pointer]:
+            - img [ref=e79]
+            - generic [ref=e83]: FAQ
+      - generic [ref=e84]:
+        - generic [ref=e85]: NovaTech Industries
+        - generic [ref=e86]: Synthetic enterprise operating profile
+        - generic [ref=e87]: Cross-functional AI program spanning engineering, support, data, and operations
+    - main [ref=e88]:
+      - generic [ref=e89]:
+        - generic [ref=e90]:
+          - generic [ref=e91]: Overview
+          - generic [ref=e92]: February 2026
+          - button "Advisory" [ref=e93] [cursor=pointer]
+        - generic [ref=e94]:
+          - status [ref=e95]:
+            - generic [ref=e97]:
+              - generic [ref=e98]: Demo using local data
+              - generic [ref=e99]: Using deterministic local demo data until a live action is requested
+          - button "Start 90-sec Walkthrough" [ref=e100] [cursor=pointer]
+          - button "Open Guided Demo" [ref=e101] [cursor=pointer]
+          - generic [ref=e102]: NT
+      - region "Active context" [ref=e103]:
+        - generic [ref=e104]:
+          - generic [ref=e105]: Mode
+          - generic [ref=e106]: Advisory
+        - generic [ref=e107]:
+          - generic [ref=e108]: Lens
+          - generic [ref=e109]: Executive
+        - generic [ref=e110]:
+          - generic [ref=e111]: Request
+          - generic [ref=e112]: customer-copilot-prod (EKS us-east-1)
+        - generic [ref=e113]:
+          - generic [ref=e114]: Model
+          - generic [ref=e115]: gpt-4o
+        - generic [ref=e116]:
+          - generic [ref=e117]: Focus
+          - generic [ref=e118]: Spend posture and savings levers
+      - region "Audience lens" [ref=e119]:
+        - generic [ref=e120]:
+          - generic [ref=e121]: Audience lens
+          - generic [ref=e122]: Company-level posture, operating leverage, and deployment readiness.
+        - generic [ref=e123]:
+          - button "Executive" [ref=e124] [cursor=pointer]
+          - button "Finance" [ref=e125] [cursor=pointer]
+          - button "Platform" [ref=e126] [cursor=pointer]
+          - button "Security" [ref=e127] [cursor=pointer]
+      - generic [ref=e128]:
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - generic [ref=e132]: Advisory
+              - generic [ref=e133]: "This page answers the first investor question: where AI spend sits today, how much of it is owned, and where the savings levers are."
+            - generic [ref=e134]:
+              - button "Open Guided Demo" [ref=e135] [cursor=pointer]
+              - button "Why these numbers are trustworthy" [ref=e136] [cursor=pointer]
+          - generic [ref=e137]: Executive Summary
+          - generic [ref=e138]:
+            - generic [ref=e139] [cursor=pointer]:
+              - generic [ref=e141]: Total AI Spend
+              - generic [ref=e142]: $847,000
+              - generic [ref=e143]: "30-day requests: 44,240,000 | Open forecasting"
+            - generic [ref=e144] [cursor=pointer]:
+              - generic [ref=e146]: Attribution Coverage
+              - generic [ref=e147]: 87.4%
+              - generic [ref=e148]: Share of spend already owned with usable confidence | Open ownership review queue
+            - generic [ref=e149] [cursor=pointer]:
+              - generic [ref=e151]: Optimization Potential
+              - generic [ref=e152]: $95,400
+              - generic [ref=e153]: "Open recommendations: 5 | View interventions"
+            - generic [ref=e154] [cursor=pointer]:
+              - generic [ref=e156]: Savings Captured
+              - generic [ref=e157]: $10,200
+              - generic [ref=e158]: Approved or implemented interventions | Review queue
+        - generic [ref=e159]:
+          - generic [ref=e160]: Spend Drivers and Ownership
+          - generic [ref=e161]:
+            - generic [ref=e162]:
+              - generic [ref=e163]:
+                - generic [ref=e164]:
+                  - generic [ref=e165]: Monthly AI Spend
+                  - generic [ref=e166]: "Trend growth: 105.6% over the displayed window"
+                - button "Open Forecast" [ref=e167] [cursor=pointer]
+              - img "Monthly AI spend trend comparing total spend and attributed spend in thousands of US dollars." [ref=e169]
+              - generic [ref=e170]:
+                - generic [ref=e171]:
+                  - strong [ref=e172]: "X-axis:"
+                  - text: Month in the observed reporting window
+                - generic [ref=e173]:
+                  - strong [ref=e174]: "Y-axis:"
+                  - text: Monthly spend in thousands of USD
+            - generic [ref=e175]:
+              - generic [ref=e176]: Operating Readiness
+              - generic [ref=e177]: What is already ready for finance and governance teams to act on, and what still needs operator attention.
+              - generic [ref=e178]:
+                - generic [ref=e179]: Chargeback-ready spend
+                - strong [ref=e181]: $740,278
+                - generic [ref=e183]: 87.4% of AI spend is already attributed with enough confidence for financial reporting.
+              - generic [ref=e184]:
+                - generic [ref=e185]: Ownership review queue
+                - strong [ref=e187]: "3"
+                - generic [ref=e189]: 44,240,000 requests were observed in the window; only the outliers still need manual confirmation.
+              - generic [ref=e190]:
+                - generic [ref=e191]: Approved savings awaiting execution
+                - strong [ref=e193]: $0
+                - generic [ref=e195]: These recommendations are already approved and become durable run-rate savings once the operating teams complete implementation.
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - generic [ref=e199]:
+                - generic [ref=e200]: Provider Breakdown
+                - generic [ref=e201]: Where spend is concentrated across frontier, open-weight, and platform-native model providers.
+              - img "Provider spend breakdown showing monthly spend by model provider family." [ref=e203]
+              - generic [ref=e204]:
+                - generic [ref=e205]:
+                  - strong [ref=e206]: "Y-axis:"
+                  - text: Model provider family
+                - generic [ref=e207]:
+                  - strong [ref=e208]: "X-axis:"
+                  - text: Monthly spend in USD
+              - generic [ref=e209]:
+                - generic [ref=e210]:
+                  - generic [ref=e211]: OpenAI
+                  - strong [ref=e212]: $232,000 | 27.4%
+                - generic [ref=e213]:
+                  - generic [ref=e214]: Google
+                  - strong [ref=e215]: $166,000 | 19.6%
+                - generic [ref=e216]:
+                  - generic [ref=e217]: Anthropic
+                  - strong [ref=e218]: $128,000 | 15.1%
+                - generic [ref=e219]:
+                  - generic [ref=e220]: Meta
+                  - strong [ref=e221]: $76,000 | 9.0%
+                - generic [ref=e222]:
+                  - generic [ref=e223]: Mistral AI
+                  - strong [ref=e224]: $54,000 | 6.4%
+                - generic [ref=e225]:
+                  - generic [ref=e226]: DeepSeek
+                  - strong [ref=e227]: $51,000 | 6.0%
+                - generic [ref=e228]:
+                  - generic [ref=e229]: Cohere
+                  - strong [ref=e230]: $43,000 | 5.1%
+                - generic [ref=e231]:
+                  - generic [ref=e232]: AWS
+                  - strong [ref=e233]: $37,000 | 4.4%
+                - generic [ref=e234]:
+                  - generic [ref=e235]: IBM
+                  - strong [ref=e236]: $31,000 | 3.7%
+                - generic [ref=e237]:
+                  - generic [ref=e238]: Alibaba
+                  - strong [ref=e239]: $29,000 | 3.4%
+            - generic [ref=e240]:
+              - generic [ref=e242]:
+                - generic [ref=e243]: Cloud Breakdown
+                - generic [ref=e244]: Which cloud footprints are carrying the current AI run-rate.
+              - img "Cloud spend breakdown showing spend by deployment footprint." [ref=e246]
+              - generic [ref=e247]:
+                - generic [ref=e248]:
+                  - strong [ref=e249]: "X-axis:"
+                  - text: Cloud platform carrying the workload
+                - generic [ref=e250]:
+                  - strong [ref=e251]: "Y-axis:"
+                  - text: Monthly spend in USD
+              - generic [ref=e252]:
+                - generic [ref=e253]:
+                  - generic [ref=e254]: AWS
+                  - strong [ref=e255]: $464,500
+                - generic [ref=e256]:
+                  - generic [ref=e257]: GCP
+                  - strong [ref=e258]: $231,400
+                - generic [ref=e259]:
+                  - generic [ref=e260]: Azure
+                  - strong [ref=e261]: $151,100
+            - generic [ref=e262]:
+              - generic [ref=e263]:
+                - generic [ref=e264]:
+                  - generic [ref=e265]: Optimization Potential Categories
+                  - generic [ref=e266]: What is driving avoidable spend and how large each lever is.
+                - button "View Interventions" [ref=e267] [cursor=pointer]
+              - img "Optimization potential breakdown showing addressable monthly spend by optimization category." [ref=e269]
+              - generic [ref=e270]:
+                - generic [ref=e271]:
+                  - strong [ref=e272]: "Y-axis:"
+                  - text: Optimization category
+                - generic [ref=e273]:
+                  - strong [ref=e274]: "X-axis:"
+                  - text: Addressable monthly spend in USD
+              - generic [ref=e275]:
+                - generic [ref=e276]:
+                  - generic [ref=e277]: Model over-provisioning
+                  - strong [ref=e278]: $62,800 | 46.6%
+                - generic [ref=e279]:
+                  - generic [ref=e280]: Duplicate requests
+                  - strong [ref=e281]: $29,100 | 21.6%
+                - generic [ref=e282]:
+                  - generic [ref=e283]: Staging and dev sprawl
+                  - strong [ref=e284]: $22,800 | 16.9%
+                - generic [ref=e285]:
+                  - generic [ref=e286]: Prompt inefficiency
+                  - strong [ref=e287]: $13,900 | 10.3%
+                - generic [ref=e288]:
+                  - generic [ref=e289]: Batch mispricing
+                  - strong [ref=e290]: $6,300 | 4.7%
+          - generic [ref=e291]:
+            - generic [ref=e292]:
+              - generic [ref=e293]:
+                - generic [ref=e294]: Employee AI Adoption
+                - generic [ref=e295]: Who is actually using AI, how broadly it is spreading, and whether that usage is controlled.
+              - button "Open Adoption Dashboard" [ref=e296] [cursor=pointer]
+            - generic [ref=e297]:
+              - generic [ref=e298]:
+                - generic [ref=e300]: Active Employees (30d)
+                - generic [ref=e301]: "486"
+                - generic [ref=e302]: "7d active: 341"
+              - generic [ref=e303]:
+                - generic [ref=e305]: Adoption Penetration
+                - generic [ref=e306]: 59.9%
+                - generic [ref=e307]: "Repeat usage rate: 64.2%"
+              - generic [ref=e308]:
+                - generic [ref=e310]: Governed Usage
+                - generic [ref=e311]: 82.4%
+                - generic [ref=e312]: "Intervention rate: 9.7%"
+              - generic [ref=e313]:
+                - generic [ref=e315]: Spend per Active Employee
+                - generic [ref=e316]: $963
+                - generic [ref=e317]: Open org / BU / team drill-down
+          - generic [ref=e318]:
+            - generic [ref=e319]:
+              - generic [ref=e320]:
+                - generic [ref=e321]: Team Attribution
+                - generic [ref=e322]: Cost ownership and optimization potential by organization
+              - button "View All Teams" [ref=e323] [cursor=pointer]
+            - table [ref=e325]:
+              - rowgroup [ref=e326]:
+                - row "Team Spend MoM Budget Utilization Optimization Potential TRAC" [ref=e327]:
+                  - columnheader "Team" [ref=e328]
+                  - columnheader "Spend" [ref=e329]
+                  - columnheader "MoM" [ref=e330]
+                  - columnheader "Budget Utilization" [ref=e331]
+                  - columnheader "Optimization Potential" [ref=e332]
+                  - columnheader "TRAC" [ref=e333]
+              - rowgroup [ref=e334]:
+                - row "Platform Engineering $218,400 10.2% 87.4% $31,200 $226,900" [ref=e335] [cursor=pointer]:
+                  - cell "Platform Engineering" [ref=e336]
+                  - cell "$218,400" [ref=e337]
+                  - cell "10.2%" [ref=e338]
+                  - cell "87.4%" [ref=e339]
+                  - cell "$31,200" [ref=e340]
+                  - cell "$226,900" [ref=e341]
+                - row "ML Engineering $187,600 9.0% 93.8% $42,800 $198,400" [ref=e342] [cursor=pointer]:
+                  - cell "ML Engineering" [ref=e343]
+                  - cell "$187,600" [ref=e344]
+                  - cell "9.0%" [ref=e345]
+                  - cell "93.8%" [ref=e346]
+                  - cell "$42,800" [ref=e347]
+                  - cell "$198,400" [ref=e348]
+                - row "Product $134,200 23.2% 89.5% $18,900 $139,800" [ref=e349] [cursor=pointer]:
+                  - cell "Product" [ref=e350]
+                  - cell "$134,200" [ref=e351]
+                  - cell "23.2%" [ref=e352]
+                  - cell "89.5%" [ref=e353]
+                  - cell "$18,900" [ref=e354]
+                  - cell "$139,800" [ref=e355]
+                - row "Data Science $98,700 12.9% 82.3% $15,200 $104,200" [ref=e356] [cursor=pointer]:
+                  - cell "Data Science" [ref=e357]
+                  - cell "$98,700" [ref=e358]
+                  - cell "12.9%" [ref=e359]
+                  - cell "82.3%" [ref=e360]
+                  - cell "$15,200" [ref=e361]
+                  - cell "$104,200" [ref=e362]
+                - row "Customer Engineering $76,300 7.2% 84.8% $22,100 $82,100" [ref=e363] [cursor=pointer]:
+                  - cell "Customer Engineering" [ref=e364]
+                  - cell "$76,300" [ref=e365]
+                  - cell "7.2%" [ref=e366]
+                  - cell "84.8%" [ref=e367]
+                  - cell "$22,100" [ref=e368]
+                  - cell "$82,100" [ref=e369]
+                - row "Security $52,400 7.6% 74.9% $8,400 $55,900" [ref=e370] [cursor=pointer]:
+                  - cell "Security" [ref=e371]
+                  - cell "$52,400" [ref=e372]
+                  - cell "7.6%" [ref=e373]
+                  - cell "74.9%" [ref=e374]
+                  - cell "$8,400" [ref=e375]
+                  - cell "$55,900" [ref=e376]
+                - row "Research $43,800 11.7% 73.0% $6,900 $49,200" [ref=e377] [cursor=pointer]:
+                  - cell "Research" [ref=e378]
+                  - cell "$43,800" [ref=e379]
+                  - cell "11.7%" [ref=e380]
+                  - cell "73.0%" [ref=e381]
+                  - cell "$6,900" [ref=e382]
+                  - cell "$49,200" [ref=e383]
+                - row "Marketing $35,600 25.4% 79.1% $9,200 $38,100" [ref=e384] [cursor=pointer]:
+                  - cell "Marketing" [ref=e385]
+                  - cell "$35,600" [ref=e386]
+                  - cell "25.4%" [ref=e387]
+                  - cell "79.1%" [ref=e388]
+                  - cell "$9,200" [ref=e389]
+                  - cell "$38,100" [ref=e390]
+        - generic [ref=e391]:
+          - generic [ref=e392]: Where To Go Next
+          - generic [ref=e394]:
+            - text: Go to
+            - button "Request Proof" [ref=e395] [cursor=pointer]
+            - text: to validate one request end to end,
+            - button "Interventions" [ref=e396] [cursor=pointer]
+            - text: to show what the platform recommends next,
+            - button "Forecasting" [ref=e397] [cursor=pointer]
+            - text: to show how those actions change the financial plan, and
+            - button "Guided Demo" [ref=e398] [cursor=pointer]
+            - text: for the full 90-second walkthrough.
+  - complementary [ref=e399]:
+    - generic [ref=e400]:
+      - generic [ref=e401]: Navigate Demo
+      - button [ref=e402] [cursor=pointer]: x
+    - navigation [ref=e403]:
+      - generic [ref=e404]:
+        - generic [ref=e405]: Platform
+        - button [ref=e406] [cursor=pointer]:
+          - img [ref=e407]
+          - generic [ref=e410]: Overview
+        - button [ref=e411] [cursor=pointer]:
+          - img [ref=e412]
+          - generic [ref=e415]: Employee Adoption
+        - button [ref=e416] [cursor=pointer]:
+          - img [ref=e417]
+          - generic [ref=e422]: Request Proof
+        - button [ref=e423] [cursor=pointer]:
+          - img [ref=e424]
+          - generic [ref=e427]: Models
+        - button [ref=e428] [cursor=pointer]:
+          - img [ref=e429]
+          - generic [ref=e434]: Teams
+        - button [ref=e435] [cursor=pointer]:
+          - img [ref=e436]
+          - generic [ref=e438]: Manual Mapping
+          - generic [ref=e439]: "3"
+        - button [ref=e440] [cursor=pointer]:
+          - img [ref=e441]
+          - generic [ref=e443]: Interventions
+          - generic [ref=e444]: "5"
+        - button [ref=e445] [cursor=pointer]:
+          - img [ref=e446]
+          - generic [ref=e449]: Governance
+      - generic [ref=e450]:
+        - generic [ref=e451]: Operational
+        - button [ref=e452] [cursor=pointer]:
+          - img [ref=e453]
+          - generic [ref=e456]: Forecasting
+        - button [ref=e457] [cursor=pointer]:
+          - img [ref=e458]
+          - generic [ref=e461]: Integrations
+        - button [ref=e462] [cursor=pointer]:
+          - img [ref=e463]
+          - generic [ref=e466]: Glossary
+        - button [ref=e467] [cursor=pointer]:
+          - img [ref=e468]
+          - generic [ref=e472]: FAQ
+  - dialog [ref=e473]:
+    - generic [ref=e474]:
+      - generic [ref=e475]:
+        - generic [ref=e476]: Guided Demo
+        - generic [ref=e477]: Run three explainable scenarios and see what changed, why it matters, and what the platform proved.
+      - button [ref=e478] [cursor=pointer]: x
+    - generic [ref=e479]:
+      - generic [ref=e480]:
+        - generic [ref=e481]: What this panel is for
+        - generic [ref=e482]: Use this panel for live controls, or launch the automated 90-second walkthrough from the top bar when you want the demo to progress through the core product story by itself.
+      - generic [ref=e483]: Guided Actions
+      - generic [ref=e484]:
+        - button [ref=e485] [cursor=pointer]: Initialize Demo
+        - button [ref=e486] [cursor=pointer]: Start 90-sec Walkthrough
+        - button [ref=e487] [cursor=pointer]: Show Attributed Request
+        - button [ref=e488] [cursor=pointer]: Show Policy Intervention
+        - button [ref=e489] [cursor=pointer]: Show Fail-Open Safety
+        - button [ref=e490] [cursor=pointer]: Reset Demo
+      - generic [ref=e491]: Latest Demonstrated Outcome
+      - generic [ref=e493]:
+        - generic [ref=e494]: Latest Demonstrated Outcome
+        - generic [ref=e495]: No live proof point selected yet.
+        - generic [ref=e496]:
+          - text: Use
+          - strong [ref=e497]: Initialize Demo
+          - text: ", then run"
+          - strong [ref=e498]: Show Attributed Request
+          - text: ","
+          - strong [ref=e499]: Show Policy Intervention
+          - text: ", or"
+          - strong [ref=e500]: Show Fail-Open Safety
+          - text: . This panel will translate the result into plain-language product evidence.
+      - generic [ref=e501]: Walkthrough Timeline
+      - generic [ref=e503]: No walkthrough steps have been run yet. Initialize the demo, then run one of the guided scenarios.
+  - status [ref=e504]:
+    - button "Dismiss notification" [ref=e505] [cursor=pointer]: Dismiss

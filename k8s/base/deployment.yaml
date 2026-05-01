@@ -1,0 +1,546 @@
+---
+# Namespace: platform runs inside customer VPC trust boundary.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aci-platform
+  labels:
+    app.kubernetes.io/part-of: aci-platform
+---
+# ConfigMap: non-sensitive platform configuration.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aci-config
+  namespace: aci-platform
+data:
+  ACI_ENVIRONMENT: "production"
+  ACI_GRAPH_BACKEND: "neo4j"
+  ACI_INDEX_BACKEND: "redis"
+  ACI_INDEX_REDIS_PREFIX: "aci:index"
+  ACI_INDEX_REDIS_TTL_S: "1800"
+  ACI_KAFKA_BOOTSTRAP: "kafka:9092"
+  ACI_REDIS_URL: "rediss://replace-with-managed-redis:6379/0"
+  ACI_EVENT_BUS_TOPIC: "aci.events"
+  ACI_EVENT_BUS_DLQ_TOPIC: "aci.events.dlq"
+  ACI_EVENT_BUS_CONSUMER_GROUP: "aci-processor"
+  ACI_INTERCEPTOR_TIMEOUT_MS: "20"
+  ACI_INTERCEPTOR_TOTAL_BUDGET_MS: "50"
+  ACI_INTERCEPTOR_POLICY_TIMEOUT_MS: "15"
+  ACI_INTERCEPTOR_ACTIVE_LITE_MIN_CONFIDENCE: "0.90"
+  ACI_INTERCEPTOR_ACTIVE_LITE_GATE_MIN_CONFIDENCE: "0.95"
+  ACI_INTERCEPTOR_MODE: "advisory"
+  ACI_UVICORN_WORKERS: "1"
+  ACI_INTERCEPTOR_CIRCUIT_STATE_BACKEND: "redis"
+  ACI_INTERCEPTOR_CIRCUIT_STATE_REDIS_KEY: "aci:circuit:interceptor"
+  ACI_INTERCEPTOR_MAX_ENRICHMENT_HEADER_BYTES: "4096"
+  ACI_INTERCEPTOR_MAX_HEADER_VALUE_LENGTH: "512"
+  ACI_AUTH_ENABLED: "true"
+  ACI_AUTH_ALLOW_DEV_BYPASS: "false"
+  ACI_AUTH_JWT_ALGORITHM: "HS256"
+  ACI_AUTH_JWT_ISSUER: "aci-control-plane"
+  ACI_AUTH_JWT_AUDIENCE: "aci-api"
+  ACI_AUTH_REQUIRED_SCOPE: "aci.api"
+  ACI_AUTH_TENANT_CLAIM: "tenant_id"
+  ACI_AUTH_CLOCK_SKEW_SECONDS: "60"
+  ACI_API_INGEST_RATE_LIMIT_BACKEND: "redis"
+  ACI_API_MAX_REQUEST_BYTES: "1048576"
+  ACI_API_TRUSTED_PROXY_CIDRS: ""
+  ACI_CONFIDENCE_CAP: "0.95"
+  ACI_CONFIDENCE_CHARGEBACK_THRESHOLD: "0.80"
+  ACI_CONFIDENCE_PROVISIONAL_THRESHOLD: "0.50"
+  ACI_TRAC_CARBON_PRICE_PER_TCO2E: "50.0"
+  ACI_TRAC_RISK_MULTIPLIER: "0.15"
+  ACI_FBP_EPSILON_TOTAL_QUARTERLY: "4.0"
+---
+# ServiceAccount: minimal RBAC.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aci-platform
+  namespace: aci-platform
+  annotations:
+    # For AWS: IAM role for read-only billing + CloudTrail access.
+    eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/aci-platform-runtime"
+---
+# Secret template: replace all placeholder values before deployment.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aci-secrets
+  namespace: aci-platform
+type: Opaque
+stringData:
+  ACI_AUTH_JWT_HS256_SECRET: "replace-with-strong-secret"
+  ACI_NEO4J_PASSWORD: "replace-with-neo4j-password"
+  ACI_REDIS_URL: "rediss://replace-with-managed-redis:6379/0"
+---
+# Deployment: gateway role (decision-time interceptor).
+# This tier reads the Redis attribution index and publishes shadow events to Kafka.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aci-gateway
+  namespace: aci-platform
+  labels:
+    app: aci-platform
+    component: gateway
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: aci-platform
+      component: gateway
+  template:
+    metadata:
+      labels:
+        app: aci-platform
+        component: gateway
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics/prometheus"
+    spec:
+      serviceAccountName: aci-platform
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: aci-platform
+          image: aci-platform:0.2.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: aci-config
+            - secretRef:
+                # Must include ACI_AUTH_JWT_HS256_SECRET and datastore credentials.
+                name: aci-secrets
+          env:
+            - name: ACI_RUNTIME_ROLE
+              value: gateway
+            - name: ACI_EVENT_BUS_BACKEND
+              value: kafka
+            - name: ACI_INTERCEPTOR_SHADOW_EVENTS_ENABLED
+              value: "true"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /live
+              port: http
+            periodSeconds: 5
+            failureThreshold: 24
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Deployment: async processor role (ingestion/reconciliation/materialization).
+# This tier is permitted to access Kafka/Neo4j/Redis.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aci-processor
+  namespace: aci-platform
+  labels:
+    app: aci-platform
+    component: processor
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: aci-platform
+      component: processor
+  template:
+    metadata:
+      labels:
+        app: aci-platform
+        component: processor
+    spec:
+      serviceAccountName: aci-platform
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: aci-platform
+          image: aci-platform:0.2.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          envFrom:
+            - configMapRef:
+                name: aci-config
+            - secretRef:
+                # Must include ACI_AUTH_JWT_HS256_SECRET and datastore credentials.
+                name: aci-secrets
+          env:
+            - name: ACI_RUNTIME_ROLE
+              value: processor
+            - name: ACI_EVENT_BUS_BACKEND
+              value: kafka
+            - name: ACI_INTERCEPTOR_SHADOW_EVENTS_ENABLED
+              value: "false"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "768Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /live
+              port: http
+            periodSeconds: 5
+            failureThreshold: 24
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+# Service: expose gateway interceptor/API endpoint.
+apiVersion: v1
+kind: Service
+metadata:
+  name: aci-platform
+  namespace: aci-platform
+spec:
+  selector:
+    app: aci-platform
+    component: gateway
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  type: ClusterIP
+---
+# PodDisruptionBudget: keep at least two gateway pods available during voluntary disruptions.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: aci-gateway
+  namespace: aci-platform
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: aci-platform
+      component: gateway
+---
+# PodDisruptionBudget: keep at least one processor pod available during voluntary disruptions.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: aci-processor
+  namespace: aci-platform
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: aci-platform
+      component: processor
+---
+# HorizontalPodAutoscaler for gateway traffic handling.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: aci-gateway
+  namespace: aci-platform
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: aci-gateway
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+---
+# Default deny-all egress in namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aci-default-deny-egress
+  namespace: aci-platform
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+---
+# Default deny-all ingress in namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aci-default-deny-ingress
+  namespace: aci-platform
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# Gateway ingress: allow service traffic from platform namespace and ingress controller namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aci-gateway-ingress
+  namespace: aci-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: aci-platform
+      component: gateway
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: aci-platform
+      ports:
+        - port: 8000
+          protocol: TCP
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - port: 8000
+          protocol: TCP
+---
+# Gateway egress: DNS + Redis + Kafka.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aci-gateway-egress
+  namespace: aci-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: aci-platform
+      component: gateway
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - port: 6379
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: kafka
+      ports:
+        - port: 9092
+          protocol: TCP
+---
+# Processor egress: DNS + Kafka + Neo4j + Redis.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aci-processor-egress
+  namespace: aci-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: aci-platform
+      component: processor
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: kafka
+      ports:
+        - port: 9092
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: neo4j
+      ports:
+        - port: 7687
+          protocol: TCP
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - port: 6379
+          protocol: TCP
+---
+# Redis ingress: only gateway + processor can access.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-ingress-from-aci
+  namespace: aci-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: aci-platform
+              component: gateway
+        - podSelector:
+            matchLabels:
+              app: aci-platform
+              component: processor
+      ports:
+        - port: 6379
+          protocol: TCP
+---
+# Kafka ingress: gateway + processor.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kafka-ingress-from-processor
+  namespace: aci-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: kafka
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: aci-platform
+              component: gateway
+        - podSelector:
+            matchLabels:
+              app: aci-platform
+              component: processor
+      ports:
+        - port: 9092
+          protocol: TCP
+---
+# Neo4j ingress: processor only.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: neo4j-ingress-from-processor
+  namespace: aci-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: neo4j
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: aci-platform
+              component: processor
+      ports:
+        - port: 7687
+          protocol: TCP

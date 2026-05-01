@@ -1,0 +1,530 @@
+- generic [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#view-root"
+  - generic:
+    - generic: SIMULATED DATA
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img [ref=e7]
+        - generic [ref=e11]:
+          - generic [ref=e12]: Argmin
+          - generic [ref=e13]: Argmin
+      - navigation "Primary navigation" [ref=e14]:
+        - generic [ref=e878]:
+          - generic [ref=e879]: Platform
+          - button "Overview" [ref=e880] [cursor=pointer]:
+            - img [ref=e881]
+            - generic [ref=e884]: Overview
+          - button "Employee Adoption" [ref=e885] [cursor=pointer]:
+            - img [ref=e886]
+            - generic [ref=e889]: Employee Adoption
+          - button "Request Proof" [ref=e890] [cursor=pointer]:
+            - img [ref=e891]
+            - generic [ref=e896]: Request Proof
+          - button "Models" [ref=e897] [cursor=pointer]:
+            - img [ref=e898]
+            - generic [ref=e901]: Models
+          - button "Teams" [ref=e902] [cursor=pointer]:
+            - img [ref=e903]
+            - generic [ref=e908]: Teams
+          - button "Manual Mapping" [ref=e909] [cursor=pointer]:
+            - img [ref=e910]
+            - generic [ref=e912]: Manual Mapping
+            - generic [ref=e913]: "3"
+          - button "Interventions" [ref=e914] [cursor=pointer]:
+            - img [ref=e915]
+            - generic [ref=e917]: Interventions
+            - generic [ref=e918]: "5"
+          - button "Governance" [ref=e919] [cursor=pointer]:
+            - img [ref=e920]
+            - generic [ref=e923]: Governance
+        - generic [ref=e924]:
+          - generic [ref=e925]: Operational
+          - button "Forecasting" [ref=e926] [cursor=pointer]:
+            - img [ref=e927]
+            - generic [ref=e930]: Forecasting
+          - button "Integrations" [ref=e931] [cursor=pointer]:
+            - img [ref=e932]
+            - generic [ref=e935]: Integrations
+          - button "Glossary" [ref=e936] [cursor=pointer]:
+            - img [ref=e937]
+            - generic [ref=e940]: Glossary
+          - button "FAQ" [ref=e941] [cursor=pointer]:
+            - img [ref=e942]
+            - generic [ref=e946]: FAQ
+      - generic [ref=e84]:
+        - generic [ref=e85]: NovaTech Industries
+        - generic [ref=e86]: Synthetic enterprise operating profile
+        - generic [ref=e87]: Cross-functional AI program spanning engineering, support, data, and operations
+    - main [ref=e88]:
+      - generic [ref=e89]:
+        - generic [ref=e90]:
+          - generic [active] [ref=e91]: Interventions
+          - generic [ref=e92]: February 2026
+          - button "Advisory" [ref=e93] [cursor=pointer]
+        - generic [ref=e94]:
+          - status [ref=e95]:
+            - generic [ref=e97]:
+              - generic [ref=e98]: Demo runtime online
+              - generic [ref=e99]: Connected to demo runtime with simulated enterprise data
+          - button "Start 90-sec Walkthrough" [ref=e100] [cursor=pointer]
+          - button "Open Guided Demo" [ref=e101] [cursor=pointer]
+          - generic [ref=e102]: NT
+      - region "Active context" [ref=e103]:
+        - generic [ref=e947]:
+          - generic [ref=e948]: Mode
+          - generic [ref=e949]: Advisory
+        - generic [ref=e950]:
+          - generic [ref=e951]: Lens
+          - generic [ref=e952]: Executive
+        - generic [ref=e953]:
+          - generic [ref=e954]: Request
+          - generic [ref=e955]: customer-copilot-prod (EKS us-east-1)
+        - generic [ref=e956]:
+          - generic [ref=e957]: Model
+          - generic [ref=e958]: gpt-4o
+        - generic [ref=e959]:
+          - generic [ref=e960]: Open actions
+          - generic [ref=e961]: "5"
+      - region "Audience lens" [ref=e119]:
+        - generic [ref=e962]:
+          - generic [ref=e963]: Audience lens
+          - generic [ref=e964]: Company-level posture, operating leverage, and deployment readiness.
+        - generic [ref=e965]:
+          - button "Executive" [ref=e966] [cursor=pointer]
+          - button "Finance" [ref=e967] [cursor=pointer]
+          - button "Platform" [ref=e968] [cursor=pointer]
+          - button "Security" [ref=e969] [cursor=pointer]
+      - generic [ref=e128]:
+        - generic [ref=e970]:
+          - generic [ref=e971]:
+            - generic [ref=e972]: Conclusion
+            - generic [ref=e973]: This is the action queue that turns visibility into savings.
+          - generic [ref=e974]:
+            - generic [ref=e975]: Why it matters
+            - generic [ref=e976]: The right question is not which card looks interesting, but which action changes run-rate fastest with the least business risk.
+          - generic [ref=e977]:
+            - generic [ref=e978]: Supporting evidence
+            - generic [ref=e979]: Each intervention now shows baseline cost, projected savings, implementation effort, business risk, and linked evidence.
+          - generic [ref=e980]:
+            - generic [ref=e981]: Next action
+            - generic [ref=e982]: Select one recommendation to carry it into Forecasting, Governance, and the active context ribbon.
+        - generic [ref=e983]:
+          - generic [ref=e984]:
+            - generic [ref=e986]: Total Potential
+            - generic [ref=e987]: $105,600
+            - generic [ref=e988]: Across all interventions
+          - generic [ref=e989]:
+            - generic [ref=e991]: Open Pipeline
+            - generic [ref=e992]: "5"
+            - generic [ref=e993]: Recommended or in review
+          - generic [ref=e994]:
+            - generic [ref=e996]: Captured
+            - generic [ref=e997]: $10,200
+            - generic [ref=e998]: Approved or implemented
+          - generic [ref=e999]:
+            - generic [ref=e1001]: Methodology
+            - generic [ref=e1002]: Rule-Driven
+            - generic [ref=e1003]: Deterministic categories and threshold conditions
+        - generic [ref=e1004]:
+          - generic [ref=e1005]:
+            - generic [ref=e1006]:
+              - generic [ref=e1007]: Intervention Queue
+              - generic [ref=e1008]: Lifecycle state is session-persistent and updates overview totals immediately.
+            - generic [ref=e1009]:
+              - button "Export intervention brief" [ref=e1010] [cursor=pointer]
+              - button "Export team optimization report" [ref=e1011] [cursor=pointer]
+          - generic [ref=e1012]:
+            - button "All" [ref=e1013] [cursor=pointer]
+            - button "Recommended" [ref=e1014] [cursor=pointer]
+            - button "In Review" [ref=e1015] [cursor=pointer]
+            - button "Approved" [ref=e1016] [cursor=pointer]
+            - button "Implemented" [ref=e1017] [cursor=pointer]
+            - button "Dismissed" [ref=e1018] [cursor=pointer]
+          - generic [ref=e1019] [cursor=pointer]:
+            - generic [ref=e1020]:
+              - generic [ref=e1021]:
+                - generic [ref=e1022]: Route fallback traffic from gpt-4o to gpt-4o-mini
+                - generic [ref=e1023]: 2.1M fallback requests analyzed. 97.3% quality parity in Mode 2a shadow evaluation.
+              - generic [ref=e1024]:
+                - generic [ref=e1025]: $31,200
+                - generic [ref=e1026]: estimated monthly impact
+            - generic [ref=e1027]:
+              - generic [ref=e1028]: Recommended
+              - generic [ref=e1029]: Confidence 94%
+              - generic [ref=e1030]: Low Risk
+              - generic [ref=e1031]: Model Routing
+              - generic [ref=e1032]: Product
+              - generic [ref=e1033]: Empirical (Mode 2a)
+            - generic [ref=e1034]:
+              - generic [ref=e1035]:
+                - generic [ref=e1036]: Baseline cost
+                - strong [ref=e1038]: $109,200
+              - generic [ref=e1039]:
+                - generic [ref=e1040]: Projected savings
+                - strong [ref=e1042]: $31,200
+              - generic [ref=e1043]:
+                - generic [ref=e1044]: Implementation effort
+                - strong [ref=e1046]: Medium
+              - generic [ref=e1047]:
+                - generic [ref=e1048]: Forecast impact
+                - strong [ref=e1050]: $93,600
+                - generic [ref=e1051]: Annualized planning effect
+            - generic [ref=e1052]:
+              - generic [ref=e1053]: Recommendation Methodology
+              - generic [ref=e1054]:
+                - strong [ref=e1055]: "Optimization Category:"
+                - text: Model over-provisioning
+              - generic [ref=e1056]:
+                - strong [ref=e1057]: "Threshold Condition:"
+                - text: Triggered by 2.1M monthly fallback requests and a 72% cost differential
+              - generic [ref=e1058]:
+                - strong [ref=e1059]: "Conditional Rule:"
+                - text: Route candidate when cost differential > 50% and equivalence confidence >= 0.93
+            - generic [ref=e1060]:
+              - generic [ref=e1061]: Linked Evidence
+              - generic [ref=e1062]: 2.1M fallback requests analyzed. 97.3% quality parity in Mode 2a shadow evaluation.
+              - generic [ref=e1063]: Triggered by 2.1M monthly fallback requests and a 72% cost differential
+              - generic [ref=e1064]: Route candidate when cost differential > 50% and equivalence confidence >= 0.93
+            - generic [ref=e1065]:
+              - generic [ref=e1066]: "INT-401 | Equivalence status: verified"
+              - generic [ref=e1067]:
+                - button "Start Review" [ref=e1068]
+                - button "Approve" [ref=e1069]
+                - button "Dismiss" [ref=e1070]
+          - generic [ref=e1071] [cursor=pointer]:
+            - generic [ref=e1072]:
+              - generic [ref=e1073]:
+                - generic [ref=e1074]: Apply input-token guardrail to analytics-batch
+                - generic [ref=e1075]: 95th percentile prompt size is 4.2K. Capping at 3.5K removes outlier spend without quality regression.
+              - generic [ref=e1076]:
+                - generic [ref=e1077]: $14,800
+                - generic [ref=e1078]: estimated monthly impact
+            - generic [ref=e1079]:
+              - generic [ref=e1080]: In Review
+              - generic [ref=e1081]: Confidence 89%
+              - generic [ref=e1082]: Medium Risk
+              - generic [ref=e1083]: Token Governance
+              - generic [ref=e1084]: ML Engineering
+              - generic [ref=e1085]: Policy floor
+            - generic [ref=e1086]:
+              - generic [ref=e1087]:
+                - generic [ref=e1088]: Baseline cost
+                - strong [ref=e1090]: $51,800
+              - generic [ref=e1091]:
+                - generic [ref=e1092]: Projected savings
+                - strong [ref=e1094]: $14,800
+              - generic [ref=e1095]:
+                - generic [ref=e1096]: Implementation effort
+                - strong [ref=e1098]: Medium
+              - generic [ref=e1099]:
+                - generic [ref=e1100]: Forecast impact
+                - strong [ref=e1102]: $79,920
+                - generic [ref=e1103]: Annualized planning effect
+            - generic [ref=e1104]:
+              - generic [ref=e1105]: Recommendation Methodology
+              - generic [ref=e1106]:
+                - strong [ref=e1107]: "Optimization Category:"
+                - text: Prompt inefficiency
+              - generic [ref=e1108]:
+                - strong [ref=e1109]: "Threshold Condition:"
+                - text: Triggered when p95 input tokens exceed policy floor by more than 20%
+              - generic [ref=e1110]:
+                - strong [ref=e1111]: "Conditional Rule:"
+                - text: Recommend prompt compaction and gate at 3.5K tokens when p95 > 4K
+            - generic [ref=e1112]:
+              - generic [ref=e1113]: Linked Evidence
+              - generic [ref=e1114]: 95th percentile prompt size is 4.2K. Capping at 3.5K removes outlier spend without quality regression.
+              - generic [ref=e1115]: Triggered when p95 input tokens exceed policy floor by more than 20%
+              - generic [ref=e1116]: Recommend prompt compaction and gate at 3.5K tokens when p95 > 4K
+            - generic [ref=e1117]:
+              - generic [ref=e1118]: "INT-402 | Equivalence status: conditional"
+              - generic [ref=e1119]:
+                - button "Approve" [ref=e1120]
+                - button "Reject" [ref=e1121]
+                - button "Reset" [ref=e1122]
+          - generic [ref=e1123] [cursor=pointer]:
+            - generic [ref=e1124]:
+              - generic [ref=e1125]:
+                - generic [ref=e1126]: Enable semantic cache for deterministic support prompts
+                - generic [ref=e1127]: Cache hit rate stabilized at 38% with no measurable quality drop for deterministic FAQ patterns.
+              - generic [ref=e1128]:
+                - generic [ref=e1129]: $10,200
+                - generic [ref=e1130]: estimated monthly impact
+            - generic [ref=e1131]:
+              - generic [ref=e1132]: Implemented
+              - generic [ref=e1133]: Confidence 92%
+              - generic [ref=e1134]: Low Risk
+              - generic [ref=e1135]: Semantic Cache
+              - generic [ref=e1136]: Customer Engineering
+              - generic [ref=e1137]: Empirical (Mode 2a)
+            - generic [ref=e1138]:
+              - generic [ref=e1139]:
+                - generic [ref=e1140]: Baseline cost
+                - strong [ref=e1142]: $35,700
+              - generic [ref=e1143]:
+                - generic [ref=e1144]: Projected savings
+                - strong [ref=e1146]: $10,200
+              - generic [ref=e1147]:
+                - generic [ref=e1148]: Implementation effort
+                - strong [ref=e1150]: Medium
+              - generic [ref=e1151]:
+                - generic [ref=e1152]: Forecast impact
+                - strong [ref=e1154]: $122,400
+                - generic [ref=e1155]: Annualized planning effect
+            - generic [ref=e1156]:
+              - generic [ref=e1157]: Recommendation Methodology
+              - generic [ref=e1158]:
+                - strong [ref=e1159]: "Optimization Category:"
+                - text: Duplicate requests
+              - generic [ref=e1160]:
+                - strong [ref=e1161]: "Threshold Condition:"
+                - text: Triggered by > 30% semantically duplicate prompts in a 7-day window
+              - generic [ref=e1162]:
+                - strong [ref=e1163]: "Conditional Rule:"
+                - text: Recommend semantic cache when duplicate ratio exceeds 0.30 and latency budget remains under 20ms
+            - generic [ref=e1164]:
+              - generic [ref=e1165]: Linked Evidence
+              - generic [ref=e1166]: Cache hit rate stabilized at 38% with no measurable quality drop for deterministic FAQ patterns.
+              - generic [ref=e1167]: Triggered by > 30% semantically duplicate prompts in a 7-day window
+              - generic [ref=e1168]: Recommend semantic cache when duplicate ratio exceeds 0.30 and latency budget remains under 20ms
+            - generic [ref=e1169]:
+              - generic [ref=e1170]: "INT-403 | Equivalence status: verified"
+              - button "Re-open" [ref=e1172]
+          - generic [ref=e1173] [cursor=pointer]:
+            - generic [ref=e1174]:
+              - generic [ref=e1175]:
+                - generic [ref=e1176]: Restrict staging model allowlist to low-cost equivalents
+                - generic [ref=e1177]: Staging traffic is using production-tier models for integration tests without quality benefit.
+              - generic [ref=e1178]:
+                - generic [ref=e1179]: $22,800
+                - generic [ref=e1180]: estimated monthly impact
+            - generic [ref=e1181]:
+              - generic [ref=e1182]: Recommended
+              - generic [ref=e1183]: Confidence 87%
+              - generic [ref=e1184]: Medium Risk
+              - generic [ref=e1185]: Policy Enforcement
+              - generic [ref=e1186]: Platform Engineering
+              - generic [ref=e1187]: Policy (Mode 1)
+            - generic [ref=e1188]:
+              - generic [ref=e1189]:
+                - generic [ref=e1190]: Baseline cost
+                - strong [ref=e1192]: $95,760
+              - generic [ref=e1193]:
+                - generic [ref=e1194]: Projected savings
+                - strong [ref=e1196]: $22,800
+              - generic [ref=e1197]:
+                - generic [ref=e1198]: Implementation effort
+                - strong [ref=e1200]: Low
+              - generic [ref=e1201]:
+                - generic [ref=e1202]: Forecast impact
+                - strong [ref=e1204]: $68,400
+                - generic [ref=e1205]: Annualized planning effect
+            - generic [ref=e1206]:
+              - generic [ref=e1207]: Recommendation Methodology
+              - generic [ref=e1208]:
+                - strong [ref=e1209]: "Optimization Category:"
+                - text: Staging and dev sprawl
+              - generic [ref=e1210]:
+                - strong [ref=e1211]: "Threshold Condition:"
+                - text: Triggered by > 25% of staging requests using frontier-tier models
+              - generic [ref=e1212]:
+                - strong [ref=e1213]: "Conditional Rule:"
+                - text: Apply staging allowlist when non-production frontier use exceeds 20%
+            - generic [ref=e1214]:
+              - generic [ref=e1215]: Linked Evidence
+              - generic [ref=e1216]: Staging traffic is using production-tier models for integration tests without quality benefit.
+              - generic [ref=e1217]: Triggered by > 25% of staging requests using frontier-tier models
+              - generic [ref=e1218]: Apply staging allowlist when non-production frontier use exceeds 20%
+            - generic [ref=e1219]:
+              - generic [ref=e1220]: "INT-404 | Equivalence status: policy"
+              - generic [ref=e1221]:
+                - button "Start Review" [ref=e1222]
+                - button "Approve" [ref=e1223]
+                - button "Dismiss" [ref=e1224]
+          - generic [ref=e1225] [cursor=pointer]:
+            - generic [ref=e1226]:
+              - generic [ref=e1227]:
+                - generic [ref=e1228]: Batch low-priority nightly summarization jobs
+                - generic [ref=e1229]: Deferred execution window unlocks lower-priced provider batch lanes for non-latency workloads.
+              - generic [ref=e1230]:
+                - generic [ref=e1231]: $17,400
+                - generic [ref=e1232]: estimated monthly impact
+            - generic [ref=e1233]:
+              - generic [ref=e1234]: Recommended
+              - generic [ref=e1235]: Confidence 84%
+              - generic [ref=e1236]: Medium Risk
+              - generic [ref=e1237]: Workload Scheduling
+              - generic [ref=e1238]: Data Science
+              - generic [ref=e1239]: Not required
+            - generic [ref=e1240]:
+              - generic [ref=e1241]:
+                - generic [ref=e1242]: Baseline cost
+                - strong [ref=e1244]: $60,900
+              - generic [ref=e1245]:
+                - generic [ref=e1246]: Projected savings
+                - strong [ref=e1248]: $17,400
+              - generic [ref=e1249]:
+                - generic [ref=e1250]: Implementation effort
+                - strong [ref=e1252]: Medium
+              - generic [ref=e1253]:
+                - generic [ref=e1254]: Forecast impact
+                - strong [ref=e1256]: $52,200
+                - generic [ref=e1257]: Annualized planning effect
+            - generic [ref=e1258]:
+              - generic [ref=e1259]: Recommendation Methodology
+              - generic [ref=e1260]:
+                - strong [ref=e1261]: "Optimization Category:"
+                - text: Batch mispricing
+              - generic [ref=e1262]:
+                - strong [ref=e1263]: "Threshold Condition:"
+                - text: Triggered when > 70% of jobs run off-peak but still on on-demand pricing
+              - generic [ref=e1264]:
+                - strong [ref=e1265]: "Conditional Rule:"
+                - text: Recommend batch lane migration when latency tolerance > 30 minutes
+            - generic [ref=e1266]:
+              - generic [ref=e1267]: Linked Evidence
+              - generic [ref=e1268]: Deferred execution window unlocks lower-priced provider batch lanes for non-latency workloads.
+              - generic [ref=e1269]: Triggered when > 70% of jobs run off-peak but still on on-demand pricing
+              - generic [ref=e1270]: Recommend batch lane migration when latency tolerance > 30 minutes
+            - generic [ref=e1271]:
+              - generic [ref=e1272]: "INT-405 | Equivalence status: n/a"
+              - generic [ref=e1273]:
+                - button "Start Review" [ref=e1274]
+                - button "Approve" [ref=e1275]
+                - button "Dismiss" [ref=e1276]
+          - generic [ref=e1277] [cursor=pointer]:
+            - generic [ref=e1278]:
+              - generic [ref=e1279]:
+                - generic [ref=e1280]: Prompt template compaction for secops-assistant
+                - generic [ref=e1281]: Removes repetitive context boilerplate while preserving the incident triage rubric and output structure.
+              - generic [ref=e1282]:
+                - generic [ref=e1283]: $9,200
+                - generic [ref=e1284]: estimated monthly impact
+            - generic [ref=e1285]:
+              - generic [ref=e1286]: In Review
+              - generic [ref=e1287]: Confidence 90%
+              - generic [ref=e1288]: Low Risk
+              - generic [ref=e1289]: Prompt Optimization
+              - generic [ref=e1290]: Security
+              - generic [ref=e1291]: Empirical (Mode 2a)
+            - generic [ref=e1292]:
+              - generic [ref=e1293]:
+                - generic [ref=e1294]: Baseline cost
+                - strong [ref=e1296]: $32,200
+              - generic [ref=e1297]:
+                - generic [ref=e1298]: Projected savings
+                - strong [ref=e1300]: $9,200
+              - generic [ref=e1301]:
+                - generic [ref=e1302]: Implementation effort
+                - strong [ref=e1304]: Medium
+              - generic [ref=e1305]:
+                - generic [ref=e1306]: Forecast impact
+                - strong [ref=e1308]: $49,680
+                - generic [ref=e1309]: Annualized planning effect
+            - generic [ref=e1310]:
+              - generic [ref=e1311]: Recommendation Methodology
+              - generic [ref=e1312]:
+                - strong [ref=e1313]: "Optimization Category:"
+                - text: Prompt inefficiency
+              - generic [ref=e1314]:
+                - strong [ref=e1315]: "Threshold Condition:"
+                - text: Triggered by > 15% template token redundancy across repeated flows
+              - generic [ref=e1316]:
+                - strong [ref=e1317]: "Conditional Rule:"
+                - text: Recommend template minimization when token redundancy > 0.15 and confidence >= 0.85
+            - generic [ref=e1318]:
+              - generic [ref=e1319]: Linked Evidence
+              - generic [ref=e1320]: Removes repetitive context boilerplate while preserving the incident triage rubric and output structure.
+              - generic [ref=e1321]: Triggered by > 15% template token redundancy across repeated flows
+              - generic [ref=e1322]: Recommend template minimization when token redundancy > 0.15 and confidence >= 0.85
+            - generic [ref=e1323]:
+              - generic [ref=e1324]: "INT-406 | Equivalence status: verified"
+              - generic [ref=e1325]:
+                - button "Approve" [ref=e1326]
+                - button "Reject" [ref=e1327]
+                - button "Reset" [ref=e1328]
+  - complementary [ref=e399]:
+    - generic [ref=e400]:
+      - generic [ref=e401]: Navigate Demo
+      - button [ref=e402] [cursor=pointer]: x
+    - navigation [ref=e403]:
+      - generic [ref=e1329]:
+        - generic [ref=e1330]: Platform
+        - button [ref=e1331] [cursor=pointer]:
+          - img [ref=e1332]
+          - generic [ref=e1335]: Overview
+        - button [ref=e1336] [cursor=pointer]:
+          - img [ref=e1337]
+          - generic [ref=e1340]: Employee Adoption
+        - button [ref=e1341] [cursor=pointer]:
+          - img [ref=e1342]
+          - generic [ref=e1347]: Request Proof
+        - button [ref=e1348] [cursor=pointer]:
+          - img [ref=e1349]
+          - generic [ref=e1352]: Models
+        - button [ref=e1353] [cursor=pointer]:
+          - img [ref=e1354]
+          - generic [ref=e1359]: Teams
+        - button [ref=e1360] [cursor=pointer]:
+          - img [ref=e1361]
+          - generic [ref=e1363]: Manual Mapping
+          - generic [ref=e1364]: "3"
+        - button [ref=e1365] [cursor=pointer]:
+          - img [ref=e1366]
+          - generic [ref=e1368]: Interventions
+          - generic [ref=e1369]: "5"
+        - button [ref=e1370] [cursor=pointer]:
+          - img [ref=e1371]
+          - generic [ref=e1374]: Governance
+      - generic [ref=e1375]:
+        - generic [ref=e1376]: Operational
+        - button [ref=e1377] [cursor=pointer]:
+          - img [ref=e1378]
+          - generic [ref=e1381]: Forecasting
+        - button [ref=e1382] [cursor=pointer]:
+          - img [ref=e1383]
+          - generic [ref=e1386]: Integrations
+        - button [ref=e1387] [cursor=pointer]:
+          - img [ref=e1388]
+          - generic [ref=e1391]: Glossary
+        - button [ref=e1392] [cursor=pointer]:
+          - img [ref=e1393]
+          - generic [ref=e1397]: FAQ
+  - dialog [ref=e473]:
+    - generic [ref=e474]:
+      - generic [ref=e475]:
+        - generic [ref=e476]: Guided Demo
+        - generic [ref=e477]: Run three explainable scenarios and see what changed, why it matters, and what the platform proved.
+      - button [ref=e478] [cursor=pointer]: x
+    - generic [ref=e479]:
+      - generic [ref=e480]:
+        - generic [ref=e481]: What this panel is for
+        - generic [ref=e482]: Use this panel for live controls, or launch the automated 90-second walkthrough from the top bar when you want the demo to progress through the core product story by itself.
+      - generic [ref=e483]: Guided Actions
+      - generic [ref=e484]:
+        - button [ref=e485] [cursor=pointer]: Initialize Demo
+        - button [ref=e486] [cursor=pointer]: Start 90-sec Walkthrough
+        - button [ref=e487] [cursor=pointer]: Show Attributed Request
+        - button [ref=e488] [cursor=pointer]: Show Policy Intervention
+        - button [ref=e489] [cursor=pointer]: Show Fail-Open Safety
+        - button [ref=e490] [cursor=pointer]: Reset Demo
+      - generic [ref=e491]: Latest Demonstrated Outcome
+      - generic [ref=e1398]:
+        - generic [ref=e1399]: Latest Demonstrated Outcome
+        - generic [ref=e1400]: No live proof point selected yet.
+        - generic [ref=e1401]:
+          - text: Use
+          - strong [ref=e1402]: Initialize Demo
+          - text: ", then run"
+          - strong [ref=e1403]: Show Attributed Request
+          - text: ","
+          - strong [ref=e1404]: Show Policy Intervention
+          - text: ", or"
+          - strong [ref=e1405]: Show Fail-Open Safety
+          - text: . This panel will translate the result into plain-language product evidence.
+      - generic [ref=e501]: Walkthrough Timeline
+      - generic [ref=e1406]: No walkthrough steps have been run yet. Initialize the demo, then run one of the guided scenarios.
+  - status [ref=e504]:
+    - button "Dismiss notification" [ref=e505] [cursor=pointer]: Dismiss

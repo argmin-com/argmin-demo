@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<title>Argmin | Decision-Time AI Cost Governance Demo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' x2='100%25' y1='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234f8ef8'/%3E%3Cstop offset='100%25' stop-color='%238f6af8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='12' fill='url(%23g)'/%3E%3Cpath d='M24 8 8 16l16 8 16-8-16-8Zm-16 16 16 8 16-8M8 32l16 8 16-8' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<!-- FIX: version asset URLs so stale browser caches cannot serve an older demo shell -->
+<script src="vendor/chart.umd.min.js?v=20260309b"></script>
+<link rel="stylesheet" href="assets/app.css?v=20260309b">
+
+</head>
+<body>
+<a class="skip-link" href="#view-root">Skip to main content</a>
+<noscript>
+  <div class="noscript-warning">JavaScript is required to run the Argmin demo UI.</div>
+</noscript>
+<!-- FIX: startup loader for cold loads -->
+<div class="app-loader" id="app-loader" aria-hidden="true">
+  <div class="app-loader-spinner"></div>
+</div>
+<div class="demo-watermark"><span id="watermark-text">SIMULATED DATA</span></div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 12l10 5 10-5"></path>
+          <path d="M2 17l10 5 10-5"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">Argmin</div>
+        <div class="brand-sub">Decision-time AI cost governance</div>
+      </div>
+    </div>
+    <nav class="nav" id="sidebar-nav" aria-label="Primary navigation"></nav>
+    <div class="tenant-card">
+      <div class="tenant-title" id="tenant-name">NovaTech Industries</div>
+      <div class="tenant-line" id="tenant-env">Synthetic enterprise operating profile</div>
+      <div class="tenant-line" id="tenant-profile">Cross-functional AI program spanning engineering, support, data, and operations</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-nav-toggle" id="mobile-nav-toggle" data-action="toggle-mobile-nav" aria-controls="mobile-nav-drawer" aria-expanded="false" aria-label="Open navigation menu">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="page-title" id="page-title" tabindex="-1">Overview</div>
+        <div class="period-pill" id="period-label">February 2026</div>
+        <button class="mode-button" id="mode-button" data-action="toggle-mode-menu" aria-haspopup="menu" aria-expanded="false" aria-controls="mode-menu">Advisory</button>
+      </div>
+      <div class="topbar-right">
+        <div class="runtime-chip" id="runtime-chip" role="status" aria-live="polite">
+          <div class="runtime-dot"></div>
+          <div class="runtime-copy">
+            <div class="runtime-label" id="runtime-label">Demo using local data</div>
+            <div class="runtime-detail" id="runtime-detail">Using deterministic local demo data until a live action is requested</div>
+          </div>
+        </div>
+        <button class="top-btn primary" id="start-walkthrough" data-action="start-walkthrough" aria-controls="walkthrough-banner" aria-expanded="false">
+          Start 90-sec Walkthrough
+        </button>
+        <button class="top-btn" id="open-guided-demo" data-action="open-drawer" aria-controls="execution-drawer" aria-expanded="false">
+          Open Guided Demo
+          <span class="stream-count" id="stream-count">0</span>
+        </button>
+        <div class="avatar" aria-hidden="true">NT</div>
+      </div>
+
+      <div class="mode-menu" id="mode-menu" role="menu" aria-hidden="true"></div>
+    </header>
+
+    <section class="context-ribbon" id="context-ribbon" aria-label="Active context"></section>
+    <section class="role-ribbon" id="role-ribbon" aria-label="Audience lens"></section>
+    <section class="walkthrough-banner" id="walkthrough-banner" aria-live="polite" hidden></section>
+
+    <section class="view-root" id="view-root" tabindex="-1" aria-busy="true">
+      <div class="hint" style="padding:20px">Loading demo interface...</div>
+    </section>
+  </main>
+</div>
+
+<div class="mobile-nav-scrim" id="mobile-nav-scrim" data-action="close-mobile-nav"></div>
+<aside class="mobile-nav-drawer" id="mobile-nav-drawer" aria-hidden="true" aria-label="Mobile navigation">
+  <div class="mobile-nav-head">
+    <div class="mobile-nav-title">Navigate Demo</div>
+    <!-- FIX: use the standard close glyph for the mobile navigation dismiss control -->
+    <button class="drawer-close" data-action="close-mobile-nav" aria-label="Close navigation menu">&times;</button>
+  </div>
+  <nav class="mobile-nav-body" id="mobile-sidebar-nav" aria-label="Mobile navigation"></nav>
+</aside>
+
+<div class="drawer-scrim" id="drawer-scrim" data-action="close-drawer"></div>
+<aside class="drawer" id="execution-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-title">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-title" id="drawer-title">Guided Demo</div>
+      <div class="drawer-subtitle">Start the automated walkthrough for the recommended presentation flow, or run one live proof action when you need it.</div>
+      <div class="hint" id="drawer-progress" style="margin-top:6px"></div>
+    </div>
+    <!-- FIX: accessible drawer close affordance -->
+    <button class="drawer-close" data-action="close-drawer" aria-label="Close guided demo">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-purpose">
+      <div class="drawer-summary-title">Recommended path</div>
+      <div class="drawer-summary-detail">For most presentations, start the 90-second walkthrough. Use the live proof controls only when you want to isolate one specific behavior.</div>
+    </div>
+
+    <div class="section-title">Automated Walkthrough</div>
+    <div class="drawer-actions">
+      <button class="small-btn success" data-action="start-walkthrough">Start 90-sec Walkthrough</button>
+      <button class="small-btn" data-action="clear-logs">Reset Demo</button>
+    </div>
+
+    <div class="section-title">Live Proof Controls</div>
+    <div class="drawer-actions">
+      <button class="small-btn primary" data-action="bootstrap-demo">Initialize Demo</button>
+      <button class="small-btn" data-action="run-scenario" data-scenario="enriched">Show Attributed Request</button>
+      <button class="small-btn" data-action="run-scenario" data-scenario="soft_stop">Show Policy Intervention</button>
+      <button class="small-btn" data-action="run-scenario" data-scenario="fail_open">Show Fail-Open Safety</button>
+    </div>
+
+    <div class="section-title">Current Result</div>
+    <!-- FIX: announce drawer summary updates as a live status region -->
+    <div id="drawer-summary" role="status" aria-live="polite"></div>
+
+    <div class="section-title" style="margin-top:12px">Recent Activity</div>
+    <!-- FIX: expose the guided log as a live log region for assistive tech -->
+    <div id="log-stream" role="log" aria-live="polite"></div>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <div class="toast-title" id="toast-title"></div>
+  <div class="toast-msg" id="toast-msg"></div>
+  <button class="toast-close" data-action="close-toast" aria-label="Dismiss notification">Dismiss</button>
+</div>
+
+<!-- FIX: version asset URLs so stale browser caches cannot serve an older demo shell -->
+<script src="assets/app.js?v=20260309b" defer></script>
+
+</html>

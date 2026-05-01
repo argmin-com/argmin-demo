@@ -1,0 +1,384 @@
+- generic [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#view-root"
+  - generic:
+    - generic: SIMULATED DATA
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img [ref=e7]
+        - generic [ref=e11]:
+          - generic [ref=e12]: Argmin
+          - generic [ref=e13]: Argmin
+      - navigation "Primary navigation" [ref=e14]:
+        - generic [ref=e468]:
+          - generic [ref=e469]: Platform
+          - button "Overview" [ref=e470] [cursor=pointer]:
+            - img [ref=e471]
+            - generic [ref=e474]: Overview
+          - button "Employee Adoption" [ref=e475] [cursor=pointer]:
+            - img [ref=e476]
+            - generic [ref=e479]: Employee Adoption
+          - button "Request Proof" [ref=e480] [cursor=pointer]:
+            - img [ref=e481]
+            - generic [ref=e486]: Request Proof
+          - button "Models" [ref=e487] [cursor=pointer]:
+            - img [ref=e488]
+            - generic [ref=e491]: Models
+          - button "Teams" [ref=e492] [cursor=pointer]:
+            - img [ref=e493]
+            - generic [ref=e498]: Teams
+          - button "Manual Mapping" [ref=e499] [cursor=pointer]:
+            - img [ref=e500]
+            - generic [ref=e502]: Manual Mapping
+            - generic [ref=e503]: "3"
+          - button "Interventions" [ref=e504] [cursor=pointer]:
+            - img [ref=e505]
+            - generic [ref=e507]: Interventions
+            - generic [ref=e508]: "5"
+          - button "Governance" [ref=e509] [cursor=pointer]:
+            - img [ref=e510]
+            - generic [ref=e513]: Governance
+        - generic [ref=e514]:
+          - generic [ref=e515]: Operational
+          - button "Forecasting" [ref=e516] [cursor=pointer]:
+            - img [ref=e517]
+            - generic [ref=e520]: Forecasting
+          - button "Integrations" [ref=e521] [cursor=pointer]:
+            - img [ref=e522]
+            - generic [ref=e525]: Integrations
+          - button "Glossary" [ref=e526] [cursor=pointer]:
+            - img [ref=e527]
+            - generic [ref=e530]: Glossary
+          - button "FAQ" [ref=e531] [cursor=pointer]:
+            - img [ref=e532]
+            - generic [ref=e536]: FAQ
+      - generic [ref=e84]:
+        - generic [ref=e85]: NovaTech Industries
+        - generic [ref=e86]: Synthetic enterprise operating profile
+        - generic [ref=e87]: Cross-functional AI program spanning engineering, support, data, and operations
+    - main [ref=e88]:
+      - generic [ref=e89]:
+        - generic [ref=e90]:
+          - generic [ref=e91]: Cost Forecasting
+          - generic [ref=e92]: February 2026
+          - button "Advisory" [ref=e93] [cursor=pointer]
+        - generic [ref=e94]:
+          - status [ref=e95]:
+            - generic [ref=e97]:
+              - generic [ref=e98]: Demo using local data
+              - generic [ref=e99]: Using deterministic local demo data until a live action is requested
+          - button "Start 90-sec Walkthrough" [ref=e100] [cursor=pointer]
+          - button "Open Guided Demo" [ref=e101] [cursor=pointer]
+          - generic [ref=e102]: NT
+      - region "Active context" [ref=e103]:
+        - generic [ref=e842]:
+          - generic [ref=e843]: Mode
+          - generic [ref=e844]: Advisory
+        - generic [ref=e845]:
+          - generic [ref=e846]: Lens
+          - generic [ref=e847]: Executive
+        - generic [ref=e848]:
+          - generic [ref=e849]: Request
+          - generic [ref=e850]: customer-copilot-prod (EKS us-east-1)
+        - generic [ref=e851]:
+          - generic [ref=e852]: Model
+          - generic [ref=e853]: gpt-4o
+        - generic [ref=e854]:
+          - generic [ref=e855]: Scenario
+          - generic [ref=e856]: Growth Push
+        - generic [ref=e857]:
+          - generic [ref=e858]: Horizon
+          - generic [ref=e859]: 12 months
+      - region "Audience lens" [ref=e119]:
+        - generic [ref=e555]:
+          - generic [ref=e556]: Audience lens
+          - generic [ref=e557]: Company-level posture, operating leverage, and deployment readiness.
+        - generic [ref=e558]:
+          - button "Executive" [ref=e559] [cursor=pointer]
+          - button "Finance" [ref=e560] [cursor=pointer]
+          - button "Platform" [ref=e561] [cursor=pointer]
+          - button "Security" [ref=e562] [cursor=pointer]
+      - generic [active] [ref=e128]:
+        - generic [ref=e563]:
+          - generic [ref=e564]:
+            - generic [ref=e565]: Conclusion
+            - generic [ref=e566]: This page shows what happens if the company acts, not just what happened last month.
+          - generic [ref=e567]:
+            - generic [ref=e568]: Why it matters
+            - generic [ref=e569]: The core question is how interventions and policy change the forward cost curve.
+          - generic [ref=e570]:
+            - generic [ref=e571]: Supporting evidence
+            - generic [ref=e572]: Scenario planning now shows both the selected projection and a compare view across the core planning cases.
+          - generic [ref=e573]:
+            - generic [ref=e574]: Next action
+            - generic [ref=e575]: Use the compare chart to explain baseline versus governed or optimized outcomes, then export the planning pack.
+        - generic [ref=e576]:
+          - generic [ref=e577]:
+            - generic [ref=e578]:
+              - generic [ref=e579]: Cost Forecasting
+              - generic [ref=e580]: Scenario-based forecasting across 3, 6, 9, 12, 18, and 24 month planning horizons.
+            - generic [ref=e581]:
+              - button "Generate Live Forecast" [ref=e582] [cursor=pointer]
+              - button "Reset" [ref=e583] [cursor=pointer]
+              - button "Export monthly planning pack" [ref=e584] [cursor=pointer]
+              - button "Glossary" [ref=e585] [cursor=pointer]
+              - button "FAQ" [ref=e586] [cursor=pointer]
+          - generic [ref=e587]:
+            - button "3m" [ref=e860] [cursor=pointer]
+            - button "6m" [ref=e861] [cursor=pointer]
+            - button "9m" [ref=e862] [cursor=pointer]
+            - button "12m" [ref=e863] [cursor=pointer]
+            - button "18m" [ref=e864] [cursor=pointer]
+            - button "24m" [ref=e865] [cursor=pointer]
+          - generic [ref=e594]:
+            - button "Baseline Current trajectory with no incremental governance capture." [ref=e866] [cursor=pointer]:
+              - generic [ref=e867]: Baseline
+              - generic [ref=e868]: Current trajectory with no incremental governance capture.
+            - button "Growth Push Assumes accelerated adoption and elevated request growth." [ref=e869] [cursor=pointer]:
+              - generic [ref=e870]: Growth Push
+              - generic [ref=e871]: Assumes accelerated adoption and elevated request growth.
+            - button "Policy Hardened Assumes enforcement hardens and outlier spend is constrained." [ref=e872] [cursor=pointer]:
+              - generic [ref=e873]: Policy Hardened
+              - generic [ref=e874]: Assumes enforcement hardens and outlier spend is constrained.
+            - button "Optimization Capture Assumes approved interventions are implemented and stick." [ref=e875] [cursor=pointer]:
+              - generic [ref=e876]: Optimization Capture
+              - generic [ref=e877]: Assumes approved interventions are implemented and stick.
+          - generic [ref=e607]: Growth Push preview updated for 12 months. Generate Live Forecast to validate with the demo runtime.
+          - generic [ref=e608]:
+            - generic [ref=e609]:
+              - generic [ref=e878]: What Growth Push Means
+              - generic [ref=e879]: Upside demand case where product rollouts, higher request volumes, and expanded model usage increase monthly spend faster than the current baseline.
+              - generic [ref=e880]:
+                - generic [ref=e881]:
+                  - generic [ref=e882]: Demand Shift
+                  - generic [ref=e883]: +3.5%
+                - generic [ref=e884]:
+                  - generic [ref=e885]: Trend Ramp
+                  - generic [ref=e886]: +13.0%
+                - generic [ref=e887]:
+                  - generic [ref=e888]: Governance Drag
+                  - generic [ref=e889]: "-0.0%"
+                - generic [ref=e890]:
+                  - generic [ref=e891]: Savings Realization
+                  - generic [ref=e892]: 0%
+              - list [ref=e893]:
+                - listitem [ref=e894]: New product launches and broader internal adoption increase request volume above the observed trend.
+                - listitem [ref=e895]: Model mix stays broadly constant, so incremental demand lands directly on spend.
+                - listitem [ref=e896]: Governance posture remains unchanged.
+            - generic [ref=e629]:
+              - generic [ref=e897]: Scenario Readout
+              - generic [ref=e898]:
+                - generic [ref=e899]:
+                  - generic [ref=e900]: Planning Horizon
+                  - generic [ref=e901]: 12 months
+                - generic [ref=e902]:
+                  - generic [ref=e903]: Input Shift vs Actual
+                  - generic [ref=e904]: +16.5%
+                - generic [ref=e905]:
+                  - generic [ref=e906]: Projected Exit Rate
+                  - generic [ref=e907]: $2.13M
+                - generic [ref=e908]:
+                  - generic [ref=e909]: Projected Change
+                  - generic [ref=e910]: +151.1%
+              - generic [ref=e911]: Scenario cards change the demand and control assumptions that feed the planning model. Generate applies the selected scenario to the live projection.
+          - generic [ref=e645]:
+            - generic [ref=e646]: Assumptions and Drivers
+            - generic [ref=e647]: Breaks the projection into demand growth, model mix, governance drag, optimization capture, and unresolved attribution risk.
+            - generic [ref=e648]:
+              - generic [ref=e912]:
+                - generic [ref=e913]: Demand growth
+                - strong [ref=e915]: +3.5%
+                - generic [ref=e916]: Additional workload demand or broader adoption pressure applied to the baseline.
+              - generic [ref=e917]:
+                - generic [ref=e918]: Model mix
+                - strong [ref=e920]: OpenAI / gpt-4o
+                - generic [ref=e921]: Current context is anchored on gpt-4o, which changes the economics if the selected team or request leans heavily on this model family.
+              - generic [ref=e922]:
+                - generic [ref=e923]: Governance drag
+                - strong [ref=e925]: +0.0%
+                - generic [ref=e926]: Reduction in outlier or policy-violating spend under tighter controls.
+              - generic [ref=e927]:
+                - generic [ref=e928]: Optimization capture
+                - strong [ref=e930]: 0%
+                - generic [ref=e931]: How much of the open intervention pipeline actually becomes durable run-rate savings.
+              - generic [ref=e932]:
+                - generic [ref=e933]: Unresolved attribution risk
+                - strong [ref=e935]: $50,700
+                - generic [ref=e936]: Spend still sitting in provisional ownership queues that finance may need to hold as planning risk.
+          - img "Growth Push spend forecast with historical actuals and confidence bounds" [ref=e937]
+          - generic [ref=e676]:
+            - generic [ref=e677]:
+              - strong [ref=e678]: "X-axis:"
+              - text: Historical and projected month
+            - generic [ref=e679]:
+              - strong [ref=e680]: "Y-axis:"
+              - text: Spend in USD, including forecast bounds
+        - generic [ref=e681]:
+          - generic [ref=e938]:
+            - generic [ref=e939]: Mar
+            - generic [ref=e940]: $1,085,531
+            - generic [ref=e941]: Range $976,978 - $1,194,084
+          - generic [ref=e942]:
+            - generic [ref=e943]: Apr
+            - generic [ref=e944]: $1,180,184
+            - generic [ref=e945]: Range $1,062,166 - $1,298,202
+          - generic [ref=e946]:
+            - generic [ref=e947]: May
+            - generic [ref=e948]: $1,274,837
+            - generic [ref=e949]: Range $1,147,353 - $1,402,321
+          - generic [ref=e950]:
+            - generic [ref=e951]: Jun
+            - generic [ref=e952]: $1,369,489
+            - generic [ref=e953]: Range $1,232,540 - $1,506,438
+          - generic [ref=e954]:
+            - generic [ref=e955]: Jul
+            - generic [ref=e956]: $1,464,142
+            - generic [ref=e957]: Range $1,317,728 - $1,610,556
+          - generic [ref=e958]:
+            - generic [ref=e959]: Aug
+            - generic [ref=e960]: $1,558,795
+            - generic [ref=e961]: Range $1,402,915 - $1,714,675
+          - generic [ref=e962]:
+            - generic [ref=e963]: Sep
+            - generic [ref=e964]: $1,653,448
+            - generic [ref=e965]: Range $1,488,103 - $1,818,793
+          - generic [ref=e966]:
+            - generic [ref=e967]: Oct
+            - generic [ref=e968]: $1,748,101
+            - generic [ref=e969]: Range $1,573,291 - $1,922,911
+          - generic [ref=e970]:
+            - generic [ref=e971]: Nov
+            - generic [ref=e972]: $1,842,754
+            - generic [ref=e973]: Range $1,658,479 - $2,027,029
+          - generic [ref=e974]:
+            - generic [ref=e975]: Dec
+            - generic [ref=e976]: $1,937,407
+            - generic [ref=e977]: Range $1,743,666 - $2,131,148
+          - generic [ref=e978]:
+            - generic [ref=e979]: Jan
+            - generic [ref=e980]: $2,032,060
+            - generic [ref=e981]: Range $1,828,854 - $2,235,266
+          - generic [ref=e982]:
+            - generic [ref=e983]: Feb
+            - generic [ref=e984]: $2,126,713
+            - generic [ref=e985]: Range $1,914,042 - $2,339,384
+        - generic [ref=e730]:
+          - generic [ref=e732]:
+            - generic [ref=e733]: Scenario Compare
+            - generic [ref=e734]: Baseline versus demand, control, and optimization cases on one planning surface.
+          - generic [ref=e735]:
+            - button "Baseline" [ref=e986] [cursor=pointer]
+            - button "Growth Push" [ref=e987] [cursor=pointer]
+            - button "Policy Hardened" [ref=e988] [cursor=pointer]
+            - button "Optimization Capture" [ref=e989] [cursor=pointer]
+          - img "Scenario comparison chart showing projected monthly spend by planning scenario" [ref=e741]
+          - generic [ref=e742]:
+            - generic [ref=e743]:
+              - strong [ref=e744]: "X-axis:"
+              - text: Projected month in the selected horizon
+            - generic [ref=e745]:
+              - strong [ref=e746]: "Y-axis:"
+              - text: Projected monthly spend in USD by scenario
+          - generic [ref=e747]:
+            - generic [ref=e990]:
+              - generic [ref=e991]: Baseline
+              - generic [ref=e992]: $847,000
+              - generic [ref=e993]: +0.0% exit-rate change
+            - generic [ref=e994]:
+              - generic [ref=e995]: Growth Push
+              - generic [ref=e996]: $1,149,570
+              - generic [ref=e997]: +35.7% exit-rate change
+            - generic [ref=e998]:
+              - generic [ref=e999]: Policy Hardened
+              - generic [ref=e1000]: $570,596
+              - generic [ref=e1001]: "-32.6% exit-rate change"
+            - generic [ref=e1002]:
+              - generic [ref=e1003]: Optimization Capture
+              - generic [ref=e1004]: $457,993
+              - generic [ref=e1005]: "-45.9% exit-rate change"
+  - complementary [ref=e361]:
+    - generic [ref=e362]:
+      - generic [ref=e363]: Navigate Demo
+      - button [ref=e364] [cursor=pointer]: ×
+    - navigation [ref=e365]:
+      - generic [ref=e764]:
+        - generic [ref=e765]: Platform
+        - button [ref=e766] [cursor=pointer]:
+          - img [ref=e767]
+          - generic [ref=e770]: Overview
+        - button [ref=e771] [cursor=pointer]:
+          - img [ref=e772]
+          - generic [ref=e775]: Employee Adoption
+        - button [ref=e776] [cursor=pointer]:
+          - img [ref=e777]
+          - generic [ref=e782]: Request Proof
+        - button [ref=e783] [cursor=pointer]:
+          - img [ref=e784]
+          - generic [ref=e787]: Models
+        - button [ref=e788] [cursor=pointer]:
+          - img [ref=e789]
+          - generic [ref=e794]: Teams
+        - button [ref=e795] [cursor=pointer]:
+          - img [ref=e796]
+          - generic [ref=e798]: Manual Mapping
+          - generic [ref=e799]: "3"
+        - button [ref=e800] [cursor=pointer]:
+          - img [ref=e801]
+          - generic [ref=e803]: Interventions
+          - generic [ref=e804]: "5"
+        - button [ref=e805] [cursor=pointer]:
+          - img [ref=e806]
+          - generic [ref=e809]: Governance
+      - generic [ref=e810]:
+        - generic [ref=e811]: Operational
+        - button [ref=e812] [cursor=pointer]:
+          - img [ref=e813]
+          - generic [ref=e816]: Forecasting
+        - button [ref=e817] [cursor=pointer]:
+          - img [ref=e818]
+          - generic [ref=e821]: Integrations
+        - button [ref=e822] [cursor=pointer]:
+          - img [ref=e823]
+          - generic [ref=e826]: Glossary
+        - button [ref=e827] [cursor=pointer]:
+          - img [ref=e828]
+          - generic [ref=e832]: FAQ
+  - dialog [ref=e435]:
+    - generic [ref=e436]:
+      - generic [ref=e437]:
+        - generic [ref=e438]: Guided Demo
+        - generic [ref=e439]: Run three explainable scenarios and see what changed, why it matters, and what the platform proved.
+      - button [ref=e440] [cursor=pointer]: ×
+    - generic [ref=e441]:
+      - generic [ref=e442]:
+        - generic [ref=e443]: What this panel is for
+        - generic [ref=e444]: Use this panel for live controls, or launch the automated 90-second walkthrough from the top bar when you want the demo to progress through the core product story by itself.
+      - generic [ref=e445]: Guided Actions
+      - generic [ref=e446]:
+        - button [ref=e447] [cursor=pointer]: Initialize Demo
+        - button [ref=e448] [cursor=pointer]: Start 90-sec Walkthrough
+        - button [ref=e449] [cursor=pointer]: Show Attributed Request
+        - button [ref=e450] [cursor=pointer]: Show Policy Intervention
+        - button [ref=e451] [cursor=pointer]: Show Fail-Open Safety
+        - button [ref=e452] [cursor=pointer]: Reset Demo
+      - generic [ref=e453]: Latest Demonstrated Outcome
+      - status [ref=e454]:
+        - generic [ref=e833]:
+          - generic [ref=e834]: Latest Demonstrated Outcome
+          - generic [ref=e835]: No live proof point selected yet.
+          - generic [ref=e836]:
+            - text: Use
+            - strong [ref=e837]: Initialize Demo
+            - text: ", then run"
+            - strong [ref=e838]: Show Attributed Request
+            - text: ","
+            - strong [ref=e839]: Show Policy Intervention
+            - text: ", or"
+            - strong [ref=e840]: Show Fail-Open Safety
+            - text: . This panel will translate the result into plain-language product evidence.
+      - generic [ref=e463]: Walkthrough Timeline
+      - log [ref=e464]:
+        - generic [ref=e841]: No walkthrough steps have been run yet. Initialize the demo, then run one of the guided scenarios.
+  - status [ref=e466]:
+    - button "Dismiss notification" [ref=e467] [cursor=pointer]: Dismiss

@@ -1,0 +1,2017 @@
+Product Requirements Document
+Argmin Platform
+Version 2.0 | March 7, 2026
+CONFIDENTIAL: Internal Use Only
+
+Richard McKinney, CEO / Co-Founder
+Charlotte Wargniez, Chief Research Scientist / Co-Founder
+
+Document Status
+
+Working Draft (Review Incorporated)
+
+Version
+
+2.0 (incorporates Reviewer #1 feedback, co-founder review session, and demo update
+specification)
+
+Date
+
+March 7, 2026
+
+Classification
+
+Confidential
+
+Audiences
+
+Co-founders, YC application review, CTO candidates, design partners
+
+Companion
+
+Engineering Specification v1.7 (separate document): fail-open acceptance tests, Active-Lite full
+spec, deployment topology, canonical schemas, latency budget, UI component specifications
+
+Source Materials
+
+Patent Architecture Spec v2.3, Platform Mockup v3/v4, Company Materials Suite, Codebase
+(github.com/argmin-com/argmin-demo)
+
+Version 2.0 Change Summary
+• Navigation and interaction: Overview metrics are clickable, routing to associated detail views. Mode switching
+(Passive/Advisory/Active-Lite) is visible and accessible from primary navigation.
+• Forecasting and scenario modeling: Cost forecasting supports intervention-based scenario modeling across configurable
+time horizons (3, 6, 9, 12, 18, and 24 months).
+• Architecture visualization: Simplified to Level-0 overview showing active integrations within a customer deployment.
+Relocated from Attribution to a dedicated Integrations tab.
+• Attribution interface: Simplified to two primary sections (Models, Teams). Six-Layer Attribution Chain explanation moved
+from UI to reference documentation. Manual attribution mapping and correction added.
+• Dynamic recalculation: User actions that affect attribution or metrics trigger visible loading indicators (0.9 to 1.2 seconds) and
+dynamic metric updates.
+• Technical diagnostics separation: Operational metrics (data freshness, ingestion latency, telemetry health) moved to a
+dedicated Technical Diagnostics tab for infrastructure/platform engineering users.
+• Execution streams: Redesigned as a collapsible side panel accessible from any page, rather than inline on the Overview
+dashboard.
+• Carbon/sustainability deferral: All carbon, energy, and sustainability content explicitly excluded from MVP scope and demo.
+Architecturally embedded for future activation.
+• Benchmarking deferral: All benchmarking references removed from MVP scope. Privacy and re-identification risks at small
+customer volumes require deferral until sufficient data aggregation is achievable.
+• Terminology: "Waste" renamed to "Optimization Potential" throughout all user-facing surfaces.
+
+• TRAC simplification: MVP formula reduced to Billed Cost + Confidence Risk Premium. Carbon Liability component deferred
+to post-MVP activation.
+• Optimization methodology: Conditional rule-based recommendation system documented. Intervention cards display
+triggering data thresholds and rule conditions.
+• Codebase alignment: Known runtime bug documented (_handle_org_change does not close old team membership edges).
+TRAC calculator code flagged for alignment with MVP formula.
+
+Table of Contents
+1. Executive Summary
+2. Product Vision and Positioning
+3. Target Users and Buyer Sequence
+4. Product Pillars
+5. Functional Requirements: Data Ingestion and Integration
+6. Functional Requirements: Attribution Graph and Confidence
+7. Functional Requirements: Decision-Time Interception
+8. Functional Requirements: Dashboard, Reporting, and UI
+9. Functional Requirements: Interventions and Right-Sizing
+10. Functional Requirements: Policy Engine
+11. Functional Requirements: Carbon Ledger (Deferred)
+12. Functional Requirements: Integrations (Slack, Email, CI/CD, Architecture View)
+13. Non-Functional Requirements
+14. Security and Trust Boundary
+15. Demo Requirements (YC Application)
+16. Information Architecture
+17. MVP Boundary
+18. Roadmap Alignment
+19. Open Questions, Risks, and Dependencies
+
+1. Executive Summary
+This document defines the product requirements for the Argmin Platform: an enterprise SaaS
+product that provides application-level cost and usage attribution for AI workloads. The platform deploys inside
+customer trust boundaries, constructs a graph-based attribution chain linking model invocations through services,
+code ownership, identity, and organizational hierarchy to cost data, and delivers decision-enabling intelligence that no
+incumbent category currently provides.
+The product has three pillars: (1) cost attribution and observability, (2) model right-sizing and optimization
+recommendations, and (3) a configurable policy engine operating in advisory and active modes. Environmental
+impact (carbon attribution) is architecturally embedded as a fourth dimension but sequenced behind cost as the lead
+value proposition and excluded from MVP scope. The patent architecture (v2.3, six-reviewer validated) provides the
+technical foundation; this PRD translates that architecture into product requirements organized for implementation.
+The document serves as the canonical reference for (a) validating the YC application demo against product scope,
+(b) communicating product scope to technical co-founder candidates and CTO hires, (c) guiding design partner
+conversations, and (d) providing the foundation for sprint planning once the engineering team is in place.
+
+2. Product Vision and Positioning
+2.1 Core Thesis
+Workload-level AI cost visibility becomes infrastructure, not tooling. Three forcing functions drive this: (a) technical
+compute variance (reasoning models consume 30 to 700x more compute than base models, making flat-rate
+allocation meaningless), (b) economic governance pressure (CFOs and FinOps teams are beginning to demand
+attribution as AI becomes a material line item), and (c) organizational decentralization (multiple teams adopting AI
+independently with no cross-team visibility).
+
+2.2 Positioning
+The product is positioned as an AI Cost Control Layer: an optimizer, not a cost cop. Lead with model optimization for
+engineering leadership (demonstrate that teams use expensive models for tasks where cheaper alternatives produce
+equivalent quality), then expand to FinOps governance and CFO reporting after proving savings. Environmental
+framing supports the founding narrative but does not lead product positioning.
+
+2.3 Competitive Differentiation
+• Decision-time intervention (pre-execution) versus post-hoc measurement. The platform intercepts AI
+inference requests before they execute, rather than reporting on spend after the fact.
+• Graph-based attribution without tags. Heuristic entity resolution across disconnected enterprise domains
+(identity, CI/CD, source control, HR, billing) produces attribution where tagging-based approaches fail.
+• Confidence-gated enforcement. Probabilistic attribution confidence directly gates decision-time actions;
+low-confidence attributions cannot trigger irreversible runtime changes.
+• Patent-defensible architecture. Provisional patent application (v2.3, six-reviewer validated) with two
+independent claims and fifteen dependent claims covering the full pipeline from ingestion through decision-time
+interception.
+
+3. Target Users and Buyer Sequence
+
+Phase
+
+Entry Point
+
+Value Proposition
+
+Deployment Mode
+
+Land
+
+VP Eng / Platform Eng
+
+Model optimization: show teams using expensive models
+where cheaper alternatives produce equivalent quality
+
+Passive or Advisory
+
+Expand
+
+FinOps / Eng Leadership
+
+Attribution and budget governance across teams; chargeback
+accuracy
+
+Advisory (org-wide)
+
+Consolidate
+
+CFO / Executive
+
+AI investment efficiency, forecasting, and compliance reporting
+
+Advisory + Active (opt-in)
+
+3.1 Ideal Customer Profile
+• Multi-cloud deployment (AWS, Azure, and/or GCP). MVP supports AWS-first organizations; multi-cloud orgs
+are viable design partners if 70% or more of AI spend is on AWS during Phase 1.
+• Active LLM integration across multiple applications and teams
+• Significant annual AI inference spend with executive pressure on cost governance, ROI justification, or budget
+attribution
+• Existing observability investment (Splunk, Datadog) indicating willingness to pay for infrastructure visibility
+
+4. Product Pillars
+The product delivers value through three interconnected pillars, each of which deepens customer integration and
+increases switching cost. A fourth dimension (carbon/sustainability) is architecturally embedded but excluded from
+MVP and sequenced as a subsequent expansion.
+Pillar
+
+Description
+
+Priority
+
+Pillar 1: Cost Attribution and
+Observability
+
+Answer: who is using which model, how often, at what cost, for what purpose?
+Construct a six-layer attribution chain (Model, Service, Code, Identity, Org, Budget)
+with calibrated confidence. Provide dashboards for team-level, model-level, and
+request-level cost visibility.
+
+P0
+
+Pillar 2: Model Right-Sizing and
+Optimization
+
+Identify workloads using models more expensive than necessary. Generate
+actionable recommendations with estimated savings, confidence intervals, and risk
+ratings. Capability equivalence verification ensures no quality degradation.
+
+P0
+
+Pillar 3: Configurable Policy
+Engine
+
+Rule-based and (over time) adaptive policies governing AI spend. Advisory mode:
+notifications via Slack, email, CI/CD hooks. Active mode: circuit-breaker gating on
+deployments exceeding configured thresholds. Fail-open safety guarantees.
+
+P0
+
+Dimension 4: Carbon Ledger
+(Deferred)
+
+Auditable carbon attribution at the workload level using a three-layer methodology
+(spend-based, activity-based, instrumented). Architecturally embedded in attribution
+chain. Excluded from MVP scope, demo, and user-facing surfaces. Activated
+post-MVP.
+
+P1
+
+TRAC (Total Risk-Adjusted Cost): MVP formula: Billed Cost + Confidence Risk Premium. The Carbon Liability
+component activates when the carbon module is enabled post-MVP. The full formula (Billed Cost + Carbon Liability +
+Confidence Risk Premium) is architecturally supported but not exposed in MVP.
+
+5. Functional Requirements: Data Ingestion and Integration
+The platform ingests heterogeneous enterprise events via OTel-native passive collection using existing log pipelines.
+No bespoke host-level agents required. All events enter as immutable records on an append-only event bus (the
+system of record). The graph is derived state, deterministically reconstructable from the event log.
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-100a
+
+Ingest cloud telemetry from AWS (CloudWatch Logs, Cost Explorer API,
+Bedrock usage metrics)
+
+P0
+
+Read-only permissions. MVP provider.
+
+FR-100b
+
+Ingest cloud telemetry from Azure (Monitor, Billing API) and GCP (Cloud
+Logging, Billing BigQuery export)
+
+P1
+
+Phase 2 expansion.
+
+FR-101a
+
+Ingest identity events from Okta via SCIM 2.0 provisioning events and
+System Log API
+
+P0
+
+User ID, email, group membership
+minimum. MVP provider.
+
+FR-101b
+
+Ingest identity events from Azure AD via SCIM 2.0 and Graph API
+
+P1
+
+Phase 2 expansion.
+
+FR-102
+
+Ingest source control events from GitHub (webhook events,
+GraphQL/REST, CODEOWNERS). NOT code content.
+
+P0
+
+Repo ownership, collaborators, commit
+metadata.
+
+FR-103a
+
+Ingest CI/CD events from GitHub Actions (webhook events or log stream
+parsing)
+
+P0
+
+Job ID, trigger repo, trigger user, created
+resources. MVP provider.
+
+FR-103b
+
+Ingest CI/CD events from Jenkins (webhook events or log stream
+parsing)
+
+P1
+
+Phase 2 expansion.
+
+FR-104
+
+Ingest HR hierarchy from Workday or BambooHR via REST/SOAP API
+(read-only). NOT compensation data.
+
+P1
+
+Team hierarchy, cost centers, manager
+chains.
+
+FR-105
+
+Ingest model registry metadata from MLflow or SageMaker (REST API,
+read-only)
+
+P1
+
+Model ID, version, registered configs.
+
+FR-108
+
+All events stored in append-only event log with idempotency keys
+preventing duplicate processing
+
+P0
+
+System of record. Graph is derived.
+
+FR-109
+
+Event schema includes: event_id, event_type, subject_id, attributes,
+event_time, ingest_time, source, idempotency_key
+
+P0
+
+Canonical schema across all sources.
+
+FR-110
+
+Model pricing integration: ingest and maintain versioned pricing tables for
+LLM providers (OpenAI, Anthropic, Google, AWS Bedrock, Azure
+OpenAI). Support token-based, request-based, and GPU-time pricing
+models. Pricing snapshots versioned with effective dates. Must parse
+provider-specific usage response headers (e.g.,
+cache_read_input_tokens for Anthropic prompt caching) to calculate
+accurate tiered costs.
+
+P0
+
+Provider pricing changes frequently. Must
+reconcile with billing data.
+
+FR-111
+
+Bifurcated cost tracking with two data freshness tiers. Real-time synthetic
+cost: computed by interceptor/collectors using tokens multiplied by
+versioned pricing tables; available within seconds. Reconciled cost:
+asynchronous true-up at T+24h against provider billing APIs. For
+streaming responses, interceptor parses trailing usage chunk from SSE; if
+absent, request marked 'unfinalized' with input-only cost, reconciled at
+T+24h.
+
+P0
+
+Streaming finalization SLA: shadow event
+emitted within 5s of stream termination.
+
+FR-112
+
+Onboarding automation: provide CloudFormation template or Terraform
+module for provisioning read-only IAM roles (AWS), API token scoping
+(Okta), and GitHub App installation. Target: under 30 minutes for
+infrastructure provisioning.
+
+P0
+
+Design partner security teams will not
+accept long-lived static credentials.
+
+6. Functional Requirements: Attribution Graph and Confidence
+The attribution graph is the core data structure linking AI model invocations to organizational cost ownership. The
+architecture assumes dirty data and patents the mechanisms for deriving actionable attribution from fragmented,
+inconsistent, and incomplete enterprise signals.
+
+6.1 Graph Construction
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-200
+
+Construct and maintain a time-versioned attribution graph with 12 node
+types: Person, Team, ServiceAccount, Workload, Repository,
+Deployment, CloudResource, Model, Environment, CostCenter,
+ExecutionConstraint, InferenceEvent
+
+P0
+
+All edges carry valid_from/valid_to
+timestamps.
+
+FR-201
+
+Implement heuristic entity resolution across disconnected enterprise
+domains using six methods in priority order: R1 (Direct ID Match, conf
+1.0), R2 (Temporal Correlation, 0.4-0.7), R3 (Naming Convention +
+Entropy, 0.3-0.6), R4 (Historical Pattern, 0.3-0.5), R5 (Service Account
+Resolution, 0.4-0.8), R6 (Proportional Allocation, 0.1-0.3)
+
+P0
+
+Core patent claim. Probabilistic resolution
+is primary; deterministic is a special case.
+
+FR-202
+
+Support fractional attribution across multiple entities via edge weights
+(0..1). Cost treated as fluid splitting across weighted edges.
+
+P0
+
+Shared endpoints serving multiple
+workloads must split cost proportionally.
+
+FR-203
+
+Two-tier graph architecture: Tier 1 (Authoritative Graph Store, durable)
+and Tier 2 (Attribution Index, precomputed serving cache)
+
+P0
+
+Hot-path index key: (resource_fingerprint,
+environment). Time-bucketing excluded
+from hot path.
+
+FR-204
+
+Attribution Index maintained as a memory-resident serving cache
+(Redis/KeyDB) with an in-process micro-cache in the interceptor; both
+optimized for constant-time lookup.
+
+P0
+
+Two-tier: interceptor micro-cache (1-5s)
+backed by Redis HMGET (15ms timeout).
+See Engineering Specification Section 6.
+
+6.2 Confidence Governance
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-210
+
+Calibrated confidence scoring: score of 0.8 means ~80% of attributions
+historically assigned 0.8 were correct against ground truth
+
+P0
+
+Empirical calibration, not assumed.
+
+FR-211
+
+Confidence thresholds: >=0.8 included in compliance/chargeback; 0.5-0.8
+'Provisional' (FinOps review required); <0.5 'Estimated' (excluded from
+chargeback)
+
+P0
+
+Customer-configurable thresholds.
+
+FR-212
+
+Calibration loop: isotonic regression per reconciliation method (R1-R6),
+updated weekly from ground truth (CI/CD provenance, user corrections,
+manual attribution inputs, FinOps review decisions)
+
+P1
+
+Min 200 ground-truth samples for full
+calibration. Manual attribution inputs
+(FR-410) feed calibration.
+
+FR-213
+
+Evidence combination via modified noisy-OR: C_combined = min(0.95, 1
+- product(1 - C_i * w_i)) with dependency penalty for correlated signals
+
+P0
+
+0.95 hard cap prevents overconfidence.
+
+FR-214
+
+Explanation artifact stored for every probabilistic attribution:
+method_used, top_contributing_signals, feature_values,
+alternatives_considered, conflict_state
+
+P0
+
+Surfaced in reference documentation and
+API. Not displayed as primary UI content.
+
+FR-215
+
+Warm-start calibration: ship pre-calibrated curves from synthetic
+enterprise environments; transition to customer-specific when KS statistic
+divergence > 0.15
+
+P1
+
+Addresses cold-start problem.
+
+7. Functional Requirements: Decision-Time Interception
+The decision-time interceptor is the primary differentiating component. It intercepts AI inference requests before
+execution and enriches, gates, or redirects them based on attributed cost, confidence, and configured policies. The
+interceptor never traverses the graph directly; it performs single-digit-millisecond index lookups with a fail-open circuit
+breaker guaranteeing zero impact on application availability.
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-300
+
+Intercept AI inference requests prior to execution via lightweight API
+middleware (sidecar or proxy deployment)
+
+P0
+
+No bespoke host-level agents.
+
+FR-301
+
+Hard timeout budget of 20ms for enrichment. If exceeded, request
+proceeds unmodified (fail-open). Shadow Event logged for async
+reconciliation.
+
+P0
+
+Fail-open is non-negotiable for enterprise
+adoption.
+
+FR-302
+
+Interceptor hot path: (1) local in-process micro-cache (1-5s TTL), (2) on
+miss, single HMGET to in-VPC Redis/KeyDB (15ms timeout), (3) on
+Redis miss/timeout, fail-open. Policy/constraint evaluation is in-process
+(compiled policy bundles loaded from control plane, not remote RPC). No
+synchronous calls to graph store, event bus, policy service, or external
+systems on the hot path.
+
+P0
+
+Three independent outage modes with
+defined behavior.
+
+FR-303
+
+Three deployment modes: (1) Passive Observation (sidecar, logs only),
+(2) Advisory (enriches response headers, does not redirect), (3) Active
+(may modify/redirect, requires explicit opt-in per application). Mode
+switching must be visible and intuitive in the primary navigation interface.
+
+P0
+
+Each mode deepens integration. Mode
+selector accessible from any page.
+
+FR-304
+
+Advisory mode enriches response headers: X-ACI-Est-Cost-USD,
+X-ACI-Advisory (with code and detail), X-ACI-Attribution-Confidence,
+X-ACI-Attribution-Owner-Id. All headers use X-ACI-* namespace. Hard
+caps: total added headers must not exceed 4KB; any single header value
+must not exceed 1KB; detail fields must be bounded and must never
+contain PII.
+
+P0
+
+Header caps are P0 safety properties.
+Carbon header (X-ACI-Carbon-gCO2e)
+architecturally reserved but not populated
+until carbon module enabled (post-MVP).
+
+FR-305
+
+Full Active mode requires: capability equivalence verification (Mode
+2a/2b), fail-open circuit breaker, semantic guardrails, and explicit
+per-application opt-in
+
+P1
+
+Full active mode is Phase 2. See FR-305a
+for MVP.
+
+FR-305a
+
+Active-Lite (MVP): restricted enforcement mode with two sub-modes.
+Active-Lite/Shape (lower risk, min confidence 0.90): same-family
+deterministic model routing, exact-match semantic caching for
+deterministic workloads. Active-Lite/Gate (higher risk, separate
+production opt-in, min confidence 0.95): pre-flight input token gating
+(HTTP 413), pre-flight model/budget rejection. Semantic safety bypass,
+environment gating, per-service opt-in, immediate disablement (<60s).
+See Engineering Specification Section 2 for full spec.
+
+P0
+
+Shape (0.90) vs Gate (0.95) confidence
+thresholds are product guarantees.
+
+FR-306
+
+Capability equivalence: Mode 1 (policy-based, admin-defined lists), Mode
+2a (empirical shadow eval, min 100 samples), Mode 2b (LLM-as-judge),
+Mode 3 (contractual/compliance-only).
+
+P1
+
+Mode 1 for MVP. Modes 2a/2b are Phase
+2.
+
+FR-308
+
+1-line per provider integration: applications integrate by changing each
+LLM provider BASE_URL to point to the interceptor's internal load
+balancer. No SDK changes, no code rewrite.
+
+P0
+
+Primary adoption accelerator.
+
+FR-309
+
+Offline resilience: if control plane unreachable, interceptor continues with
+last-known-good policy bundle. If Redis unreachable, interceptor serves
+from micro-cache and fails open. Telemetry queued locally; oldest
+dropped first if local queue exceeds 50MB.
+
+P0
+
+Three independent outage modes with
+defined behavior for each.
+
+FR-310
+
+X-ACI-Route values must be bounded, enum-like templated route names.
+If route cardinality exceeds 50K keys per environment, fallback to
+per-service fingerprinting.
+
+P0
+
+Protects index sizing assumptions.
+
+FR-311
+
+Semantic cache (Active-Lite/Shape) must never share the Redis eviction
+pool with the Attribution Index.
+
+P0
+
+Product safety property.
+
+8. Functional Requirements: Dashboard, Reporting, and UI
+The platform provides a web-based dashboard organized into distinct views. The information architecture separates
+financial and organizational intelligence (primary user-facing views) from technical operational metrics (diagnostics
+view for platform engineering). All overview metrics are interactive: clicking any metric card navigates to the
+associated detail view.
+
+8.1 Dashboard Views
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-400
+
+Overview dashboard: total AI spend (current and trend), attribution
+coverage percentage (as defined in Section 17.3), total optimization
+potential from recommended interventions, savings captured. All metric
+cards are clickable, navigating directly to the associated detail view (e.g.,
+clicking attribution coverage opens the Attribution page). Overview is
+organized into: Zone 1 (financial summary metrics), Zone 2 (spend
+visualizations: monthly trend, provider breakdown, cloud breakdown,
+optimization potential breakdown, team attribution table). No code-level or
+request-level detail on this page.
+
+P0
+
+Primary landing page. Executive-level
+summary. Financial and organizational
+metrics only.
+
+FR-401
+
+Attribution view: organized into two primary sub-sections: (a) Models and
+(b) Teams. The Models sub-view shows per-model spend, request
+volume, latency, cost per 1K requests, team adoption, trend, optimization
+potential estimate, and cost variance. Explanatory or interpretive text
+appears as hover tooltips, not persistent panels. The Teams sub-view
+shows per-team AI spend, budget utilization, optimization potential
+percentage, top models, top applications, and month-over-month trend.
+
+P0
+
+Core views. Six-layer attribution chain
+explanation removed from primary UI;
+available in glossary/FAQ reference
+documentation.
+
+FR-402
+
+Cost forecasting view: predict monthly AI spend at team and org level
+based on trailing consumption patterns. Support scenario modeling based
+on intervention adoption: (a) no interventions implemented, (b) subset of
+specific interventions, (c) all recommended interventions. Configurable
+time horizons: 3, 6, 9, 12, 18, and 24 months. Forecast versus budget
+with variance highlighting. Forecast model inputs relocated to a dedicated
+configuration/advanced settings view, not displayed on the primary
+forecasting page.
+
+P0
+
+FinOps teams prioritize forward-looking
+budget visibility with scenario planning.
+[v2.0: upgraded from P1 to P0]
+
+FR-403
+
+Interventions view: recommended optimizations with estimated savings,
+confidence, risk rating, capability equivalence status. Each intervention
+card displays: optimization category, triggering data threshold,
+rule/condition met, and estimated savings. Filterable by status
+(recommended, in review, approved, rejected, implemented, dismissed).
+Approve/reject actions update intervention status, and savings totals
+update dynamically across the Overview and Interventions views.
+
+P0
+
+Actionable savings with transparent
+methodology. See Section 9.
+
+FR-404
+
+Governance view: policy engine configuration, active policies, violation
+counts, deployment mode selector (Passive/Advisory/Active-Lite)
+accessible from this view and from global navigation. Security and trust
+boundary summary.
+
+P0
+
+Mode selector visible from primary
+navigation. See Section 10 for policy
+engine.
+
+FR-405
+
+Carbon Ledger view: architecturally present but excluded from MVP. If
+included in demo, clearly labeled as future capability.
+
+P1
+
+Supports sustainability reporting. Excluded
+from MVP per Section 17.
+
+8.2 Navigation and Interaction (v2.0)
+
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-410
+
+Manual attribution mapping and correction: the Attribution page supports
+manual association of known or inferred identifiers (API keys, services,
+models, workloads) with organizational entities (teams, services, cloud
+environments, CI/CD pipelines, Git repositories). Unresolved or
+low-confidence attributions are surfaced with the platform's best guess
+and confidence interval, allowing users to confirm, correct, or assign.
+Manual inputs feed the calibration loop (FR-212) to improve future
+attribution accuracy.
+
+P0
+
+Design partner feedback mechanism.
+Drives coverage improvement. Updates
+attribution coverage and related metrics
+dynamically.
+
+FR-411
+
+Dynamic recalculation indicators: when user actions trigger metric
+recalculation (e.g., manual attribution, intervention approval), the system
+displays a visible loading indicator (0.9 to 1.2 seconds) signaling that the
+system is processing. All affected metrics (attribution coverage, AI spend,
+optimization potential, provider breakdown, cloud breakdown) update
+dynamically after recalculation completes.
+
+P0
+
+Demonstrates live computation. Duration
+calibrated for human perception of
+processing.
+
+FR-412
+
+Collapsible request stream panel: a slide-out side panel (accessible from
+any page via a persistent icon in the top navigation bar) displays the most
+recent N inference requests with their attribution status, model, cost, and
+confidence. Defaults to collapsed. Does not disrupt primary page layout
+when open.
+
+P0
+
+Replaces inline execution stream on
+Overview. Accessible from any page.
+
+FR-413
+
+Technical diagnostics view: operational metrics (data freshness, ingestion
+latency, telemetry health, collector status, event bus throughput, index
+materialization lag) displayed in a separate tab intended for infrastructure
+or platform engineering users. Not displayed in the primary user-facing
+interface.
+
+P0
+
+Audience separation: FinOps/exec vs.
+platform engineering.
+
+FR-414
+
+Cost explanation drill-down: for any individual inference request
+(accessed from the collapsible request stream or via search), show full
+cost breakdown (tokens, model pricing, latency, region, hardware tier)
+with attribution chain. Answer: 'Why did this request cost $X?'
+
+P0
+
+Builds trust in attribution. Content appears
+as hover tooltip or drill-down, not persistent
+panel.
+
+Glossary and FAQ views (FR-407): in-product reference for terminology (HRE, confidence thresholds, attribution
+chain, optimization categories, etc.) and common questions. The six-layer attribution chain explanation, previously
+displayed as primary UI content, is now housed in this reference section. Includes optimization methodology
+documentation explaining the conditional rule-based recommendation system. Priority: P1.
+
+9. Functional Requirements: Interventions and Right-Sizing
+Interventions are the product's primary mechanism for delivering measurable value. Each intervention is a
+recommended action with estimated savings, confidence score, risk rating, and (where applicable) capability
+equivalence verification status. Interventions are generated from attribution data, model intelligence, and policy
+engine rules via a conditional rule-based system.
+
+9.1 Optimization Methodology
+The platform ships with a predefined set of optimization categories. For each category, the platform defines specific
+data thresholds and variable conditions. As data is ingested from enabled integrations, it is parsed and stored in the
+customer's isolated data environment. The platform continuously evaluates the parsed data against the predefined
+rule set. When a specific combination of data thresholds is met (e.g., expensive model detected combined with
+verified equivalent quality from a cheaper alternative for the same use case), the corresponding optimization category
+is triggered, estimated savings are calculated, and the recommendation is presented. V1 operates on predefined
+conditional rules with configurable thresholds. The rule set covers the most common and highest-impact optimization
+patterns. Every recommendation traces to a specific rule and the data that triggered it.
+
+9.2 Intervention Types
+Type
+
+Description
+
+Example
+
+Model Routing
+
+Redirect workloads to cheaper models with
+verified equivalent quality
+
+Route Customer Copilot fallback from gpt-4o to gpt-4o-mini (saves
+$31.2K/mo, 94% confidence)
+
+Deduplication
+
+Eliminate redundant API calls via caching
+
+38% of embedding requests are duplicates within 4hr window (saves
+$18.4K/mo)
+
+Governance
+
+Consolidate model sprawl in
+non-production environments
+
+Restrict staging to gpt-4o-mini and claude-3-haiku (saves $22.8K/mo)
+
+Optimization
+
+Migrate non-latency-sensitive workloads to
+batch pricing
+
+Threat Analysis batch jobs to Batch API pricing (saves $14.2K/mo)
+
+Budget Enforcement
+
+Token budget caps per request with
+soft/hard stops
+
+Per-request ceiling of 4,096 output tokens (saves $8.4K/mo)
+
+Resource Recovery
+
+Identify and shut down orphaned or
+shadow deployments
+
+Orphaned load testing harness running 8.2M req/mo (saves $34.1K/mo)
+
+Cost Simulation
+
+Pre-deploy cost projection surfaced in
+CI/CD pipeline checks
+
+New Summarization Service flagged: $23.4K/mo reduced to $3.2K/mo
+with model swap
+
+[v2.0: "Waste Elimination" renamed to "Resource Recovery" per terminology review.]
+
+9.3 Intervention Requirements
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-500
+
+Generate model routing recommendations when cheaper models achieve
+equivalent quality per capability equivalence verification
+
+P0
+
+Equivalent quality threshold configurable
+per use case.
+
+FR-501
+
+Each intervention includes: estimated savings ($/mo), confidence score,
+risk rating (low/medium/high), affected team, capability equivalence
+status and method, optimization category, triggering data threshold, and
+rule/condition met
+
+P0
+
+Transparency drives trust. Methodology
+indicators visible on each card.
+
+FR-502
+
+Intervention lifecycle: Recommended -> In Review -> Approved/Rejected
+-> Implemented/Dismissed. Post-implementation validation: savings
+measured via pre/post window normalized by request volume, minimum
+7-day sample, rollback triggered if realized savings fall below 50% of
+estimate for 3 consecutive days. Approve/reject actions in the UI update
+status in-session and propagate to Overview totals.
+
+P0
+
+Savings verification builds credibility. UI
+state updates dynamically.
+
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-503
+
+Pre-deploy cost simulation integrated into CI/CD pipeline (GitHub Actions,
+GitLab CI). Flag deployments projected to exceed configurable threshold.
+
+P1
+
+Surfaces cost before it is incurred.
+
+FR-504
+
+Shadow deployment detection: alert on unregistered services consuming
+above configurable daily threshold, identified via attribution chain gap
+analysis.
+
+P0
+
+API key active but no CI/CD or code
+ownership linkage.
+
+FR-505
+
+Duplicate request detection and caching recommendations based on
+observed request patterns
+
+P1
+
+Embedding deduplication is a common
+high-value finding.
+
+10. Functional Requirements: Policy Engine
+The policy engine provides configurable rules governing AI spend and deployment behavior. Policies operate at two
+layers: Layer 2 (attribution-based detection, post-hoc) and Layer 3 (decision-time enforcement, real-time). The
+engine's posture is optimizer, not cost cop: intervention recommendations are non-blocking by default, with active
+blocking available as an explicit opt-in. In MVP, enforcement defaults to staging; production enforcement is opt-in
+per-service and starts with static safety constraints (token size limits) before budget gates.
+
+10.1 Policy Types (MVP)
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-600
+
+Production Model Allowlist: only approved models permitted in
+production. Enforced only when requests transit the interceptor; bypass
+traffic inflates coverage denominator per Section 17.3. Approved list
+reviewed monthly.
+
+P0
+
+Layer 3 enforcement.
+
+FR-601
+
+Staging Cost Ceiling: monthly aggregate and per-team caps. Soft stop
+(Slack alert) at configurable threshold. Hard stop (approval required) at
+cap.
+
+P0
+
+Layer 3. Configurable thresholds.
+
+FR-602
+
+Token Size Limits Per Request: configurable input token size caps per
+application (static size constraint, not stateful financial quota). If input
+exceeds policy limit, rejected pre-flight with HTTP 413. Semantic safety
+bypass: if payload contains response_format json_object or tool/function
+definitions, all payload modifications bypassed.
+
+P0
+
+Layer 3. Pre-flight input size gating.
+
+FR-603
+
+High-Cost Model Approval Gate: models exceeding configurable cost
+threshold require team lead approval for new service deployments
+
+P0
+
+Layer 3. Pre-deploy cost simulation
+required.
+
+FR-604
+
+Policy violation audit trail: all policy evaluations (pass/fail) logged with
+attribution context, timestamp, and enforcement action taken.
+
+P1
+
+Layer 2. Feeds into immutable audit log
+(SEC-05).
+
+FR-605
+
+Attribution Confidence Floor: flag requests with confidence below
+threshold for FinOps review before chargeback inclusion
+
+P0
+
+Layer 2. Provisional attributions excluded
+from compliance.
+
+FR-606
+
+CI/CD Pre-Deploy Cost Simulation: estimate monthly cost at projected
+request volume before merge.
+
+P1
+
+Layer 3. GitHub Actions / GitLab CI
+integration.
+
+FR-607
+
+Cost reconciliation drift monitoring: if reconciled cost diverges from
+synthetic cost by more than 3% daily or 5% weekly, generate
+investigation alert and annotate affected dashboard values as
+'unreconciled' until resolved.
+
+P0
+
+Prevents FinOps trust erosion.
+
+10.2 Adaptive Learning (Roadmap)
+The policy engine will evolve from purely rule-based to adaptive over time. The adaptive layer builds per-customer
+consumption baselines and flags anomalous spending trajectories. This is a roadmap feature (Phase 3), not an MVP
+commitment. Rule-based policies are the P0 deliverable.
+
+11. Functional Requirements: Carbon Ledger (Deferred)
+All carbon and sustainability requirements (FR-700 through FR-704) are architecturally embedded but excluded from
+MVP scope, MVP demo, and all user-facing surfaces. Carbon data model fields exist in the schema but are not
+populated or exposed. The full specification from PRD v1.9 is retained for Phase 2 planning; no changes to the
+requirements themselves.
+
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-700
+
+Three-layer carbon methodology: Layer 1 (spend-based, +/-50-100%),
+Layer 2 (activity-based using AI Energy Score benchmarks, +/-15-30%),
+Layer 3 (instrumented via Kepler/RAPL/NVML, +/-5-15%)
+
+P1
+
+Each figure tagged with layer.
+
+FR-701
+
+Carbon Ledger: immutable calculation receipts with full factor provenance
+
+P1
+
+Compliance credibility.
+
+FR-702
+
+Scope 2 dual reporting: location-based and market-based accounting per
+GHG Protocol guidance
+
+P2
+
+Required under CSRD.
+
+FR-703
+
+Scope 3 / third-party inference: Layer 1.5 methodology. Uncertainty
++/-40-80%.
+
+P2
+
+Honest uncertainty labeling.
+
+FR-704
+
+TRAC metric: MVP formula: Billed Cost + Confidence Risk Premium.
+Carbon Liability component activates when carbon module is enabled
+post-MVP.
+
+P1
+
+MVP TRAC omits carbon. Architecture
+supports adding it.
+
+12. Functional Requirements: Integrations (Slack, Email, CI/CD,
+Architecture View)
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+FR-800
+
+Slack integration: push notifications for policy violations, budget threshold
+alerts, intervention recommendations, and shadow deployment
+detections to configurable channels
+
+P0
+
+Primary notification channel.
+
+FR-801
+
+Email integration: configurable digest (daily/weekly) of spend summary,
+new interventions, and policy violations to team leads and FinOps
+
+P1
+
+Fallback for orgs without Slack.
+
+FR-802
+
+CI/CD integration: GitHub Actions and/or GitLab CI checks for pre-deploy
+cost simulation. Surface estimated monthly cost in PR comments.
+
+P1
+
+Shifts cost visibility left.
+
+FR-803
+
+Webhook API: generic outbound webhooks for custom integrations (Jira,
+PagerDuty, ServiceNow)
+
+P2
+
+Extensibility.
+
+FR-810
+
+Integrations tab with architecture overview: a Level-0 (L0) visualization
+showing active integrations within the customer deployment. Displays
+which data sources (cloud providers, identity providers, source control,
+CI/CD) are currently connected and flowing data. Non-connected
+integrations shown as available but inactive. This is a deployment-specific
+view, not a conceptual architecture diagram.
+
+P0
+
+[v2.0: Relocated from Attribution section.
+Simplified to L0 active-integration view per
+reviewer feedback.]
+
+13. Non-Functional Requirements
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+NFR-01
+
+Decision-time interception path: P99 latency <= 15ms for index lookup +
+constraint evaluation. Total overhead <= 50ms including routing. Current
+codebase microbenchmark: ~3.7 microseconds/call for in-process index
+lookup + policy evaluation only, excluding network hops, JSON parsing,
+TLS, and upstream provider latency.
+
+P0
+
+Patent Claim 1 invariant.
+
+NFR-02
+
+Fail-open guarantee: zero application-impacting failures. If any
+component on the decision path fails, the request proceeds unmodified.
+Crash-level fail-open requires service mesh / Envoy ingress with outlier
+ejection or dual-route client configuration.
+
+P0
+
+Non-negotiable for enterprise adoption.
+
+NFR-03
+
+Attribution index memory footprint <= 256MB for typical enterprise
+deployment (10K-50K active resources)
+
+P0
+
+Phase 0 'Glass Jaw' criteria.
+
+NFR-04
+
+Horizontal scalability: interceptor, collectors, and reconciliation engine
+scale independently
+
+P1
+
+Containerized microservices on
+EKS/AKS/GKE.
+
+NFR-05
+
+Event processing: handle sustained throughput of 10K events/second per
+collector
+
+P1
+
+Kafka/Pulsar/Kinesis backend.
+
+NFR-06
+
+Dashboard: initial page load < 3 seconds. Subsequent navigation < 1
+second. Dynamic recalculation indicator visible within 100ms of user
+action.
+
+P0
+
+Standard SaaS UX expectation.
+Recalculation indicator per FR-411.
+
+NFR-07
+
+Availability: 99.9% uptime for data plane components (within customer
+VPC). Control plane: 99.5%.
+
+P1
+
+SLA terms for enterprise contracts.
+
+NFR-08
+
+Codebase implements all core subsystems as discrete modules: hre/
+(R1-R6 methods, noisy-OR combination, orchestrator), confidence/
+(isotonic regression calibration), interceptor/ (fail-open gateway, circuit
+breaker state machine), equivalence/ (policy/empirical/judge modes),
+trac/ (calculator with temporal decay), carbon/ (three-layer methodology),
+policy/ (governance engine), ingestion/connectors/ (AWS CUR,
+CloudTrail, Bedrock).
+
+P0
+
+Verified against repo structure.
+
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+NFR-09
+
+Technology stack: Python 3.12+, FastAPI + Uvicorn, Neo4j (production) /
+in-memory (development), Apache Kafka (production) / in-memory
+(development), Redis with local process cache, scikit-learn (isotonic
+regression), OpenTelemetry, Prometheus metrics, Kubernetes
+(EKS/AKS/GKE)
+
+P0
+
+Production dependencies vs. dev
+substitutes clearly separated.
+
+NFR-10
+
+CI/CD: GitHub Actions workflows in place. Dockerfile and
+docker-compose.yml for local development. Kubernetes deployment
+manifests with security controls.
+
+P0
+
+Deployment infrastructure exists.
+
+NFR-11
+
+Phase 0 Glass Jaw validation: quantitative pass/fail gate before graph
+construction or dashboard development. Criteria: P99 <= 15ms
+interceptor overhead, zero request failures over 72h sustained load, <=
+256MB attribution index memory footprint, zero client errors under
+chaos/fault injection.
+
+P0
+
+Each failure mode has a defined pivot
+branch.
+
+NFR-12
+
+Data retention: default 12 months for attribution and telemetry data.
+Configurable from 30 days to 5 years. Anonymization and deletion
+workflows for GDPR/CCPA compliance.
+
+P1
+
+Enterprise procurement requirement.
+
+NFR-13
+
+Platform self-observability: structured logs, Prometheus metrics,
+OpenTelemetry traces for platform health. Technical diagnostics metrics
+surfaced in dedicated diagnostics view (FR-413), not primary dashboard.
+
+P0
+
+Required for operational support.
+
+NFR-14
+
+Interceptor language migration path: Python/FastAPI acceptable for MVP.
+Production data plane may require Go, Rust, or Envoy filter for consistent
+sub-15ms P99 under GIL contention.
+
+P1
+
+Acknowledged tech debt.
+
+14. Security and Trust Boundary
+Security is a product feature, not a compliance checkbox. The deployment model mirrors how Splunk and Datadog
+deploy: all data stays within the customer's trust boundary.
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+SEC-01
+
+Platform deploys inside customer VPC (EKS, AKS, GKE). All telemetry
+aggregation, attribution, and reporting occurs within customer
+infrastructure.
+
+P0
+
+Zero exfiltration of raw data.
+
+SEC-02
+
+Read-only permissions to all enterprise systems of record. No write
+access to any customer data store. Request shaping within the
+customer-authorized AI inference call path (Active-Lite) requires
+per-service opt-in.
+
+P0
+
+Eliminates operational risk.
+
+SEC-03
+
+PII minimization: emails pseudonymized via HMAC-SHA256 using
+KMS-protected customer-specific key at ingestion. Raw PII in separate
+encrypted column with break-glass-only access.
+
+P0
+
+Graph traversal never requires raw PII.
+
+SEC-04
+
+Row/column-level access controls: FinOps sees spend without identities;
+Sustainability sees carbon without team names
+
+P1
+
+RBAC alone insufficient.
+
+SEC-05
+
+Immutable audit logging: attribution changes, interceptor decisions,
+constraint changes, data access, config modifications. Tamper-evident
+via hash chain.
+
+P0
+
+SOC 2, ISO 27001 requirement.
+
+SEC-06
+
+Encryption at rest (customer-managed KMS keys), in transit (TLS 1.3),
+inter-service (mTLS)
+
+P0
+
+Standard enterprise requirement.
+
+SEC-07
+
+SOC 2 Type 1 targeted within 6 months of first design partner
+deployment; Type 2 within 12-18 months
+
+P0
+
+Enterprise table stakes.
+
+15. Demo Requirements (YC Application)
+This section defines the minimum scope for the YC application demo. The demo is a representation of the product
+vision, not a production deployment. It includes features across the product scope rendered with simulated data.
+Section 17 (MVP Boundary) defines what ships in Phase 1; this section defines what must be visible in the application
+submission.
+
+15.1 Demo Minimum Scope
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+DEM-01
+
+Overview dashboard with spend summary, attribution coverage,
+optimization potential, and savings captured. All metric cards clickable,
+navigating to associated detail views. Financial metrics only; no
+code-level or request-level detail on this page.
+
+P0
+
+Maps to FR-400. Executive-level summary.
+
+DEM-02
+
+Attribution view with two sub-sections: Models (per-model spend, cost/1K,
+trend, optimization potential) and Teams (per-team spend, budget
+utilization, optimization potential %, top models). Interpretive text as hover
+tooltips.
+
+P0
+
+Maps to FR-401. Simplified from v1.9.
+
+DEM-03
+
+Manual attribution mapping: display unresolved or low-confidence
+attributions with best-guess and confidence interval. Allow manual
+team/service assignment. On confirmation, dynamically recalculate all
+affected metrics with visible loading indicator.
+
+P0
+
+Maps to FR-410, FR-411. [v2.0: new
+requirement]
+
+DEM-04
+
+Cost forecasting with scenario modeling: show forecast based on current
+spend; allow selection of no interventions, specific interventions, or all
+interventions. Configurable time horizons (3/6/9/12/18/24 months).
+Forecast model inputs in advanced settings, not on primary view.
+
+P0
+
+Maps to FR-402. [v2.0: upgraded from P1]
+
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+DEM-05
+
+Interventions view with at least 5 sample recommendations across
+multiple intervention types. Each card shows optimization category,
+triggering threshold, rule/condition, savings, confidence, risk, and
+equivalence status. Approve/reject buttons functional, updating status
+and totals dynamically.
+
+P0
+
+Maps to FR-403, FR-500-505.
+
+DEM-06
+
+Governance view with policy engine configuration, deployment mode
+selector (Passive/Advisory/Active-Lite), and at least 5 sample policies.
+Mode selector also accessible from global navigation.
+
+P0
+
+Maps to FR-404, FR-600-606.
+
+DEM-07
+
+Integrations tab with L0 architecture visualization showing active data
+source integrations within the deployment.
+
+P0
+
+Maps to FR-810. [v2.0: relocated from
+Attribution]
+
+DEM-08
+
+Collapsible request stream panel accessible from persistent top-bar icon,
+showing recent requests with attribution status.
+
+P0
+
+Maps to FR-412. [v2.0: new requirement]
+
+DEM-09
+
+Patent abstract slide preceding the product walkthrough in the 3-minute
+demo video
+
+P0
+
+Charlotte speaks to patent; Richard walks
+demo.
+
+DEM-10
+
+All data clearly dummy/simulated. Persistent 'SIMULATED DATA'
+watermark on all dashboard views.
+
+P0
+
+Legal and disambiguation requirement.
+
+DEM-11
+
+Carbon Ledger view: excluded from demo. If present in navigation, clearly
+labeled as future capability.
+
+P2
+
+Carbon and sustainability excluded from
+MVP/demo.
+
+DEM-12
+
+No references to carbon, CO2, emissions, benchmarking, or TRAC
+carbon liability in any demo content.
+
+P0
+
+[v2.0: explicit exclusion requirement]
+
+DEM-13
+
+Metric values must be internally consistent across all views (Overview
+totals match Models/Teams detail views).
+
+P0
+
+[v2.0: per co-founder review session]
+
+15.2 Demo Validation Checklist
+Before submission, verify: (a) every view listed in DEM-01 through DEM-08 is navigable and displays credible dummy
+data, (b) metric values are consistent across Overview, Models, and Teams views, (c) interventions include multiple
+types with realistic savings estimates and visible methodology indicators, (d) manual attribution mapping triggers
+dynamic recalculation with loading indicator, (e) the policy engine shows both active and monitoring policies, (f) the
+deployment mode selector is visible and functional, (g) no placeholder text, broken links, or console errors, (h) no
+references to carbon, sustainability, emissions, or benchmarking in any user-facing text, (i) collapsible request stream
+opens/closes without breaking layout, (j) provisional patent has been filed (OQ-02 BLOCKER), (k) demo renders
+correctly at 90%, 100%, 110%, 125% browser zoom.
+
+16. Information Architecture
+The platform UI is organized into five sections with distinct views, reflecting the v2.0 restructuring. The v4 mockup
+(frontend/index.html in the repository) fetches from /v1/dashboard/overview and is served from the FastAPI server.
+Section
+
+View
+
+Primary User
+
+Key Data
+
+Intelligence
+
+Overview
+
+All
+
+Spend trend, attribution coverage, optimization potential, savings
+captured
+
+Attribution
+
+Models
+
+Eng Leadership
+
+Per-model spend, cost/1K, trend, optimization potential, variance, teams
+
+Attribution
+
+Teams
+
+FinOps / Mgmt
+
+Per-team spend, budget, optimization potential %, top models,
+month-over-month
+
+Attribution
+
+Manual Mapping
+
+FinOps / Eng
+
+Unresolved attributions, manual team/service assignment, confidence
+display
+
+Optimization
+
+Interventions
+
+Eng / FinOps
+
+Recommended actions, savings, confidence, methodology, equivalence
+status
+
+Optimization
+
+Cost Forecasting
+
+FinOps / Exec
+
+Scenario modeling, intervention impact simulation, time horizon selection
+
+Optimization
+
+Governance
+
+Admin / FinOps
+
+Policies, violations, deployment mode, security summary
+
+Integrations
+
+Architecture Overview
+
+Admin / Eng
+
+L0 active integration view, data source status, connection management
+
+Reference
+
+Glossary
+
+All
+
+Terminology (HRE, confidence thresholds, attribution chain, optimization
+categories)
+
+Reference
+
+FAQ
+
+All
+
+Common questions, optimization methodology, onboarding guidance
+
+Diagnostics
+
+Technical Metrics
+
+Platform Eng
+
+Data freshness, ingestion latency, telemetry health, collector status
+
+[v2.0: Attribution simplified to Models + Teams + Manual Mapping. Architecture view moved to Integrations. Technical
+Diagnostics separated from primary views. Carbon Ledger removed from MVP navigation. Execution Streams replaced by
+collapsible panel accessible from global navigation.]
+
+17. MVP Boundary
+This document describes a complete product vision. Not all requirements ship in Phase 1.
+
+17.1 MVP Scope (Phase 1, Months 1-6)
+• Cloud ingestion: AWS only. Azure and GCP are Phase 2.
+• Identity: Okta only. Azure AD is Phase 2.
+• Source control: GitHub only. GitLab is Phase 2.
+• CI/CD: GitHub Actions only. Jenkins is Phase 2.
+• HR integration deferred. MVP uses flat org mapping or manual CSV import.
+• Attribution: full graph with R1-R6. HRE, confidence governance, and attribution index are core MVP. Manual
+attribution mapping (FR-410) is MVP.
+• Interception: Passive, Advisory, and Active-Lite modes. Full Active mode is Phase 2.
+• Dashboard: Overview, Attribution (Models + Teams + Manual Mapping), Interventions, Cost Forecasting (with
+scenario modeling), Governance, Integrations (L0 architecture view), Technical Diagnostics. Carbon Ledger is
+Phase 2.
+• Policy engine: rule-based only. Adaptive/RL-based policies are Phase 3.
+• Carbon: not in MVP. All FR-700 series requirements are P1/P2. Carbon data model architecturally present but
+not exposed.
+• Benchmarking: not in MVP. Deferred due to re-identification risk at small customer volumes.
+
+• TRAC: MVP formula is Billed Cost + Confidence Risk Premium. Carbon Liability component deferred.
+• Interceptor: Python/FastAPI. Compiled-language migration is post-Phase 1 if needed.
+• Terminology: all user-facing instances of "waste" use "optimization potential" instead.
+
+17.2 MVP Validation Criteria
+Phase 1 succeeds if: (a) 2-3 design partners are actively using the product, (b) attribution coverage exceeds 70% of
+each design partner's AI spend (as defined in Section 17.3), (c) at least one partner has acted on a right-sizing
+recommendation with verified savings (before/after normalized by traffic volume, with rollback trigger if savings fail to
+materialize), (d) at least one verbal commitment to convert to paid customer.
+
+17.3 Attribution Coverage % Definition
+Attribution Coverage % is the proportion of AI compute spend (USD) within supported ingestion providers during a
+trailing 30-day window that the platform links to a terminal organizational node (team or cost center) with a confidence
+score meeting or exceeding the chargeback threshold (default >= 0.80). Formula: Coverage % = (Attributed_Spend /
+Total_Reconciled_Billed_Cost) x 100. Manual attribution inputs (FR-410) that confirm or correct attributions
+contribute to Attributed_Spend when the resulting confidence meets the threshold. Spend attributed to fallback
+buckets such as UNASSIGNED_TEAM or SHARED_PLATFORM does not count as terminal organizational nodes for
+coverage purposes.
+
+17.4 Deployment Topology (MVP)
+All platform components deploy within the customer VPC on Kubernetes (EKS for MVP). Namespace isolation:
+aci-ingestion, aci-core, aci-edge, aci-ui, aci-system. Optional vendor control plane (non-sensitive). Full deployment
+topology, IAM requirements, network posture, and design partner installation milestones are documented in the
+companion Engineering Specification v1.7.
+
+18. Roadmap Alignment
+Phase
+
+Timeline
+
+Product Milestones
+
+Business Milestones
+
+Phase 1: MVP
+
+Months 1-6
+
+AWS Bedrock collector, GitHub/Okta integration,
+static cost model, dashboard with team attribution
+(Models + Teams + Manual Mapping),
+scenario-based cost forecasting, basic policy
+engine (advisory mode), L0 integrations view,
+technical diagnostics separation
+
+2-3 design partner agreements, core team of
+6, SOC 2 Type 1 initiated
+
+Phase 2: Enterprise
+
+Months 7-12
+
+Azure/GCP support, Workday integration, model
+right-sizing engine, active mode (opt-in), CI/CD
+pre-deploy cost simulation, carbon module
+activation
+
+3+ paying customers, $600K+ ARR, SOC 2
+Type 2, team of 12+
+
+Phase 3: Scale
+
+Year 2
+
+Dynamic pricing API, predictive forecasting,
+self-service tier, additional IdPs, adaptive policy
+engine (RL-based)
+
+10+ customers, $2.5M+ ARR, breakeven or
+clear path
+
+Phase 4: Leadership
+
+Year 3+
+
+Federated benchmarking with DP, secure
+aggregation, full carbon Scope 1-3
+
+25+ customers, $8M+ ARR, category leader
+recognition
+
+19. Open Questions, Risks, and Dependencies
+ID
+
+Requirement
+
+Priorit
+y
+
+Notes
+
+OQ-01
+
+Company name and URL: not yet finalized. Affects product branding,
+domain, and all external-facing materials.
+
+Blocke
+r
+
+Required before any public-facing demo or
+application submission.
+
+OQ-02
+
+Provisional patent not yet filed. Any disclosure of the patent architecture
+constitutes public disclosure, forfeiting rights in absolute-novelty
+jurisdictions and starting a 12-month US clock.
+
+BLOC
+KER
+
+Specification ready to file as provisional
+application.
+
+OQ-03
+
+Carbon regulatory thesis weakened: EU CSRD scope reduced ~80-90%,
+SEC climate rules withdrawn. Carbon excluded from MVP scope (Section
+17). All carbon, sustainability, and benchmarking references removed
+from demo.
+
+Strateg
+ic
+
+Materials referencing regulatory tailwinds
+must reflect current enforcement status.
+
+OQ-04
+
+Adaptive policy engine scope: RL-based learning layer is a roadmap
+feature, not an MVP commitment.
+
+Scope
+
+Rule-based policies are P0. Adaptive is
+Phase 3.
+
+OQ-05
+
+Pricing model validation: price range is hypothesis. No design partner
+pricing conversations completed.
+
+Validati Design partner engagement will validate
+willingness to pay.
+on
+
+OQ-06
+
+Design partner onboarding friction: full-VPC deployment may extend
+sales cycles. Mitigation: 1-click CloudFormation/Terraform templates.
+Target: under 2 weeks.
+
+Risk
+
+Validate onboarding time with first design
+partner.
+
+OQ-07
+
+Multi-provider LLM pricing complexity: token pricing, prompt caching
+discounts, batch API pricing vary across providers. Variance monitoring
+(>3% drift) is a P0 safeguard.
+
+Risk
+
+FR-110 and FR-111 address this.
+
+OQ-08
+
+Codebase bug: _handle_org_change in processor.py does not close old
+team membership edges when a person moves teams. Creates a new
+edge to the new team but the old edge (person -> old_team) remains
+active. This produces incorrect dual-team attribution until TTL expiry.
+
+Bug
+
+Known since v1.6 audit. Must be fixed
+before design partner deployment.
+
+OQ-09
+
+Codebase alignment: TRAC calculator (trac/calculator.py) still computes
+Carbon Liability in the MVP formula. Code must be updated to match
+PRD v2.0 MVP formula (Billed Cost + Confidence Risk Premium only).
+
+Bug
+
+Code vs. spec divergence.
+
+OQ-10
+
+Benchmarking removed from MVP due to re-identification risk at small
+customer volumes. Federated Benchmarking Protocol deferred to Phase
+4 with differential privacy and secure aggregation.
+
+Strateg
+ic
+
+Privacy risk acknowledged. Requires
+sufficient customer base.
+
+End of Document. This is a living document. Requirements will be updated as design partner feedback, CTO input,
+and market signals refine the product scope. All changes should be version-tracked.
+
+
