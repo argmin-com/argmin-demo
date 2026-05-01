@@ -9,6 +9,7 @@ Demonstrate that the platform can:
 1. Attribute AI spend to the correct owner with defensible evidence.
 2. Execute decision-time governance with fail-open guarantees.
 3. Translate platform posture into operational and financial action.
+4. Show where the attached PRD/spec/deck requirements appear in the local demo.
 
 ## Prerequisites
 
@@ -62,15 +63,16 @@ deterministic local demo data so the product story remains intact.
 Then walk views in this order:
 
 1. **Overview**: financial summary, spend distributions, team attribution.
-2. **Employee Adoption**: organization, business-unit, and team-level uptake with CEO/CFO/COO/CTO lenses.
-3. **Request Proof**: request-level evidence trail, staged decision replay, evidence quality, cost explanation, and safety rationale.
-4. **Interventions**: approve/reject/dismiss lifecycle, operational evidence, implementation effort, and forecast effect.
-5. **Forecasting**: scenario-based planning horizons, compare mode, and assumptions/drivers broken into demand, model mix, governance drag, optimization capture, and unresolved attribution risk.
-6. **Governance**: mode controls, active policies, fail-open posture, trust boundary notes, and a request-level policy simulator.
-7. **Manual Mapping**: human correction flow with explicit before/after business impact, including confidence lift, owner reassignment, budget effect, intervention reprioritization, and planning delta.
-8. **Models** and **Teams**: model-family and organizational optimization surfaces with the same active request/team/model context carried across pages.
-9. **Integrations**: show connected enterprise systems, owned business handoff workflows, and scenario-driven downstream actions.
-10. **Glossary / FAQ**: diligence-ready terminology and methodology references.
+2. **PRD Proof**: source-document journeys, decision-surface trust states, RAIL/HRE stages, invariants, pathway caveats, and requirement coverage.
+3. **Employee Adoption**: organization, business-unit, and team-level uptake with CEO/CFO/COO/CTO lenses.
+4. **Request Proof**: request-level evidence trail, staged decision replay, evidence quality, cost explanation, and safety rationale.
+5. **Interventions**: approve/reject/dismiss lifecycle, operational evidence, implementation effort, and forecast effect.
+6. **Forecasting**: scenario-based planning horizons, compare mode, and assumptions/drivers broken into demand, model mix, governance drag, optimization capture, and unresolved attribution risk.
+7. **Governance**: mode controls, active policies, fail-open posture, trust boundary notes, and a request-level policy simulator.
+8. **Manual Mapping**: human correction flow with explicit before/after business impact, including confidence lift, owner reassignment, budget effect, intervention reprioritization, and planning delta.
+9. **Models** and **Teams**: model-family and organizational optimization surfaces with the same active request/team/model context carried across pages.
+10. **Integrations**: show connected enterprise systems, owned business handoff workflows, and scenario-driven downstream actions.
+11. **Glossary / FAQ**: diligence-ready terminology and methodology references.
 
 ## Equivalent API Walkthrough
 

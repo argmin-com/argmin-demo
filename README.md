@@ -82,8 +82,9 @@ In the UI:
 
 1. Open **Guided Demo** from the top bar.
 2. Click **Start 90-sec Walkthrough**.
-3. Narrate the walkthrough in the same six-step order the UI uses:
+3. Narrate the walkthrough in the same seven-step order the UI uses:
    - Overview
+   - PRD Proof
    - Employee Adoption
    - Request Proof
    - Interventions
@@ -96,6 +97,7 @@ In the UI:
    request, team, model, and intervention visible as you move between views.
 6. Navigate the left rail across:
    - Overview
+   - PRD Proof
    - Employee Adoption
    - Models
    - Teams

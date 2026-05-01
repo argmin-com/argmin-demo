@@ -241,6 +241,7 @@ def test_frontend_investor_walkthrough_is_defined() -> None:
     js = _read(FRONTEND_APP_JS)
     assert "const INVESTOR_WALKTHROUGH_STEPS" in js
     assert "Overview: where the money is" in js
+    assert "PRD Proof: every claim tied to a visible surface" in js
     assert "Employee Adoption: who is actually using AI" in js
     assert "Request Proof: why one request belongs to one owner" in js
     assert "Interventions: what to do next" in js
@@ -250,10 +251,51 @@ def test_frontend_investor_walkthrough_is_defined() -> None:
     assert 'data-action="start-walkthrough"' in _read(FRONTEND_INDEX)
     assert "const INVESTOR_WALKTHROUGH_TOTAL_MS" in js
     assert "durationMs: 12000" in js
+    assert "durationMs: 10000" in js
     assert "durationMs: 11000" in js
     assert "durationMs: 15000" in js
     assert "durationMs: 13000" in js
     assert "durationMs: 14000" in js
+
+
+def test_frontend_demo_includes_prd_traceability_proof_surface() -> None:
+    import json
+
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+    readme = _read(FRONTEND_README)
+    schema = _read(FRONTEND_SCHEMA)
+    feature_matrix = _read(REPO_ROOT / "docs" / "demo-feature-matrix.md")
+    dataset_path = REPO_ROOT / "frontend" / "data" / "demo_dataset.json"
+    dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
+
+    assert "PRD Proof" in js
+    assert "requirementsView" in js
+    assert 'data-action="select-proof-journey"' in js
+    assert "Pathway Coverage Matrix" in js
+    assert "Requirement Coverage Matrix" in js
+    assert ".proof-hero" in css
+    assert ".rail-stage-grid" in css
+    assert "prd_traceability" in schema
+    assert "PRD Proof page maps the attached Argmin artifacts" in readme
+    assert "| `PRD Proof` |" in feature_matrix
+
+    traceability = dataset["prd_traceability"]
+    assert len(traceability["document_sources"]) >= 6
+    assert len(traceability["journeys"]) >= 6
+    assert len(traceability["decision_surfaces"]) >= 6
+    assert len(traceability["rail_pipeline"]) >= 4
+    assert len(traceability["invariants"]) >= 8
+    assert len(traceability["pathway_matrix"]) >= 10
+    assert len(traceability["requirement_matrix"]) >= 20
+    assert {journey["key"] for journey in traceability["journeys"]} >= {
+        "money",
+        "models",
+        "adoption",
+        "budget",
+        "trust",
+        "dispute",
+    }
 
 def test_frontend_support_docs_cover_schema_and_local_assets() -> None:
     readme = _read(FRONTEND_README)

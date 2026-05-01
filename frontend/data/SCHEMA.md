@@ -22,6 +22,9 @@
 - `faq`: categorized question-and-answer content
 - `demo_scenarios`: guided demo request payloads and labels
 - `forecast_scenarios`: scenario definitions used by Forecasting
+- `prd_traceability`: source-document proof data for PRD Proof, including
+  journeys, decision surfaces, RAIL stages, invariants, pathway coverage, and
+  requirement coverage rows
 
 ## Key Conventions
 
@@ -60,6 +63,8 @@ Examples of high-impact fields that should remain stable:
 - `interventions[].status`
 - `attribution_requests[].confidence`
 - `integrations.summary.*`
+- `prd_traceability.journeys[]`
+- `prd_traceability.requirement_matrix[]`
 - `glossary[].term`
 - `faq[].items[]`
 
@@ -68,3 +73,5 @@ Examples of high-impact fields that should remain stable:
 - Prefer additive changes to preserve demo continuity.
 - Keep all example identities and addresses synthetic, using `.example` domains where relevant.
 - If a new UI surface is added, document the new top-level or nested object here at the same time.
+- Keep PRD Proof rows explicit enough for a presenter to answer where a
+  requirement appears without opening the source documents during a recording.

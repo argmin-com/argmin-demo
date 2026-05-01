@@ -9,6 +9,7 @@ presentation.
 | Proof point | What the demo shows | Where to show it |
 |---|---|---|
 | Request-level attribution | A single request can be tied to service, code, identity, organization, and budget owner with explicit confidence and evidence. | `Request Proof` |
+| PRD/spec traceability | Source-document journeys, decision surfaces, invariants, RAIL stages, and pathway caveats are tied to visible local surfaces. | `PRD Proof` |
 | Decision-time governance | The platform can enrich, intervene, or fail open without blocking inference availability. | `Guided Demo`, `Governance`, `Interventions` |
 | Financial actionability | Spend can be segmented by model, team, and scenario so optimization work becomes prioritizable rather than anecdotal. | `Overview`, `Models`, `Teams`, `Forecasting` |
 | Workforce adoption clarity | Employee usage can be rolled up from team to business unit to organization with executive lenses for CEO, CFO, COO, and CTO reviewers. | `Employee Adoption`, `Overview` |
@@ -18,6 +19,7 @@ presentation.
 | View | Purpose | Backing surface |
 |---|---|---|
 | `Overview` | Show the aggregate business posture: spend, coverage, savings opportunity, and organizational distribution. | `frontend/index.html`, seeded demo dataset, optional `GET /v1/dashboard/overview` enrichment |
+| `PRD Proof` | Show how the attached PRD/spec/deck artifacts map to visible local journeys, decision surfaces, RAIL stages, invariants, pathway coverage, and requirement coverage rows. | `frontend/data/demo_dataset.json`, `frontend/index.html` |
 | `Employee Adoption` | Show how AI usage is spreading across teams, business units, and the parent organization, including governed usage, repeat usage, power-user concentration, and executive metrics. | `frontend/index.html`, seeded demo dataset, optional `GET /v1/adoption/hierarchy`, `GET /v1/adoption/dashboard` enrichment |
 | `Models` | Compare model families on spend, request volume, latency, variance, optimization headroom, and enterprise model/platform context. | `frontend/index.html`, seeded demo dataset |
 | `Teams` | Show ownership, budget posture, and optimization potential by business unit while preserving active team/model/request context. | `frontend/index.html`, seeded demo dataset |

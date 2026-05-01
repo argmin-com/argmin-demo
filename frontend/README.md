@@ -34,6 +34,11 @@ The Models page frames those providers in the broader enterprise context:
 - the canonical five-layer enterprise AI stack: data, AI infrastructure,
   model/inference, agent, and application layers
 
+The PRD Proof page maps the attached Argmin artifacts into an operator-visible
+requirements proof. It shows source documents, PRD user journeys, decision
+surface trust states, the RAIL/HRE pipeline, pathway coverage, invariants, and
+the local page that demonstrates each major requirement.
+
 Served by FastAPI at:
 
 - `http://localhost:8000/platform/`
@@ -68,6 +73,7 @@ This is only needed if the local backend is configured to require auth for demo 
 3. Click **Start 90-sec Walkthrough**
 4. Review:
    - Overview (financial summary and organizational spend)
+   - PRD Proof (source-document requirements, trust states, and proof map)
    - Employee Adoption (team, business-unit, and organization adoption dashboards)
    - Request Proof (request-level evidence, decision replay, and evidence quality)
    - Interventions (stateful lifecycle, methodology, effort, and forecast effect)
@@ -106,6 +112,7 @@ The demo also exposes:
 - Externalized CSS and JavaScript so the demo can run under a stricter CSP than an all-inline page
 - Local dataset fallback so the presentation layer remains coherent when live API calls are unavailable
 - Reconciled overview totals so the executive summary, model totals, and team totals all represent the same 30-day operating window
+- PRD/spec traceability so each major visible claim maps back to a source-document requirement and an interactive local surface
 
 ## Keyboard Shortcuts
 

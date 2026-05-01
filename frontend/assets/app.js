@@ -3,6 +3,7 @@ const NAV_ITEMS = [
     group: "Platform",
     items: [
       { key: "overview", label: "Overview", icon: "<path d='M3 12l9-9 9 9'/><path d='M9 21V9h6v12'/>", badge: null },
+      { key: "requirements", label: "PRD Proof", icon: "<path d='M9 11l2 2 4-4'/><path d='M9 17h6'/><path d='M5 3h14v18H5z'/>", badge: null },
       { key: "adoption", label: "Employee Adoption", icon: "<path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M20 8v6'/><path d='M23 11h-6'/>", badge: null },
       { key: "attribution", label: "Request Proof", icon: "<circle cx='12' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><circle cx='18' cy='18' r='3'/><path d='M10 8l-2 7M14 8l2 7M9 18h6'/>", badge: null },
       { key: "models", label: "Models", icon: "<rect x='3' y='3' width='18' height='18' rx='3'/><path d='M3 9h18M9 3v18'/>", badge: null },
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
 
 const PAGE_TITLES = {
   overview: "Overview",
+  requirements: "PRD Proof",
   adoption: "Employee AI Adoption",
   attribution: "Request Proof",
   models: "Model Intelligence",
@@ -456,6 +458,20 @@ const FALLBACK_DATASET = {
   governance: { modes: [], policies: [], fail_open_matrix: [], trust_boundary_summary: [] },
   manual_mapping: [],
   integrations: FALLBACK_INTEGRATION_OVERVIEW,
+  prd_traceability: {
+    summary: {
+      conclusion: "The local demo is organized as a requirements proof, not a generic dashboard.",
+      basis: "It maps the Argmin PRD, Engineering Specification, RAIL PRD, HRE decisions, vision statement, and pitch deck into visible local workflows.",
+      operating_boundary: "Every proof item uses synthetic local data and simulated actions; production-only systems remain represented as readiness, trust-boundary, and architecture evidence."
+    },
+    decision_surfaces: [],
+    journeys: [],
+    rail_pipeline: [],
+    invariants: [],
+    pathway_matrix: [],
+    requirement_matrix: [],
+    document_sources: []
+  },
   glossary: [],
   faq: [],
   demo_scenarios: {},
@@ -501,6 +517,7 @@ const state = {
   integrationOverview: null,
   integrationLoading: false,
   integrationDeliveries: [],
+  selectedProofJourney: "money",
   glossaryQuery: "",
   faqQuery: "",
   faqOpenKeys: new Set(),
@@ -545,6 +562,18 @@ const INVESTOR_WALKTHROUGH_STEPS = [
     headline: "Start with the business posture: total spend, owned spend, and the biggest savings levers.",
     prepare: async () => {
       go("overview");
+    }
+  },
+  {
+    key: "requirements-proof",
+    page: "requirements",
+    anchor: "walkthrough-requirements",
+    durationMs: 10000,
+    title: "PRD Proof: every claim tied to a visible surface",
+    headline: "Anchor the walkthrough in the actual Argmin source documents: decision surfaces, RAIL, trust controls, and local proof paths.",
+    prepare: async () => {
+      state.selectedProofJourney = "trust";
+      go("requirements");
     }
   },
   {
@@ -705,6 +734,12 @@ function pageLensNarrative(pageKey = state.page, lens = state.roleLens) {
       finance: ["This request-level view is what makes chargeback and audit defensible.", "It answers who pays, why they pay, and how much uncertainty remains in the ownership chain."],
       platform: ["This is the runtime evidence path from model invocation to final owner.", "It is where you see whether the attribution system is credible enough to drive automation."],
       security: ["This is where policy context and evidence quality meet.", "It shows whether a request can be governed confidently or needs human confirmation."]
+    },
+    requirements: {
+      executive: ["This page ties the product story directly to the PRD and investor narrative.", "It shows that the demo is proving a system of record for AI consumption, not a disconnected feature tour."],
+      finance: ["This page explains which workflows are decision-ready and which remain informational.", "It separates chargeback-ready outputs from provisional, estimated, allocated, or indirect evidence."],
+      platform: ["This page is the implementation map for the local demo.", "It shows the pipeline, state machines, and visible surfaces that satisfy the engineering specification with deterministic dummy data."],
+      security: ["This page preserves the trust-boundary claims while keeping the local demo honest.", "It shows fail-open, read-only, confidence caps, uncapturable disclosures, and human approval boundaries as explicit controls."]
     },
     interventions: {
       executive: ["This is the action queue that turns visibility into savings.", "The right question is not which card looks interesting, but which action changes run-rate fastest with the least business risk."],
@@ -1157,6 +1192,12 @@ function activeContextItems() {
 
   if (state.page === "overview") {
     items.push({ label: "Focus", value: "Spend posture and savings levers" });
+  }
+
+  if (state.page === "requirements") {
+    const journey = selectedProofJourney();
+    items.push({ label: "Source", value: "PRD + Engineering Spec + RAIL" });
+    items.push({ label: "Journey", value: journey?.title || "All requirements" });
   }
 
   if (state.page === "adoption") {
@@ -3104,6 +3145,257 @@ function renderDrawer() {
 
   setExecutionDrawer(state.executionDrawerOpen);
   syncGuidedActionButtons();
+}
+
+function traceabilityData() {
+  return dataset.prd_traceability || FALLBACK_DATASET.prd_traceability || {};
+}
+
+function selectedProofJourney() {
+  const journeys = traceabilityData().journeys || [];
+  return journeys.find((item) => item.key === state.selectedProofJourney) || journeys[0] || null;
+}
+
+function renderMiniPills(items = [], className = "proof-pill") {
+  return (items || []).map((item) => `<span class="${className}">${esc(item)}</span>`).join("");
+}
+
+function requirementsView() {
+  const traceability = traceabilityData();
+  const lensNarrative = pageLensNarrative("requirements");
+  const summary = traceability.summary || {};
+  const journeys = traceability.journeys || [];
+  const selected = selectedProofJourney();
+  const decisionSurfaces = traceability.decision_surfaces || [];
+  const railStages = traceability.rail_pipeline || [];
+  const invariants = traceability.invariants || [];
+  const pathwayRows = traceability.pathway_matrix || [];
+  const requirementRows = traceability.requirement_matrix || [];
+  const sources = traceability.document_sources || [];
+
+  const journeyButtons = journeys.map((journey) => `
+    <button class="proof-journey-btn${journey.key === selected?.key ? " active" : ""}" data-action="select-proof-journey" data-journey-key="${esc(journey.key)}">
+      <span>${esc(journey.title)}</span>
+      <strong>${esc(journey.status || "mapped")}</strong>
+    </button>
+  `).join("");
+
+  const proofPoints = (selected?.proof_points || []).map((point) => `
+    <li>
+      <strong>${esc(point.label)}</strong>
+      <span>${esc(point.detail)}</span>
+    </li>
+  `).join("");
+
+  const surfaceCards = decisionSurfaces.map((surface) => `
+    <div class="proof-surface">
+      <div class="proof-surface-head">
+        <div>
+          <div class="card-title">${esc(surface.name)}</div>
+          <div class="card-subtitle">${esc(surface.decision)}</div>
+        </div>
+        <span class="status-badge">${esc(surface.trust_state)}</span>
+      </div>
+      <div class="proof-surface-grid">
+        <div><span>Owner</span><strong>${esc(surface.owner)}</strong></div>
+        <div><span>Cadence</span><strong>${esc(surface.cadence)}</strong></div>
+        <div><span>Action</span><strong>${esc(surface.action_class)}</strong></div>
+        <div><span>Minimum confidence</span><strong>${esc(surface.minimum_confidence)}</strong></div>
+      </div>
+      <div class="proof-pill-row">${renderMiniPills(surface.truth_domains || [])}</div>
+      <div class="hint">${esc(surface.failure_rule || "")}</div>
+    </div>
+  `).join("");
+
+  const railCards = railStages.map((stage, index) => `
+    <div class="rail-stage-card">
+      <div class="rail-stage-index">${index + 1}</div>
+      <div class="rail-stage-title">${esc(stage.stage)}</div>
+      <div class="rail-stage-purpose">${esc(stage.purpose)}</div>
+      <div class="rail-stage-io">
+        <span>Input</span>
+        <strong>${esc(stage.input)}</strong>
+      </div>
+      <div class="rail-stage-io">
+        <span>Output</span>
+        <strong>${esc(stage.output)}</strong>
+      </div>
+      <div class="proof-pill-row">${renderMiniPills(stage.requirements || [], "proof-pill subtle")}</div>
+      <div class="hint">${esc(stage.visible_proof)}</div>
+    </div>
+  `).join("");
+
+  const invariantCards = invariants.map((item) => `
+    <div class="invariant-card">
+      <div class="invariant-id">${esc(item.id)}</div>
+      <div class="invariant-claim">${esc(item.claim)}</div>
+      <div class="hint">${esc(item.local_proof)}</div>
+      <span class="status-badge ${esc(String(item.status || "").toLowerCase())}">${esc(item.status || "visible")}</span>
+    </div>
+  `).join("");
+
+  const pathwayMarkup = pathwayRows.map((row) => `
+    <tr>
+      <td><span class="mono">${esc(row.pathway_class)}</span></td>
+      <td>${esc(row.primary_capture)}</td>
+      <td>${esc(row.usage_truth)}</td>
+      <td>${esc(row.cost_truth)}</td>
+      <td>${esc(row.ownership_truth)}</td>
+      <td><span class="status-badge">${esc(row.feasibility)}</span></td>
+      <td>${esc(row.local_proof)}</td>
+    </tr>
+  `).join("");
+
+  const requirementMarkup = requirementRows.map((row) => `
+    <tr>
+      <td><span class="mono">${esc(row.id)}</span></td>
+      <td>${esc(row.requirement)}</td>
+      <td>${esc(row.visible_surface)}</td>
+      <td>${esc(row.proof)}</td>
+      <td><span class="status-badge">${esc(row.status)}</span></td>
+    </tr>
+  `).join("");
+
+  const sourceMarkup = sources.map((source) => `
+    <div class="source-chip">
+      <strong>${esc(source.name)}</strong>
+      <span>${esc(source.used_for)}</span>
+    </div>
+  `).join("");
+
+  return `
+    <div class="requirements-page" data-walkthrough-anchor="walkthrough-requirements">
+      <div class="proof-hero">
+        <div class="proof-hero-copy">
+          <div class="pill">Local PRD/spec proof</div>
+          <h1>Argmin demo requirement map</h1>
+          <p>${esc(summary.conclusion || "The local demo maps source-document requirements to visible workflows.")}</p>
+          <div class="proof-doc-row">${sourceMarkup}</div>
+        </div>
+        <div class="proof-hero-panel">
+          <div class="proof-hero-panel-label">Operating boundary</div>
+          <div class="proof-hero-panel-value">${esc(summary.operating_boundary || "")}</div>
+          <div class="proof-hero-panel-foot">${esc(summary.basis || "")}</div>
+        </div>
+      </div>
+
+      ${renderSectionNarrative(
+        "Requirements proof",
+        {
+          conclusion: lensNarrative[0],
+          why: lensNarrative[1]
+        },
+        "Every source-document claim shown here is tied to an interactive local surface, a deterministic dummy dataset, or an explicit production-only boundary.",
+        "Use the journey selector, then jump to the corresponding page to show the working proof."
+      )}
+
+      <div class="requirements-layout">
+        <section class="card proof-journey-panel">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Source Document Journeys</div>
+              <div class="card-subtitle">The PRD workflows converted into a local presentation path.</div>
+            </div>
+          </div>
+          <div class="proof-journey-list">${journeyButtons}</div>
+        </section>
+
+        <section class="card proof-detail-panel">
+          <div class="card-header">
+            <div>
+              <div class="card-title">${esc(selected?.title || "Journey proof")}</div>
+              <div class="card-subtitle">${esc(selected?.trigger || "Select a journey to inspect how the demo proves it.")}</div>
+            </div>
+            <button class="small-btn primary" data-action="go" data-page="${esc(selected?.visible_route || "overview")}">Open Surface</button>
+          </div>
+          <div class="proof-detail-grid">
+            <div>
+              <span>Persona</span>
+              <strong>${esc(selected?.persona || "Operator")}</strong>
+            </div>
+            <div>
+              <span>Success condition</span>
+              <strong>${esc(selected?.success || "Visible local proof")}</strong>
+            </div>
+            <div>
+              <span>Mapped requirements</span>
+              <strong>${esc((selected?.requirements || []).join(", "))}</strong>
+            </div>
+          </div>
+          <ul class="proof-point-list">${proofPoints}</ul>
+        </section>
+      </div>
+
+      <section class="proof-section">
+        <div class="section-title">Decision Surface Controls</div>
+        <div class="proof-surface-grid-wrap">${surfaceCards}</div>
+      </section>
+
+      <section class="proof-section">
+        <div class="section-title">RAIL and HRE Pipeline</div>
+        <div class="rail-stage-grid">${railCards}</div>
+      </section>
+
+      <section class="proof-section">
+        <div class="section-title">Trust Boundary and Invariant Ledger</div>
+        <div class="invariant-grid">${invariantCards}</div>
+      </section>
+
+      <section class="proof-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Pathway Coverage Matrix</div>
+              <div class="card-subtitle">Comparable provider views preserve feasibility and truth-domain caveats rather than flattening evidence quality.</div>
+            </div>
+            <button class="small-btn" data-action="go" data-page="integrations">Open Integrations</button>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Pathway</th>
+                  <th>Capture</th>
+                  <th>Usage</th>
+                  <th>Cost</th>
+                  <th>Ownership</th>
+                  <th>Feasibility</th>
+                  <th>Local proof</th>
+                </tr>
+              </thead>
+              <tbody>${pathwayMarkup}</tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="proof-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Requirement Coverage Matrix</div>
+              <div class="card-subtitle">High-signal P0/P1 requirements made visible in the local demo.</div>
+            </div>
+            <button class="small-btn" data-action="start-walkthrough">Run Walkthrough</button>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Requirement</th>
+                  <th>Visible surface</th>
+                  <th>Proof shown</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>${requirementMarkup}</tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  `;
 }
 
 function overviewView() {
@@ -6151,6 +6443,9 @@ function renderMainView() {
       root.innerHTML = overviewView();
       renderOverviewCharts();
       break;
+    case "requirements":
+      root.innerHTML = requirementsView();
+      break;
     case "adoption":
       root.innerHTML = adoptionView();
       renderAdoptionCharts();
@@ -6796,6 +7091,10 @@ function handleAction(actionEl) {
       return;
     case "go":
       go(actionEl.dataset.page || "overview");
+      return;
+    case "select-proof-journey":
+      state.selectedProofJourney = actionEl.dataset.journeyKey || state.selectedProofJourney;
+      render();
       return;
     case "set-role-lens":
       state.roleLens = actionEl.dataset.roleLens || "executive";

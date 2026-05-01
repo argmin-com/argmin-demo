@@ -3768,5 +3768,576 @@
       ],
       "why_it_matters": "This is where adoption becomes visible to leadership and where spend, ROI, and governance become executive topics."
     }
-  ]
+  ],
+  "prd_traceability": {
+    "summary": {
+      "conclusion": "The local demo is organized as an interactive proof of the Argmin PRD and Engineering Specification.",
+      "basis": "Requirements are mapped from the master PRD, Engineering Specification, RAIL PRD, HRE architecture decisions, vision statement, and pitch deck.",
+      "operating_boundary": "All data is synthetic and local. Production-only systems such as AWS VPC deployment, Kafka, Redis, Neo4j, Helm, and customer IAM are represented as trust-boundary, readiness, and architecture evidence rather than live cloud mutation."
+    },
+    "document_sources": [
+      {
+        "name": "Vision and Mission",
+        "used_for": "System-of-record thesis, trust boundary, optimizer-not-enforcer posture, adoption intelligence."
+      },
+      {
+        "name": "Master PRD v8.14",
+        "used_for": "User journeys, feature IDs, decision surfaces, state machines, truth domains, dashboard requirements."
+      },
+      {
+        "name": "Engineering Specification v2.7",
+        "used_for": "Invariants, frontend pages, gate checks, API contracts, deployment posture, fail-open architecture."
+      },
+      {
+        "name": "RAIL PRD v2.3",
+        "used_for": "Stage A/B/C attribution pipeline, graph taxonomy, cpost/coper confidence split, conflict preservation."
+      },
+      {
+        "name": "HRE Architecture Decisions",
+        "used_for": "Zero-ML Stage A, four Stage B candidates, five-node taxonomy, edge-existence prediction target."
+      },
+      {
+        "name": "Pitch Deck v3",
+        "used_for": "Investor story: visible, attributable, billable, governable enterprise AI consumption."
+      }
+    ],
+    "journeys": [
+      {
+        "key": "money",
+        "title": "Where is my AI money going?",
+        "persona": "FinOps Lead / VP Engineering",
+        "trigger": "A CFO asks why AI spend reached a reportable budget line.",
+        "success": "Top spend owners, confidence mix, chargeback readiness, and export posture are visible in one pass.",
+        "visible_route": "overview",
+        "requirements": ["F-100", "F-101", "F-102", "F-104", "F-106", "F-400"],
+        "status": "Visible locally",
+        "proof_points": [
+          {
+            "label": "Spend and owner rollup",
+            "detail": "Overview and Teams show total AI spend, team ownership, TRAC exposure, and optimization potential from one synthetic operating profile."
+          },
+          {
+            "label": "Confidence-aware finance posture",
+            "detail": "Chargeback-ready spend is separated from provisional review work so the demo preserves honest uncertainty."
+          },
+          {
+            "label": "Export path",
+            "detail": "Request Proof, Manual Mapping, and Governance expose the fields that become chargeback and audit evidence."
+          }
+        ]
+      },
+      {
+        "key": "models",
+        "title": "Are we using the right models?",
+        "persona": "VP Engineering / Platform Lead",
+        "trigger": "Teams are using expensive reasoning models for work that cheaper models can handle.",
+        "success": "Model mix, reasoning token share, Price Reversal risk, savings evidence, and approval boundaries are inspectable.",
+        "visible_route": "models",
+        "requirements": ["F-107", "F-108", "F-109", "F-110", "F-113", "F-402"],
+        "status": "Visible locally",
+        "proof_points": [
+          {
+            "label": "Multi-model estate",
+            "detail": "Models presents enterprise model families, provider mix, AI platform context, and canonical AI stack layers."
+          },
+          {
+            "label": "Intervention proof",
+            "detail": "Interventions turns over-provisioning and routing findings into auditable recommendations with state transitions."
+          },
+          {
+            "label": "Planning link",
+            "detail": "Forecasting shows how approved actions alter the forward spend curve with confidence bands."
+          }
+        ]
+      },
+      {
+        "key": "adoption",
+        "title": "Is our AI program working?",
+        "persona": "CTO / CHRO / Chief People Officer",
+        "trigger": "The board asks whether AI investment produced operating adoption or shelfware.",
+        "success": "Adoption depth, governed usage, role/function signal quality, and tooling gain/loss are visible without a second data pipeline.",
+        "visible_route": "adoption",
+        "requirements": ["F-200", "F-201", "F-202", "F-203", "F-204", "F-205", "F-206"],
+        "status": "Visible locally",
+        "proof_points": [
+          {
+            "label": "Graph projection",
+            "detail": "Employee Adoption uses the same synthetic attributed usage record as cost views, preserving the PRD constraint that adoption is a graph projection."
+          },
+          {
+            "label": "Executive integrity",
+            "detail": "Signal quality, governed usage, and visibility caveats are shown so weak observability is not mislabeled as low adoption."
+          },
+          {
+            "label": "Buyer expansion",
+            "detail": "Role lenses let the same data surface speak to executive, finance, platform, and security audiences."
+          }
+        ]
+      },
+      {
+        "key": "budget",
+        "title": "Set budget guardrails without breaking anything",
+        "persona": "FinOps Lead / Admin",
+        "trigger": "A team exceeds its AI budget and needs guardrails that engineering will not route around.",
+        "success": "Shape mode, Gate mode boundaries, confidence-gated enforcement, notifications, and audit surfaces are clear.",
+        "visible_route": "governance",
+        "requirements": ["F-300", "F-301", "F-302", "F-303", "F-304", "F-305", "F-306"],
+        "status": "Visible locally",
+        "proof_points": [
+          {
+            "label": "Optimizer by default",
+            "detail": "Governance starts in advisory mode and makes hard stops explicit, per-workload, and audit-logged."
+          },
+          {
+            "label": "Fail-open safety",
+            "detail": "Guided Demo can trigger a fail-open proof path that shows request continuity under degraded platform state."
+          },
+          {
+            "label": "Policy explainability",
+            "detail": "Policy Simulation shows confidence floors, budget ceilings, and suppression when ownership evidence is unsafe."
+          }
+        ]
+      },
+      {
+        "key": "trust",
+        "title": "Can I trust this enough for real decisions?",
+        "persona": "CFO / CTO / FinOps Lead",
+        "trigger": "Leadership is deciding whether Argmin outputs can support chargeback, budgeting, and board reporting.",
+        "success": "Truth domains, trust state, capture feasibility, degradation classes, and uncapturable pathways are explicit.",
+        "visible_route": "requirements",
+        "requirements": ["F-409", "F-410", "F-411", "F-412", "F-413", "F-416", "INV-6", "INV-17", "INV-18"],
+        "status": "Visible locally",
+        "proof_points": [
+          {
+            "label": "Decision surface binding",
+            "detail": "This page declares owner, cadence, trust state, action class, confidence requirement, and failure rule for major surfaces."
+          },
+          {
+            "label": "Coverage caveats",
+            "detail": "Pathway Coverage Matrix labels direct, partial, indirect, and uncapturable paths so comparable views remain honest."
+          },
+          {
+            "label": "Invariant ledger",
+            "detail": "Trust boundary controls such as fail-open, read-only access, confidence caps, and null energy estimates are made visible."
+          }
+        ]
+      },
+      {
+        "key": "dispute",
+        "title": "Why is this attribution wrong or uncertain?",
+        "persona": "FinOps Lead / Platform Lead / Admin",
+        "trigger": "A high-cost workload has provisional confidence, conflicting evidence, or shared-identity ambiguity.",
+        "success": "Winning path, losing candidates, conflict class, manual override path, and audit persistence are visible.",
+        "visible_route": "attribution",
+        "requirements": ["F-103", "F-131", "F-132", "F-133", "F-134", "F-135", "F-140", "F-141", "F-144"],
+        "status": "Visible locally",
+        "proof_points": [
+          {
+            "label": "Evidence chain",
+            "detail": "Request Proof shows source signals, confidence basis, owner chain, alternatives, and actionability."
+          },
+          {
+            "label": "Manual mapping",
+            "detail": "Manual Mapping shows before/after confidence, budget impact, forecast delta, and intervention reprioritization."
+          },
+          {
+            "label": "Audit persistence",
+            "detail": "The local action path keeps operator decisions explicit instead of silently mutating history."
+          }
+        ]
+      }
+    ],
+    "decision_surfaces": [
+      {
+        "name": "Overview",
+        "decision": "Where is AI spend concentrated and what should leadership inspect first?",
+        "owner": "Executive / FinOps",
+        "cadence": "Daily / weekly",
+        "truth_domains": ["cost", "ownership", "usage"],
+        "minimum_confidence": "Aggregates visible; chargeback requires >= 0.80 coper",
+        "trust_state": "DECISION_SUPPORT",
+        "action_class": "Informational / advisory",
+        "failure_rule": "Show provisional and unknown spend rather than hiding it inside totals."
+      },
+      {
+        "name": "Request Proof",
+        "decision": "Can this request be assigned to an owner and budget line?",
+        "owner": "FinOps / Platform",
+        "cadence": "On dispute / on high-cost review",
+        "truth_domains": ["usage", "ownership", "feasibility"],
+        "minimum_confidence": "Chargeback-ready at >= 0.80; operational cap 0.95",
+        "trust_state": "OPERATIONALLY_TRUSTED when threshold passes",
+        "action_class": "Approval-required when evidence is contested",
+        "failure_rule": "Preserve alternatives and route low-confidence cases to manual review."
+      },
+      {
+        "name": "Model Intelligence",
+        "decision": "Which model choices are expensive, over-provisioned, or energy inefficient?",
+        "owner": "VP Engineering",
+        "cadence": "Weekly / on-demand",
+        "truth_domains": ["usage", "cost", "quality proxy", "energy"],
+        "minimum_confidence": "Recommendation confidence >= 0.50; quality equivalence required before action",
+        "trust_state": "DECISION_SUPPORT",
+        "action_class": "Advisory",
+        "failure_rule": "Low-evidence recommendations remain monitoring candidates, not active swaps."
+      },
+      {
+        "name": "Employee Adoption",
+        "decision": "Which teams are embedding AI into work and where is enablement needed?",
+        "owner": "CTO / CHRO",
+        "cadence": "Weekly / monthly",
+        "truth_domains": ["usage", "ownership", "adoption signal"],
+        "minimum_confidence": "Signal type must be direct, inferred, or estimated",
+        "trust_state": "DECISION_SUPPORT",
+        "action_class": "Informational / advisory",
+        "failure_rule": "Weak visibility is labeled as weak observation, not low adoption."
+      },
+      {
+        "name": "Governance",
+        "decision": "Which budget and policy controls can be applied safely now?",
+        "owner": "FinOps / Admin",
+        "cadence": "Real-time / daily",
+        "truth_domains": ["cost", "ownership", "policy", "feasibility"],
+        "minimum_confidence": "Default enforcement floor 0.80",
+        "trust_state": "OPERATIONALLY_TRUSTED for Gate mode",
+        "action_class": "Advisory by default; enforcement only after opt-in",
+        "failure_rule": "Conflict or low-confidence ownership downgrades enforcement to advisory."
+      },
+      {
+        "name": "Forecasting",
+        "decision": "What happens to spend if the company acts or does nothing?",
+        "owner": "FinOps / Executive",
+        "cadence": "Monthly planning / board prep",
+        "truth_domains": ["cost", "usage", "intervention state"],
+        "minimum_confidence": "Confidence bands shown for every scenario",
+        "trust_state": "DECISION_SUPPORT",
+        "action_class": "Informational / advisory",
+        "failure_rule": "Local directional estimates are clearly labeled when live forecast API is unavailable."
+      }
+    ],
+    "rail_pipeline": [
+      {
+        "stage": "Stage 0 - Pathway classification",
+        "purpose": "Classify the capture path before any downstream interpretation.",
+        "input": "Provider, gateway, billing, telemetry, SaaS, and infrastructure signals",
+        "output": "Pathway category, capture layer, and capture feasibility class",
+        "requirements": ["F-115", "F-120", "INV-17"],
+        "visible_proof": "Pathway Coverage Matrix and Integrations Overview show direct, partial, indirect, and uncapturable rows."
+      },
+      {
+        "stage": "Stage A - Deterministic observation fusion",
+        "purpose": "Create the maximum reliable graph skeleton with zero ML.",
+        "input": "Exact IDs, trace IDs, timestamps, service metadata, identity, org, project, and code signals",
+        "output": "Five node types and deterministic edges across the graph",
+        "requirements": ["RAIL 2.1", "HRE Decision 1", "INV-10"],
+        "visible_proof": "Request Proof displays exact, rule-based, stale-source, and missing-signal evidence in the attribution chain."
+      },
+      {
+        "stage": "Stage B - Residual attribution inference",
+        "purpose": "Resolve genuinely ambiguous residual edges with calibrated confidence.",
+        "input": "Unresolved edges, node features, edge evidence, and graph context",
+        "output": "cpost for learning and coper capped at 0.95 for customer-facing operations",
+        "requirements": ["F-102", "F-131", "INV-6", "HRE Decision 2"],
+        "visible_proof": "Request Proof and Manual Mapping preserve winning candidates, alternatives, confidence basis, and conflict classes."
+      },
+      {
+        "stage": "Stage C - Fractional allocation",
+        "purpose": "Split cost when ownership is shared without pretending allocation is ownership.",
+        "input": "Shared resources, candidate organizations, allocation priors, and billing truth",
+        "output": "Conserved cost splits with allocation method labels",
+        "requirements": ["F-132", "F-133", "INV-10", "INV-11"],
+        "visible_proof": "Governance and Manual Mapping show shared ownership, policy suppression, and review priority rather than false single-owner enforcement."
+      }
+    ],
+    "invariants": [
+      {
+        "id": "INV-1",
+        "claim": "Fail-open is absolute; Argmin must not block production AI traffic because Argmin failed.",
+        "local_proof": "Guided Demo has a fail-open scenario; Governance explains degraded-mode behavior.",
+        "status": "Visible"
+      },
+      {
+        "id": "INV-2",
+        "claim": "Integrations are read-only.",
+        "local_proof": "Integrations and onboarding docs describe read-only sources and synthetic handoffs.",
+        "status": "Visible"
+      },
+      {
+        "id": "INV-3",
+        "claim": "Customer operational data stays inside the trust boundary.",
+        "local_proof": "Local-only demo uses no external telemetry and surfaces VPC/trust-boundary architecture as a boundary claim.",
+        "status": "Visible"
+      },
+      {
+        "id": "INV-5",
+        "claim": "Decision-time interceptor reads the precomputed index, not the graph.",
+        "local_proof": "Governance and Request Proof separate request-time proof from graph/processor concepts.",
+        "status": "Visible"
+      },
+      {
+        "id": "INV-6",
+        "claim": "Operational confidence is capped at 0.95.",
+        "local_proof": "Request confidence labels and decision surfaces state the coper cap and chargeback threshold.",
+        "status": "Visible"
+      },
+      {
+        "id": "INV-7",
+        "claim": "Manual overrides persist and remain auditable.",
+        "local_proof": "Manual Mapping shows operator action, prior state, and downstream impact without silently rewriting history.",
+        "status": "Visible"
+      },
+      {
+        "id": "INV-8",
+        "claim": "Estimated and reconciled cost remain distinct.",
+        "local_proof": "Forecasting, Request Proof, and finance posture labels keep estimate/reconciliation distinctions visible.",
+        "status": "Visible"
+      },
+      {
+        "id": "INV-17",
+        "claim": "Uncapturable pathways must be represented explicitly.",
+        "local_proof": "Pathway Coverage Matrix includes indirect and uncapturable rows with caveats.",
+        "status": "Visible"
+      },
+      {
+        "id": "INV-18",
+        "claim": "Energy estimates are best-effort and unknown models return null, not zero.",
+        "local_proof": "Model Intelligence and requirement matrix label energy/carbon as informational and null-safe.",
+        "status": "Visible"
+      }
+    ],
+    "pathway_matrix": [
+      {
+        "pathway_class": "Direct API calls",
+        "primary_capture": "Proxy / gateway",
+        "usage_truth": "Direct",
+        "cost_truth": "Estimated then reconciled",
+        "ownership_truth": "Deterministic or probabilistic",
+        "feasibility": "FULLY_CAPTURABLE",
+        "local_proof": "Guided attributed request and Request Proof"
+      },
+      {
+        "pathway_class": "AI gateways and routers",
+        "primary_capture": "Gateway logs and response parsing",
+        "usage_truth": "Direct or partial",
+        "cost_truth": "Estimated on served model",
+        "ownership_truth": "Depends on identity preservation",
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "local_proof": "Models shows requested vs served model and routing risk"
+      },
+      {
+        "pathway_class": "AWS Bedrock",
+        "primary_capture": "Invocation logs and billing",
+        "usage_truth": "Direct",
+        "cost_truth": "Reconciled through AWS billing",
+        "ownership_truth": "Good when IAM context exists",
+        "feasibility": "FULLY_CAPTURABLE",
+        "local_proof": "Integrations and Provider Breakdown"
+      },
+      {
+        "pathway_class": "Azure OpenAI",
+        "primary_capture": "Proxy or APIM",
+        "usage_truth": "Partial without APIM",
+        "cost_truth": "Billing plus APIM",
+        "ownership_truth": "Good with AAD context",
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "local_proof": "Pathway caveat row and model landscape"
+      },
+      {
+        "pathway_class": "Agentic AI",
+        "primary_capture": "Framework callbacks",
+        "usage_truth": "Direct or partial",
+        "cost_truth": "Estimated then reconciled",
+        "ownership_truth": "Requires root_request_id lineage",
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "local_proof": "Requirement matrix maps INV-15 and runaway alerts"
+      },
+      {
+        "pathway_class": "Embedded SaaS seat AI",
+        "primary_capture": "Admin APIs",
+        "usage_truth": "Usage-only or estimated",
+        "cost_truth": "Seat allocated",
+        "ownership_truth": "Adoption only",
+        "feasibility": "INDIRECTLY_CAPTURABLE",
+        "local_proof": "Adoption signal labels and caveats"
+      },
+      {
+        "pathway_class": "Developer tools",
+        "primary_capture": "Vendor API or BYOK billing evidence",
+        "usage_truth": "Partial",
+        "cost_truth": "Direct or derived",
+        "ownership_truth": "Often user scoped",
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "local_proof": "Adoption tooling gain/loss and model estate context"
+      },
+      {
+        "pathway_class": "Self-hosted inference",
+        "primary_capture": "Infrastructure metrics",
+        "usage_truth": "Direct or partial",
+        "cost_truth": "Derived",
+        "ownership_truth": "Good if workload mapping exists",
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "local_proof": "Requirement matrix labels derived cost as not invoice-verified"
+      },
+      {
+        "pathway_class": "Data platform AI",
+        "primary_capture": "Platform usage tables",
+        "usage_truth": "Partial",
+        "cost_truth": "Platform plus cloud",
+        "ownership_truth": "Query, job, or pipeline owner",
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "local_proof": "Pathway caveat row and FAQ"
+      },
+      {
+        "pathway_class": "Client-side AI",
+        "primary_capture": "None",
+        "usage_truth": "Unavailable",
+        "cost_truth": "Unavailable",
+        "ownership_truth": "Unavailable",
+        "feasibility": "UNCAPTURABLE",
+        "local_proof": "Explicit blind-spot disclosure"
+      }
+    ],
+    "requirement_matrix": [
+      {
+        "id": "F-100",
+        "requirement": "Read-only onboarding for AWS billing, identity, and source control.",
+        "visible_surface": "Integrations / PRD Proof",
+        "proof": "Connected-source inventory and trust-boundary copy show read-only local demo posture.",
+        "status": "Represented"
+      },
+      {
+        "id": "F-101/F-102",
+        "requirement": "Automatic cost attribution with calibrated confidence and chargeback thresholds.",
+        "visible_surface": "Overview / Request Proof",
+        "proof": "Coverage, confidence basis, and chargeback-ready labels are visible.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-103",
+        "requirement": "Manual override and audit persistence.",
+        "visible_surface": "Manual Mapping",
+        "proof": "Operator decisions show confidence, owner, budget, forecast, and intervention impact.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-104/F-105",
+        "requirement": "Estimated vs reconciled cost and versioned model pricing.",
+        "visible_surface": "Forecasting / Models",
+        "proof": "Forecast and model views preserve estimate/reconciliation and pricing-drift concepts.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-106/F-408",
+        "requirement": "Chargeback and FOCUS-compatible export posture.",
+        "visible_surface": "Request Proof / Governance",
+        "proof": "Export-oriented fields and finance readiness are explicit in the proof matrix.",
+        "status": "Represented"
+      },
+      {
+        "id": "F-107/F-108",
+        "requirement": "Optimization categories and intervention lifecycle.",
+        "visible_surface": "Overview / Interventions",
+        "proof": "Savings categories, Proposed to Approved lifecycle, rejection/implementation actions.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-111/F-112",
+        "requirement": "Fail-open interception and Passive/Advisory/Active deployment modes.",
+        "visible_surface": "Governance / Guided Demo",
+        "proof": "Mode controls and fail-open proof action run locally.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-113/F-114",
+        "requirement": "Reasoning-token tracking and requested vs served model capture.",
+        "visible_surface": "Models / Request Proof",
+        "proof": "Model analytics and request samples surface reasoning and routing semantics.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-115-F-122",
+        "requirement": "Pathway classification, feasibility labeling, and blind-spot disclosure.",
+        "visible_surface": "PRD Proof / Integrations",
+        "proof": "Pathway Coverage Matrix labels fully, partially, indirectly, and uncapturable pathways.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-131-F-144",
+        "requirement": "Conflict handling, unknown/shared states, event-time/current-state interpretation, and dispute navigation.",
+        "visible_surface": "Request Proof / Manual Mapping",
+        "proof": "Winning path, alternatives, conflict class, and review priority are visible.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-200-F-206",
+        "requirement": "Adoption intelligence as a projection of the attribution graph.",
+        "visible_surface": "Employee Adoption",
+        "proof": "Adoption depth, governed usage, role lenses, and zero-extra-pipeline framing.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-207-F-214",
+        "requirement": "SaaS adoption feasibility, signal type labels, and executive caveats.",
+        "visible_surface": "Employee Adoption / PRD Proof",
+        "proof": "Adoption proof points distinguish direct, inferred, estimated, weak, and opaque signal quality.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-300-F-306",
+        "requirement": "Budget policies, Shape mode, Gate mode, graduated enforcement, audit log, Slack/email alerts.",
+        "visible_surface": "Governance / Integrations",
+        "proof": "Policy Simulation, mode controls, notification routes, and audit handoffs.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-308",
+        "requirement": "TRAC risk-adjusted cost.",
+        "visible_surface": "Overview / Teams / Request Proof",
+        "proof": "TRAC exposure is included in team rollups and request-level decision records.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-313-F-316",
+        "requirement": "Uncertainty-aware recommendations and conflict-aware enforcement suppression.",
+        "visible_surface": "Interventions / Governance",
+        "proof": "Recommendation evidence, confidence floor, and policy suppression are shown.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-400-F-419",
+        "requirement": "Dashboard, reporting, coverage, decision explanation, trust indicator, and operator/executive modes.",
+        "visible_surface": "All local pages",
+        "proof": "Navigation, role lenses, decision-surface framing, and proof page tie each view to a decision.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-470-F-473",
+        "requirement": "Notification center, email, Slack, webhook preferences.",
+        "visible_surface": "Integrations",
+        "proof": "Local routes and delivery history simulate Slack, email, and webhook handoffs.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-450-F-458",
+        "requirement": "Admin interface and API posture for integrations, policy, deployment mode, audit, and diagnostics.",
+        "visible_surface": "Governance / Integrations / PRD Proof",
+        "proof": "Administrative controls are represented with local mode switching and diagnostic summaries.",
+        "status": "Represented"
+      },
+      {
+        "id": "F-600-F-609",
+        "requirement": "Energy and carbon transparency without fabricated zero values.",
+        "visible_surface": "Models / PRD Proof",
+        "proof": "Energy is included as an informational decision dimension with null-safe caveats.",
+        "status": "Represented"
+      },
+      {
+        "id": "RAIL",
+        "requirement": "Stage A deterministic, Stage B calibrated inference, Stage C allocation, five-node graph, eight meaningful edge types.",
+        "visible_surface": "PRD Proof / Request Proof",
+        "proof": "RAIL and HRE pipeline makes the stage boundary and graph taxonomy visible.",
+        "status": "Visible"
+      }
+    ]
+  }
 }
