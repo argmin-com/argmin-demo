@@ -45,24 +45,29 @@ Served by FastAPI at:
 
 ## Quick Start
 
+Prerequisites are documented and automated in
+[`../docs/local-prerequisites.md`](../docs/local-prerequisites.md). The frontend
+does not require Node.js, npm, pnpm, or yarn; it is served as static HTML, CSS,
+JavaScript, vendored Chart.js, and local fonts by the Python demo runtime.
+
 From repo root:
 
 ```bash
-./scripts/run_demo.sh
+./scripts/start_demo.sh
 ```
 
 Custom port:
 
 ```bash
-ACI_DEMO_PORT=8010 ./scripts/run_demo.sh
+ACI_DEMO_PORT=8010 ./scripts/start_demo.sh
 ```
 
-The launcher uses the dedicated `demo` runtime profile, installs
+The startup command uses the dedicated `demo` runtime profile, installs
 `requirements-demo.lock` instead of the full production lock, runs the API from
-`src/` directly, and auto-seeds the backend state. The seed baseline is fixed to
-a synthetic February 2026 operating period with predictable demo accounts,
-stable workflow scenarios, simulated notifications, and repeatable mock
-responses.
+`src/` directly, auto-seeds the backend state, opens the app, and prints the
+synthetic demo personas. The seed baseline is fixed to a synthetic February 2026
+operating period with predictable demo accounts, stable workflow scenarios,
+simulated notifications, and repeatable mock responses.
 
 To restore a running demo to that known state:
 

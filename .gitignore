@@ -19,6 +19,7 @@ htmlcov/
 venv/
 .playwright-cli/
 *.log
+.demo-start-*.pid
 uv.lock
 results/
 .benchmarks/

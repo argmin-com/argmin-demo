@@ -25,6 +25,9 @@ trap cleanup EXIT
 
 cd "${REPO_ROOT}"
 
+ACI_PREFLIGHT_PROFILE=shared-backend ACI_PREFLIGHT_REQUIRE_PORT_FREE=1 "${SCRIPT_DIR}/preflight_local.sh" \
+  || fail "shared-backend prerequisite check failed"
+
 if ! command -v docker >/dev/null 2>&1; then
   fail "docker is required"
 fi

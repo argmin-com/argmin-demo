@@ -15,10 +15,21 @@ Enterprise AI spend is visible at cloud-account granularity but usually not attr
 
 ### Run locally (30-second path)
 
-Prerequisites:
+Prerequisites are intentionally explicit and checked by script. The short demo
+requires macOS, Linux, or WSL2; `bash`; Python `3.12+`; `python3 -m venv`;
+`python3 -m pip`; `curl`; a modern browser; and one free local port. It does
+not require Node.js, npm/pnpm/yarn, Docker, a database, a queue, or cloud
+credentials.
 
-- Python `3.12+`
-- `bash`
+Run preflight first if you want setup diagnostics before the launcher does any
+dependency work:
+
+```bash
+./scripts/preflight_local.sh
+```
+
+For the complete prerequisite matrix, optional Docker/shared-backend path, and
+port overrides, see [docs/local-prerequisites.md](docs/local-prerequisites.md).
 
 Get into the repository root first.
 
@@ -43,20 +54,20 @@ You are in the correct directory if `ls` shows files such as:
 - `frontend/`
 
 ```bash
-./scripts/run_demo.sh
+./scripts/start_demo.sh
 ```
 
-Open the demo:
-
-- `http://localhost:8000/platform/`
+This one command installs locked demo dependencies, starts the local API and UI,
+resets the backend to deterministic seed data, opens the app, and prints the
+synthetic demo personas to use during a walkthrough.
 
 If port `8000` is occupied:
 
 ```bash
-ACI_DEMO_PORT=8010 ./scripts/run_demo.sh
+ACI_DEMO_PORT=8010 ./scripts/start_demo.sh
 ```
 
-Then open `http://localhost:8010/platform/`.
+Then use the app URL printed by the script.
 
 To restore a running demo to the same seeded state before another recording or
 stakeholder walkthrough:
@@ -72,16 +83,19 @@ If you prefer not to `cd` into the repo first, you can also launch it with an
 absolute path:
 
 ```bash
-/absolute/path/to/argmin-demo/scripts/run_demo.sh
+/absolute/path/to/argmin-demo/scripts/start_demo.sh
 ```
 
-`./scripts/run_demo.sh` launches the explicit `demo` profile:
+`./scripts/start_demo.sh` wraps the lower-level `./scripts/run_demo.sh` launcher
+and uses the explicit `demo` profile:
 
 - single worker
 - in-memory graph/event/index backends
 - deterministic startup seeding
 - auth bypass enabled only for the demo profile
 - outbound notifications forced to simulation mode
+- browser auto-open unless `ACI_START_OPEN_BROWSER=0`
+- synthetic demo credential printout
 
 The demo launcher refuses `ACI_ENVIRONMENT=production` or `ACI_ENVIRONMENT=staging`
 and forces local-only memory backends so cloud or shared-backend shell variables
@@ -134,10 +148,16 @@ In the UI:
    - FAQ
 
 For the API-level walkthrough, use [docs/demo-guide.md](docs/demo-guide.md).
+For local OS, Python, Node, Docker, database, browser, port, and package-manager
+requirements, see [docs/local-prerequisites.md](docs/local-prerequisites.md).
 For the view-by-view demo reference, see [docs/demo-feature-matrix.md](docs/demo-feature-matrix.md).
+For production capability-to-local mock coverage, see
+[docs/feature-demo-coverage-matrix.md](docs/feature-demo-coverage-matrix.md).
 For policy semantics and enforcement behavior, see [docs/policy-reference.md](docs/policy-reference.md).
 For ingestion contracts and examples, see [docs/ingestion-reference.md](docs/ingestion-reference.md).
-For automated end-to-end demo verification, run `./scripts/smoke_demo.sh`.
+For the low-level foreground server without browser open or credential printout,
+run `./scripts/run_demo.sh`. For automated end-to-end demo verification, run
+`./scripts/smoke_demo.sh`.
 For a non-destructive state reset against an already running demo, run
 `./scripts/reset_demo.sh`.
 
@@ -154,7 +174,8 @@ already prepared.
 
 ### Demo profile
 
-- Launcher: `./scripts/run_demo.sh`
+- Presenter startup: `./scripts/start_demo.sh`
+- Low-level launcher: `./scripts/run_demo.sh`
 - Compose: `docker compose -f docker-compose.demo.yml up --build`
 - Backend selection:
   - `ACI_GRAPH_BACKEND=memory`

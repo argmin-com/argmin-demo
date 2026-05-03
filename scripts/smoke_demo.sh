@@ -26,6 +26,8 @@ trap cleanup EXIT
 
 cd "${REPO_ROOT}"
 
+ACI_PREFLIGHT_PROFILE=smoke-demo ACI_PREFLIGHT_REQUIRE_PORT_FREE=1 "${SCRIPT_DIR}/preflight_local.sh"
+
 if ! command -v python3 >/dev/null 2>&1; then
   fail "python3 is required"
 fi
@@ -50,7 +52,7 @@ then
   fail "port ${PORT} is already in use; set ACI_DEMO_PORT to an available port"
 fi
 
-ACI_DEMO_PORT="${PORT}" ACI_DEMO_RELOAD=0 ./scripts/run_demo.sh >"${SERVER_LOG}" 2>&1 &
+ACI_DEMO_PORT="${PORT}" ACI_DEMO_RELOAD=0 ACI_DEMO_SKIP_PREFLIGHT=1 ./scripts/run_demo.sh >"${SERVER_LOG}" 2>&1 &
 SERVER_PID=$!
 
 for _ in {1..60}; do

@@ -14,11 +14,11 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from ipaddress import ip_address, ip_network
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Annotated, Any, Literal, cast
 from uuid import uuid4
 
 import structlog
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -515,7 +515,7 @@ class EventIngestResponse(BaseModel):
 
 
 class EventBatchIngestRequest(BaseModel):
-    events: list[EventIngestRequest]
+    events: list[EventIngestRequest] = Field(min_length=1)
 
 
 class EventBatchIngestResponse(BaseModel):
@@ -2452,14 +2452,18 @@ async def integrations_notify(
 
 
 @app.get("/v1/integrations/deliveries", response_model=list[NotificationDeliveryResponse])
-async def integrations_deliveries(limit: int = 100) -> list[NotificationDeliveryResponse]:
+async def integrations_deliveries(
+    limit: Annotated[int, Query(ge=0, le=100)] = 100,
+) -> list[NotificationDeliveryResponse]:
     """Inspect recent notification deliveries for auditability."""
     deliveries = get_state().notification_hub.list_deliveries(limit=limit)
     return [_notification_delivery_response(delivery) for delivery in deliveries]
 
 
 @app.get("/v1/integrations/overview", response_model=IntegrationOverviewResponse)
-async def integrations_overview(limit: int = 12) -> IntegrationOverviewResponse:
+async def integrations_overview(
+    limit: Annotated[int, Query(ge=0, le=100)] = 12,
+) -> IntegrationOverviewResponse:
     """Summarize inbound coverage and outbound operational handoffs."""
     app_state = get_state()
     hub = app_state.notification_hub

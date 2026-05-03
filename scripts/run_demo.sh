@@ -42,6 +42,10 @@ PY
 
 cd "${REPO_ROOT}"
 
+if [[ "${ACI_DEMO_SKIP_PREFLIGHT:-0}" != "1" ]]; then
+  ACI_PREFLIGHT_PROFILE=demo ACI_PREFLIGHT_REQUIRE_PORT_FREE=1 "${SCRIPT_DIR}/preflight_local.sh"
+fi
+
 if ! command -v python3 >/dev/null 2>&1; then
   echo "python3 is required to run the local demo." >&2
   exit 1
@@ -121,7 +125,7 @@ echo "ACI demo starting on http://localhost:${PORT}/platform/"
 echo "ACI runtime profile: environment=${ACI_ENVIRONMENT} workers=${ACI_UVICORN_WORKERS} graph=${ACI_GRAPH_BACKEND} event_bus=${ACI_EVENT_BUS_BACKEND} index=${ACI_INDEX_BACKEND}"
 
 if [[ "${ACI_DEMO_RELOAD:-0}" == "1" ]]; then
-  uvicorn aci.api.app:app --host 0.0.0.0 --port "${PORT}" --reload
+  exec uvicorn aci.api.app:app --host 0.0.0.0 --port "${PORT}" --reload
 else
-  uvicorn aci.api.app:app --host 0.0.0.0 --port "${PORT}"
+  exec uvicorn aci.api.app:app --host 0.0.0.0 --port "${PORT}"
 fi

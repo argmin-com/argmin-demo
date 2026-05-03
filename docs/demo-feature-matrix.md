@@ -4,6 +4,9 @@ This page describes what the public demo shows, how each view is meant to be
 used in a live walkthrough, and which runtime surfaces back each part of the
 presentation.
 
+For the production capability-to-local mock contract matrix, see
+[feature-demo-coverage-matrix.md](feature-demo-coverage-matrix.md).
+
 ## Core Proof Points
 
 | Proof point | What the demo shows | Where to show it |
@@ -48,7 +51,7 @@ presentation.
 
 | Capability | How it appears in the repo |
 |---|---|
-| Deterministic demo runtime | `./scripts/run_demo.sh` launches the dedicated `demo` profile and auto-seeds state on startup. |
+| Deterministic demo runtime | `./scripts/start_demo.sh` installs dependencies, starts the dedicated `demo` profile, resets seed data, opens the app, and prints synthetic demo personas. |
 | Shared-backend local runtime | `docker-compose.yml` exercises Kafka, Redis, and Neo4j together for integration validation. |
 | Pricing and reconciliation services | `/v1/pricing/*` and `/v1/finops/*` expose catalog, estimation, reconciliation, and drift summaries. |
 | Identity / SCM / CI ingestion breadth | Okta, GitHub, AWS billing, CloudTrail, and Bedrock connectors normalize external payloads into domain events. |
@@ -56,7 +59,8 @@ presentation.
 
 ## Demo Entry Points
 
-- One-command launch: `./scripts/run_demo.sh`
+- One-command launch: `./scripts/start_demo.sh`
+- Low-level server launch: `./scripts/run_demo.sh`
 - Browser: `http://localhost:8000/platform/`
 - Guided walkthrough: open **Guided Demo**, click **Start Full Walkthrough**
 - Reset presentation state: **Reset Demo**

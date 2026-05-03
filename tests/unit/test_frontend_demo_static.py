@@ -7,6 +7,7 @@ FRONTEND_APP_CSS = REPO_ROOT / "frontend" / "assets" / "app.css"
 FRONTEND_APP_JS = REPO_ROOT / "frontend" / "assets" / "app.js"
 FRONTEND_README = REPO_ROOT / "frontend" / "README.md"
 FRONTEND_SCHEMA = REPO_ROOT / "frontend" / "data" / "SCHEMA.md"
+FEATURE_DEMO_MATRIX = REPO_ROOT / "docs" / "feature-demo-coverage-matrix.md"
 VENDORED_CHART = REPO_ROOT / "frontend" / "vendor" / "chart.umd.min.js"
 FRONTEND_FONT_DIR = REPO_ROOT / "frontend" / "assets" / "fonts"
 LEGACY_V3_MOCKUP = REPO_ROOT / "frontend" / "platform-mockup-v3.html"
@@ -14,6 +15,7 @@ DEMO_USER_FACING_PATHS = [
     REPO_ROOT / "README.md",
     REPO_ROOT / "docs" / "demo-guide.md",
     REPO_ROOT / "docs" / "demo-feature-matrix.md",
+    FEATURE_DEMO_MATRIX,
     FRONTEND_INDEX,
     FRONTEND_APP_JS,
     FRONTEND_SCHEMA,
@@ -348,6 +350,66 @@ def test_frontend_docs_state_static_shell_and_local_first_runtime() -> None:
     assert "plain HTML, CSS, and JavaScript" in readme
     assert "local-data mode" in readme
     assert "before the presenter asks" in readme
+
+
+def test_feature_to_demo_coverage_matrix_treats_mocks_as_contracts() -> None:
+    matrix = _read(FEATURE_DEMO_MATRIX)
+    readme = _read(REPO_ROOT / "README.md")
+    surface_reference = _read(REPO_ROOT / "docs" / "demo-feature-matrix.md")
+
+    assert "Feature-to-Demo Coverage Matrix" in matrix
+    assert "mocks as product contracts" in matrix
+    assert "production capability-to-local mock contract matrix" in surface_reference
+    assert "feature-demo-coverage-matrix.md" in readme
+
+    for heading in (
+        "Production capability",
+        "Local demo equivalent",
+        "Mock source of truth",
+        "Dummy dataset or seed",
+        "UI path",
+        "Contract expectations",
+        "Validation status",
+    ):
+        assert heading in matrix
+
+    required_capabilities = (
+        "Immutable multi-source event ingestion",
+        "Heuristic reconciliation and ownership graph",
+        "Materialized attribution index",
+        "Decision-time interceptor",
+        "Policy evaluation and deployment mode controls",
+        "Pricing catalog and cost estimation",
+        "FinOps reconciliation and drift",
+        "Forecasting and planning",
+        "Optimization interventions",
+        "Workforce and workflow AI adoption intelligence",
+        "Enterprise integrations and operational handoffs",
+        "Chargeback and export posture",
+        "Energy, carbon, and TRAC posture",
+        "Manual mapping and human correction",
+        "Authentication, RBAC, and permission posture",
+        "Observability and readiness",
+        "Shared-backend production topology",
+        "Deterministic reset and local setup",
+        "Security and local safety boundaries",
+        "UI product narrative and design-partner proof",
+    )
+    for capability in required_capabilities:
+        assert capability in matrix
+
+    for contract_term in (
+        "422",
+        "413",
+        "429",
+        "404",
+        "503",
+        "bounded `limit` pagination",
+        "redacted",
+        "demo bypass",
+        "production/staging demo reset is forbidden",
+    ):
+        assert contract_term in matrix
 
 
 def test_frontend_tables_are_wrapped_for_horizontal_scroll() -> None:

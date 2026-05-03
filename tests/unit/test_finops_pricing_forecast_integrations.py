@@ -431,6 +431,58 @@ def test_integrations_overview_and_scenario_dispatch_endpoints() -> None:
         )
 
 
+def test_integrations_list_limits_are_bounded_and_contractual() -> None:
+    app_state = get_state()
+    app_state.notification_hub.clear()
+
+    with TestClient(app) as client:
+        first_dispatch = client.post("/v1/integrations/scenarios/policy-breach/dispatch")
+        second_dispatch = client.post(
+            "/v1/integrations/scenarios/manual-mapping-dispute/dispatch"
+        )
+        assert first_dispatch.status_code == 200
+        assert second_dispatch.status_code == 200
+
+        limited_deliveries = client.get("/v1/integrations/deliveries?limit=1")
+        assert limited_deliveries.status_code == 200
+        limited_payload = limited_deliveries.json()
+        assert len(limited_payload) == 1
+        assert {
+            "delivery_id",
+            "channel",
+            "target",
+            "status",
+            "message",
+            "sent_at",
+            "event_type",
+            "severity",
+            "route_id",
+            "route_name",
+            "workflow_name",
+            "audience",
+            "business_outcome",
+            "scenario_id",
+        } <= limited_payload[0].keys()
+
+        empty_page = client.get("/v1/integrations/deliveries?limit=0")
+        assert empty_page.status_code == 200
+        assert empty_page.json() == []
+
+        limited_overview = client.get("/v1/integrations/overview?limit=1")
+        assert limited_overview.status_code == 200
+        overview_payload = limited_overview.json()
+        assert len(overview_payload["recent_deliveries"]) == 1
+        assert overview_payload["summary"]["recent_delivery_count"] > 1
+        assert overview_payload["summary"]["inbound_source_count"] >= 9
+        assert overview_payload["summary"]["outbound_route_count"] >= 8
+        assert overview_payload["summary"]["scenario_count"] >= 8
+
+        too_many_deliveries = client.get("/v1/integrations/deliveries?limit=101")
+        too_many_overview = client.get("/v1/integrations/overview?limit=101")
+        assert too_many_deliveries.status_code == 422
+        assert too_many_overview.status_code == 422
+
+
 def test_integrations_dispatch_ticketing_scenarios_are_simulated_handoffs() -> None:
     app_state = get_state()
     app_state.notification_hub.clear()

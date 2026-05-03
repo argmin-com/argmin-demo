@@ -675,6 +675,43 @@ def test_event_batch_ingest_rejects_oversized_batches() -> None:
         assert "exceeds configured max" in response.json()["detail"]
 
 
+def test_event_batch_ingest_rejects_empty_batches() -> None:
+    with TestClient(app) as client:
+        response = client.post("/v1/events/ingest/batch", json={"events": []})
+
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["type"] == "too_short"
+
+
+def test_event_batch_ingest_reports_deduplicated_events() -> None:
+    payload = {
+        "events": [
+            {
+                "event_type": "inference.request",
+                "subject_id": "req-batch-dedupe-1",
+                "attributes": {"model": "gpt-4o-mini", "provider": "openai"},
+                "event_time": datetime.now(UTC).isoformat(),
+                "source": "unit-test-batch-contract",
+                "idempotency_key": "req-batch-dedupe-1",
+            },
+            {
+                "event_type": "inference.request",
+                "subject_id": "req-batch-dedupe-duplicate",
+                "attributes": {"model": "gpt-4o-mini", "provider": "openai"},
+                "event_time": datetime.now(UTC).isoformat(),
+                "source": "unit-test-batch-contract",
+                "idempotency_key": "req-batch-dedupe-1",
+            },
+        ]
+    }
+
+    with TestClient(app) as client:
+        response = client.post("/v1/events/ingest/batch", json=payload)
+
+    assert response.status_code == 200
+    assert response.json() == {"total": 2, "accepted": 1, "deduplicated": 1}
+
+
 def test_event_ingest_rate_limit_is_enforced() -> None:
     app_state = get_state()
     app_state.ingest_rate_limiter = SlidingWindowRateLimiter(limit=1, window_seconds=60.0)

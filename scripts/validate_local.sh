@@ -20,6 +20,10 @@ PY
 
 cd "${REPO_ROOT}"
 
+if [[ "${ACI_VALIDATE_SKIP_PREFLIGHT:-0}" != "1" ]]; then
+  ACI_PREFLIGHT_PROFILE=validate ACI_PREFLIGHT_REQUIRE_PORT_FREE=1 "${SCRIPT_DIR}/preflight_local.sh"
+fi
+
 if ! command -v python3 >/dev/null 2>&1; then
   echo "python3 is required to validate the repo." >&2
   exit 1

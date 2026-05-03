@@ -13,8 +13,20 @@ Demonstrate that the platform can:
 
 ## Prerequisites
 
-- Python 3.12+
-- `pip`
+The default demo requires macOS, Linux, or WSL2; `bash`; Python `3.12+`;
+`python3 -m venv`; `python3 -m pip`; `curl`; a modern browser; and one free
+local port. It does not require Node.js, npm/pnpm/yarn, Docker, a database,
+a queue, or cloud credentials.
+
+Run the automated check first:
+
+```bash
+./scripts/preflight_local.sh
+```
+
+For the full OS, Python, Node, Docker, database, browser, port, and
+package-manager matrix, see
+[local-prerequisites.md](local-prerequisites.md).
 
 Change into the repository root first.
 
@@ -34,12 +46,12 @@ cd /path/to/where/you/unzipped/argmin-demo
 ## Run Local Demo
 
 ```bash
-./scripts/run_demo.sh
+./scripts/start_demo.sh
 ```
 
-Open:
-
-- `http://localhost:8000/platform/`
+`start_demo.sh` installs locked demo dependencies, starts the local services,
+waits for health/readiness, restores the deterministic seed baseline, opens the
+browser, and prints synthetic demo login personas.
 
 The local launcher uses the dedicated `demo` runtime profile. It starts single-worker,
 auto-seeds deterministic attribution/index state, and allows auth bypass only in `demo`.
@@ -48,6 +60,9 @@ It installs the minimal local-demo dependencies from `requirements-demo.lock` in
 on later runs unless `requirements-demo.lock` or `pyproject.toml` changes. The
 full `requirements.lock` remains available when you intentionally want the
 production/shared-backend dependency set.
+
+For a lower-level foreground server without browser open or credential printout,
+run `./scripts/run_demo.sh`.
 
 To restore an already running demo to the known seeded baseline:
 

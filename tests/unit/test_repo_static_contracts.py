@@ -26,6 +26,31 @@ def test_shared_backend_smoke_script_is_executable() -> None:
     assert "docker compose -p" in script.read_text(encoding="utf-8")
 
 
+def test_local_preflight_script_documents_all_setup_assumptions() -> None:
+    script = REPO_ROOT / "scripts" / "preflight_local.sh"
+    content = script.read_text(encoding="utf-8")
+
+    assert script.exists()
+    assert script.stat().st_mode & S_IXUSR
+    assert "ACI_PREFLIGHT_PROFILE" in content
+    assert "demo)" in content
+    assert "smoke-demo)" in content
+    assert "validate)" in content
+    assert "shared-backend)" in content
+    assert "all)" in content
+    assert "macOS, Linux, or WSL2" in content
+    assert "Python 3.12+" in content
+    assert "python3 -m venv" in content
+    assert "python3 -m pip" in content
+    assert "Node.js is not required" in content
+    assert "npm/pnpm/yarn are not required" in content
+    assert "Docker is not required for the 30-second demo" in content
+    assert "Docker is required for the shared-backend profile" in content
+    assert "Redis, Kafka, and Neo4j" in content
+    assert "a modern browser is required" in content
+    assert "port ${port} is already in use" in content
+
+
 def test_demo_reset_script_restores_known_backend_state() -> None:
     script = REPO_ROOT / "scripts" / "reset_demo.sh"
     content = script.read_text(encoding="utf-8")
@@ -38,6 +63,31 @@ def test_demo_reset_script_restores_known_backend_state() -> None:
     assert '"${BASE_URL}/health"' in content
     assert '"${BASE_URL}/ready"' in content
     assert '"${BASE_URL}/v1/attribution/customer-support-bot"' in content
+
+
+def test_one_command_startup_script_is_presenter_ready() -> None:
+    script = REPO_ROOT / "scripts" / "start_demo.sh"
+    content = script.read_text(encoding="utf-8")
+
+    assert script.exists()
+    assert script.stat().st_mode & S_IXUSR
+    assert 'PORT="${ACI_DEMO_PORT:-8000}"' in content
+    assert "ACI_PREFLIGHT_PROFILE=demo" in content
+    assert "ACI_DEMO_SKIP_PREFLIGHT=1" in content
+    assert '"${SCRIPT_DIR}/run_demo.sh"' in content
+    assert "nohup env ACI_DEMO_PORT" in content
+    assert 'POST "${BASE_URL}/v1/demo/reset"' in content
+    assert "wait_for_endpoint \"/health\"" in content
+    assert "wait_for_endpoint \"/ready\"" in content
+    assert "open_demo_url" in content
+    assert "Demo login credentials" in content
+    assert "argmin-demo-local" in content
+    assert "auth bypass is enabled" in content
+    assert "demo_accounts" in content
+    assert "ACI_START_DETACH" in content
+    assert "ACI_START_OPEN_BROWSER" in content
+    assert ".demo-start-${PORT}.log" in content
+    assert ".demo-start-${PORT}.pid" in content
 
 
 def test_docker_compose_uses_dummy_local_defaults_instead_of_required_secrets() -> None:
@@ -58,6 +108,7 @@ def test_confidential_exports_are_excluded_from_docker_context() -> None:
 
 
 def test_local_runtime_scripts_have_clear_preflight_guards() -> None:
+    start_demo = (REPO_ROOT / "scripts" / "start_demo.sh").read_text(encoding="utf-8")
     run_demo = (REPO_ROOT / "scripts" / "run_demo.sh").read_text(encoding="utf-8")
     validate_local = (REPO_ROOT / "scripts" / "validate_local.sh").read_text(
         encoding="utf-8"
@@ -65,6 +116,10 @@ def test_local_runtime_scripts_have_clear_preflight_guards() -> None:
     smoke_demo = (REPO_ROOT / "scripts" / "smoke_demo.sh").read_text(encoding="utf-8")
     smoke_stack = (REPO_ROOT / "scripts" / "smoke_stack.sh").read_text(encoding="utf-8")
 
+    assert "ACI_PREFLIGHT_PROFILE=demo" in start_demo
+    assert "ACI_DEMO_SKIP_PREFLIGHT=1" in start_demo
+    assert "Demo login credentials" in start_demo
+    assert "ACI_PREFLIGHT_PROFILE=demo" in run_demo
     assert "Python 3.12+ is required" in run_demo
     assert "require_port_available" in run_demo
     assert "not a usable Python virtual environment" in run_demo
@@ -75,13 +130,48 @@ def test_local_runtime_scripts_have_clear_preflight_guards() -> None:
     assert 'export ACI_NOTIFICATION_LIVE_NETWORK="false"' in run_demo
     assert 'export PYTHONPATH="${REPO_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}"' in run_demo
     assert "pip install --no-deps -e ." not in run_demo
+    assert "exec uvicorn aci.api.app:app" in run_demo
+    assert "ACI_PREFLIGHT_PROFILE=validate" in validate_local
     assert "Python 3.12+ is required" in validate_local
     assert "not a usable Python virtual environment" in validate_local
+    assert "ACI_PREFLIGHT_PROFILE=smoke-demo" in smoke_demo
     assert "port ${PORT} is already in use" in smoke_demo
     assert '.demo-smoke-${PORT}.log' in smoke_demo
+    assert "ACI_DEMO_SKIP_PREFLIGHT=1" in smoke_demo
+    assert "ACI_PREFLIGHT_PROFILE=shared-backend" in smoke_stack
     assert "curl is required" in smoke_stack
     assert "docker compose up failed" in smoke_stack
     assert "readiness endpoint did not become ready" in smoke_stack
+
+
+def test_local_prerequisites_are_documented_in_user_facing_docs() -> None:
+    prereqs = (REPO_ROOT / "docs" / "local-prerequisites.md").read_text(
+        encoding="utf-8"
+    )
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    demo_guide = (REPO_ROOT / "docs" / "demo-guide.md").read_text(encoding="utf-8")
+    frontend_readme = (REPO_ROOT / "frontend" / "README.md").read_text(
+        encoding="utf-8"
+    )
+
+    for content in (prereqs, readme, demo_guide):
+        assert "macOS, Linux, or WSL2" in content
+        assert "Python `3.12+`" in content or "Python 3.12+" in content
+        assert "Node.js" in content
+        assert "Docker" in content
+        assert "database" in content.lower()
+        assert "browser" in content.lower()
+        assert "port" in content.lower()
+        assert "package-manager" in content or "package manager" in content
+
+    assert "./scripts/preflight_local.sh" in readme
+    assert "./scripts/preflight_local.sh" in demo_guide
+    assert "./scripts/start_demo.sh" in readme
+    assert "./scripts/start_demo.sh" in demo_guide
+    assert "./scripts/start_demo.sh" in prereqs
+    assert "../docs/local-prerequisites.md" in frontend_readme
+    assert "not require Node.js" in readme
+    assert "No Docker requirement for the default demo path" in prereqs
 
 
 def test_generated_browser_artifacts_are_excluded_from_repo_contexts() -> None:
@@ -97,6 +187,7 @@ def test_generated_browser_artifacts_are_excluded_from_repo_contexts() -> None:
         ]
 
     assert ".playwright-cli/" in gitignore
+    assert ".demo-start-*.pid" in gitignore
     assert ".playwright-cli" in dockerignore
     assert committed_snapshots == []
 
