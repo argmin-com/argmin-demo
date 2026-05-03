@@ -22,14 +22,17 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Protocol
 
 import structlog
-from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
-from aiokafka.structs import OffsetAndMetadata
-from redis.asyncio import Redis as AsyncRedis
 
 from aci.core.event_schema import validate_domain_event
 from aci.models.events import DomainEvent
+from aci.optional_deps import (
+    load_aiokafka,
+    load_aiokafka_offset_metadata,
+    load_async_redis,
+)
 
 if TYPE_CHECKING:
+    from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
     from aiokafka.structs import TopicPartition
 
 logger = structlog.get_logger()
@@ -79,7 +82,10 @@ class RedisIdempotencyStore:
         ttl_seconds: int,
         key_prefix: str = "aci:idempotency",
     ) -> None:
-        self._redis = AsyncRedis.from_url(redis_url, decode_responses=True)
+        self._redis = load_async_redis("Redis event-bus idempotency").from_url(
+            redis_url,
+            decode_responses=True,
+        )
         self._ttl_seconds = ttl_seconds
         self._key_prefix = key_prefix
 
@@ -132,12 +138,23 @@ class InMemoryEventBus:
         """No-op for interface parity with durable bus backends."""
         return None
 
+    def clear(self) -> None:
+        """Reset in-memory demo/test event state while preserving subscriptions."""
+        self._log.clear()
+        self._seen_keys.clear()
+        self._idempotency_order.clear()
+        self._published_count = 0
+        self._deduplicated_count = 0
+        self._idempotency_evictions = 0
+        self._topic_counts.clear()
+        self._dispatch_errors = 0
+
     @property
     def is_started(self) -> bool:
         """In-memory backend is always available once instantiated."""
         return True
 
-    async def publish(self, event: DomainEvent) -> bool:
+    async def publish(self, event: DomainEvent, *, dispatch: bool = True) -> bool:
         """
         Publish an event to the bus.
 
@@ -164,6 +181,9 @@ class InMemoryEventBus:
             self._log.append(event)
             self._published_count += 1
             self._topic_counts[topic] += 1
+
+        if not dispatch:
+            return True
 
         with self._handler_lock:
             handlers = [
@@ -201,12 +221,17 @@ class InMemoryEventBus:
         with self._handler_lock:
             self._handlers[topic].append(handler)
 
-    async def publish_batch(self, events: list[DomainEvent]) -> dict[str, int]:
+    async def publish_batch(
+        self,
+        events: list[DomainEvent],
+        *,
+        dispatch: bool = True,
+    ) -> dict[str, int]:
         """Publish a batch of events and return publish/dedup counts."""
         published = 0
         deduplicated = 0
         for event in events:
-            accepted = await self.publish(event)
+            accepted = await self.publish(event, dispatch=dispatch)
             if accepted:
                 published += 1
             else:
@@ -306,7 +331,9 @@ class KafkaEventBus:
         if self._started:
             return
 
-        self._producer = AIOKafkaProducer(
+        aiokafka_consumer, aiokafka_producer = load_aiokafka("Kafka event bus")
+
+        self._producer = aiokafka_producer(
             bootstrap_servers=self._bootstrap_servers,
             acks="all",
             enable_idempotence=True,
@@ -315,7 +342,7 @@ class KafkaEventBus:
         await self._producer.start()
 
         if self._consume_messages:
-            self._consumer = AIOKafkaConsumer(
+            self._consumer = aiokafka_consumer(
                 self._topic,
                 bootstrap_servers=self._bootstrap_servers,
                 group_id=self._consumer_group,
@@ -364,7 +391,8 @@ class KafkaEventBus:
         with self._handler_lock:
             self._handlers[topic].append(handler)
 
-    async def publish(self, event: DomainEvent) -> bool:
+    async def publish(self, event: DomainEvent, *, dispatch: bool = True) -> bool:
+        del dispatch
         validate_domain_event(event)
 
         if not self._started:
@@ -387,7 +415,13 @@ class KafkaEventBus:
         self._published_count += 1
         return True
 
-    async def publish_batch(self, events: list[DomainEvent]) -> dict[str, int]:
+    async def publish_batch(
+        self,
+        events: list[DomainEvent],
+        *,
+        dispatch: bool = True,
+    ) -> dict[str, int]:
+        del dispatch
         published = 0
         deduplicated = 0
         for event in events:
@@ -442,8 +476,10 @@ class KafkaEventBus:
 
     async def _commit_offset(self, topic_partition: TopicPartition, offset: int) -> None:
         """Commit a processed offset with explicit metadata type."""
+        offset_and_metadata = load_aiokafka_offset_metadata("Kafka event-bus offset commits")
+
         assert self._consumer is not None
-        await self._consumer.commit({topic_partition: OffsetAndMetadata(offset + 1, "")})
+        await self._consumer.commit({topic_partition: offset_and_metadata(offset + 1, "")})
 
     async def _dispatch_event(self, event: DomainEvent) -> None:
         topic = event.event_type.value

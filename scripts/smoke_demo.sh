@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PORT="${ACI_DEMO_PORT:-8010}"
 BASE_URL="http://127.0.0.1:${PORT}"
-SERVER_LOG="${REPO_ROOT}/.demo-smoke.log"
+SERVER_LOG="${REPO_ROOT}/.demo-smoke-${PORT}.log"
 
 fail() {
   echo "Demo smoke failed: $*" >&2
@@ -26,8 +26,28 @@ trap cleanup EXIT
 
 cd "${REPO_ROOT}"
 
+if ! command -v python3 >/dev/null 2>&1; then
+  fail "python3 is required"
+fi
+
 if ! command -v curl >/dev/null 2>&1; then
   fail "curl is required"
+fi
+
+if ! python3 - "${PORT}" <<'PY'
+import socket
+import sys
+
+port = int(sys.argv[1])
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        sock.bind(("127.0.0.1", port))
+    except OSError:
+        raise SystemExit(1)
+PY
+then
+  fail "port ${PORT} is already in use; set ACI_DEMO_PORT to an available port"
 fi
 
 ACI_DEMO_PORT="${PORT}" ACI_DEMO_RELOAD=0 ./scripts/run_demo.sh >"${SERVER_LOG}" 2>&1 &

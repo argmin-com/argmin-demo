@@ -130,6 +130,18 @@ def test_root_and_health_endpoints() -> None:
         assert "aci_interceptor_latency_p99" in prom.text
 
 
+def test_root_redirects_browser_preview_to_platform_demo() -> None:
+    with TestClient(app) as client:
+        response = client.get(
+            "/",
+            headers={"Accept": "text/html,application/xhtml+xml"},
+            follow_redirects=False,
+        )
+
+    assert response.status_code == 307
+    assert response.headers["location"] == "/platform/"
+
+
 def test_health_echoes_correlation_id_header() -> None:
     with TestClient(app) as client:
         response = client.get("/health", headers={"X-ACI-Correlation-Id": "corr-health-1"})
@@ -153,12 +165,12 @@ def test_platform_demo_serves_csp_header_for_frame_ancestors() -> None:
 def test_platform_demo_assets_are_versioned_and_not_cached() -> None:
     with TestClient(app) as client:
         html = client.get("/platform/")
-        js = client.get("/platform/assets/app.js?v=20260309b")
+        js = client.get("/platform/assets/app.js?v=20260309e")
 
     assert html.status_code == 200
-    assert 'src="assets/app.js?v=20260309b"' in html.text
-    assert 'href="assets/app.css?v=20260309b"' in html.text
-    assert 'src="vendor/chart.umd.min.js?v=20260309b"' in html.text
+    assert 'src="assets/app.js?v=20260309e"' in html.text
+    assert 'href="assets/app.css?v=20260309e"' in html.text
+    assert 'src="vendor/chart.umd.min.js?v=20260309e"' in html.text
     assert js.status_code == 200
     assert js.headers["Cache-Control"] == "no-store, max-age=0"
     assert js.headers["Pragma"] == "no-cache"
@@ -330,8 +342,9 @@ def test_demo_bootstrap_seeds_interceptable_workloads() -> None:
         bootstrap = client.post("/v1/demo/bootstrap")
         assert bootstrap.status_code == 200
         payload = bootstrap.json()
-        assert payload["seeded_entries"] >= 3
+        assert payload["seeded_entries"] >= 9
         assert "customer-support-bot" in payload["workloads"]
+        assert "support-bot-staging" in payload["workloads"]
 
         intercept = client.post(
             "/v1/intercept",
@@ -348,6 +361,38 @@ def test_demo_bootstrap_seeds_interceptable_workloads() -> None:
         )
         assert intercept.status_code == 200
         assert intercept.json()["outcome"] != "fail_open"
+
+
+def test_demo_bootstrap_seeds_manual_mapping_workloads_for_live_correction() -> None:
+    app_state = get_state()
+    app_state.config.environment = "development"
+
+    with TestClient(app) as client:
+        bootstrap = client.post("/v1/demo/bootstrap")
+        assert bootstrap.status_code == 200
+
+        correction = client.post(
+            "/v1/attribution/manual",
+            json={
+                "workload_id": "support-bot-staging",
+                "true_team_id": "team-platform-engineering",
+                "true_team_name": "Platform Engineering",
+                "true_cost_center_id": "CC-PLATFORM",
+                "true_cost_center_name": "Platform Engineering",
+                "actor": "unit-test",
+                "note": "live manual correction parity check",
+            },
+        )
+
+    assert correction.status_code == 200
+    payload = correction.json()
+    assert payload["updated_team_name"] == "Platform Engineering"
+    assert payload["confidence_after"] == 1.0
+
+    updated = app_state.index_store.lookup("support-bot-staging")
+    assert updated is not None
+    assert updated.team_name == "Platform Engineering"
+    assert updated.method_used == "MANUAL_CORRECTION"
 
 
 def test_demo_bootstrap_seeds_adoption_dashboard() -> None:
@@ -371,6 +416,73 @@ def test_demo_bootstrap_seeds_adoption_dashboard() -> None:
         assert dashboard_payload["summary"]["active_employees_30d"] > 0
         assert dashboard_payload["executive_lenses"]
         assert dashboard_payload["top_employees"]
+
+
+def test_demo_reset_restores_deterministic_runtime_baseline() -> None:
+    app_state = get_state()
+    app_state.config.environment = "demo"
+
+    with TestClient(app) as client:
+        first = client.post("/v1/demo/reset")
+        assert first.status_code == 200
+        first_payload = first.json()
+        assert first_payload["reference_time"] == "2026-02-28T17:00:00+00:00"
+        assert first_payload["reset_token"] == "argmin-demo-baseline-v1"
+        assert len(first_payload["scenario_ids"]) == 8
+        assert len(first_payload["demo_accounts"]) >= 6
+        assert first_payload["events_published"] == 6
+
+        mode = client.post("/v1/demo/mode", json={"mode": "active"})
+        assert mode.status_code == 200
+        assert app_state.interceptor.mode == DeploymentMode.ACTIVE
+
+        correction = client.post(
+            "/v1/attribution/manual",
+            json={
+                "workload_id": "support-bot-staging",
+                "true_team_id": "team-platform-engineering",
+                "true_team_name": "Platform Engineering",
+                "true_cost_center_id": "CC-PLATFORM",
+                "true_cost_center_name": "Platform Engineering",
+                "actor": "unit-test",
+                "note": "intentional mutation before reset",
+            },
+        )
+        assert correction.status_code == 200
+        assert correction.json()["event_id"] == (
+            "evt-demo-manual-support-bot-staging-team-platform-engineering-cc-platform"
+        )
+
+        intervention = client.post(
+            "/v1/interventions/INT-401/status",
+            json={"status": "approved", "actor": "unit-test", "note": "mutation"},
+        )
+        assert intervention.status_code == 200
+        assert intervention.json()["status"] == "approved"
+
+        second = client.post("/v1/demo/reset")
+        assert second.status_code == 200
+        second_payload = second.json()
+        assert second_payload == first_payload
+        assert app_state.interceptor.mode.value == "advisory"
+
+        attribution = client.get("/v1/attribution/support-bot-staging")
+        assert attribution.status_code == 200
+        attribution_payload = attribution.json()
+        assert attribution_payload["team_name"] == "Customer Engineering"
+        assert attribution_payload["method_used"] == "R5"
+
+        summary = client.get("/v1/interventions/summary")
+        assert summary.status_code == 200
+        assert summary.json()["approved_count"] == 0
+
+        deliveries = client.get("/v1/integrations/deliveries")
+        assert deliveries.status_code == 200
+        delivery_payload = deliveries.json()
+        assert {item["scenario_id"] for item in delivery_payload} >= set(
+            first_payload["scenario_ids"]
+        )
+        assert all(item["sent_at"].startswith("2026-02-28T17:") for item in delivery_payload)
 
 
 def test_adoption_dashboard_supports_scope_drilldown() -> None:
@@ -431,6 +543,16 @@ def test_demo_bootstrap_disabled_in_production() -> None:
     app_state.config.auth.enabled = False
     with TestClient(app) as client:
         response = client.post("/v1/demo/bootstrap")
+        assert response.status_code == 403
+        assert "disabled in production" in response.json()["detail"]
+
+
+def test_demo_reset_disabled_in_production() -> None:
+    app_state = get_state()
+    app_state.config.environment = "production"
+    app_state.config.auth.enabled = False
+    with TestClient(app) as client:
+        response = client.post("/v1/demo/reset")
         assert response.status_code == 403
         assert "disabled in production" in response.json()["detail"]
 

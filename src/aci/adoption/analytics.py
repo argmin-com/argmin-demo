@@ -10,8 +10,8 @@ from threading import RLock
 from typing import TYPE_CHECKING, Literal, Protocol, cast
 
 import structlog
-from redis import Redis as SyncRedis
-from redis.exceptions import RedisError
+
+from aci.optional_deps import RedisPackageError, load_sync_redis
 
 if TYPE_CHECKING:
     from aci.models.events import DomainEvent
@@ -230,12 +230,19 @@ class AdoptionAnalytics:
             redis_client
             if redis_client is not None
             else (
-                cast("SupportsRedisAdoption", SyncRedis.from_url(redis_url, decode_responses=True))
+                cast(
+                    "SupportsRedisAdoption",
+                    load_sync_redis("Redis adoption backend").from_url(
+                        redis_url,
+                        decode_responses=True,
+                    ),
+                )
                 if redis_url
                 else None
             )
         )
         self._durable_errors = 0
+        self._reference_time: datetime | None = None
         if self._redis is not None:
             self._load_from_redis()
 
@@ -248,7 +255,15 @@ class AdoptionAnalytics:
         with self._lock:
             self._employees.clear()
             self._daily_usage.clear()
+            self._reference_time = None
         self._persist()
+
+    def set_reference_time(self, reference_time: datetime | None) -> None:
+        """Pin dashboard windows for deterministic demo/test baselines."""
+        with self._lock:
+            self._reference_time = (
+                reference_time.astimezone(UTC) if reference_time is not None else None
+            )
 
     def close(self) -> None:
         if self._redis is not None:
@@ -259,9 +274,18 @@ class AdoptionAnalytics:
             return True
         try:
             return bool(self._redis.ping())
-        except RedisError:
+        except RedisPackageError:
             self._durable_errors += 1
             return False
+
+    def _clock_now(self) -> datetime:
+        with self._lock:
+            if self._reference_time is not None:
+                return self._reference_time
+        return datetime.now(UTC)
+
+    def _today(self) -> date:
+        return self._clock_now().date()
 
     def upsert_employee(
         self,
@@ -638,7 +662,7 @@ class AdoptionAnalytics:
         )
 
         return AdoptionDashboard(
-            generated_at=datetime.now(UTC),
+            generated_at=self._clock_now(),
             scope_type=scope_type,
             scope_id=resolved_scope_id,
             scope_label=scope_label,
@@ -705,7 +729,7 @@ class AdoptionAnalytics:
         record.eligible_for_ai = bool(eligible_for_ai)
         if last_identity_login_at is not None:
             record.last_identity_login_at = last_identity_login_at.astimezone(UTC)
-        record.updated_at = datetime.now(UTC)
+        record.updated_at = self._clock_now()
 
     def _prune_locked(self, *, reference_day: date) -> None:
         cutoff = (reference_day - timedelta(days=self._retention_days)).isoformat()
@@ -727,7 +751,7 @@ class AdoptionAnalytics:
         *,
         window_days: int,
     ) -> list[_EmployeeWindowAggregate]:
-        today = datetime.now(UTC).date()
+        today = self._today()
         current_start = today - timedelta(days=window_days - 1)
         prior_start = current_start - timedelta(days=window_days)
         prior_end = current_start - timedelta(days=1)
@@ -942,7 +966,7 @@ class AdoptionAnalytics:
         usage: dict[str, dict[str, DailyUsageRollup]],
     ) -> list[AdoptionTrendPoint]:
         del employees
-        today = datetime.now(UTC).date()
+        today = self._today()
         start = today.replace(day=1) - timedelta(days=150)
         monthly: dict[str, _MonthlyTrendBucket] = {}
 
@@ -1169,7 +1193,7 @@ class AdoptionAnalytics:
         }
         try:
             self._redis.set(self._snapshot_key(), json.dumps(snapshot, separators=(",", ":")))
-        except RedisError as exc:
+        except RedisPackageError as exc:
             self._durable_errors += 1
             logger.warning("adoption.persist_failed", error=str(exc))
 
@@ -1178,7 +1202,7 @@ class AdoptionAnalytics:
             return
         try:
             raw = self._redis.get(self._snapshot_key())
-        except RedisError as exc:
+        except RedisPackageError as exc:
             self._durable_errors += 1
             logger.warning("adoption.load_failed", error=str(exc))
             return

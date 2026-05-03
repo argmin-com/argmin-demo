@@ -1690,6 +1690,897 @@
           }
         ]
       }
+    },
+    "workflow_map": {
+      "summary": {
+        "organization_label": "NovaTech Industries",
+        "workflow_count": 20,
+        "business_units_with_adoption": 4,
+        "teams_with_adoption": 4,
+        "ai_services_used": 17,
+        "capability_classes": 20,
+        "embedded_or_scaled_workflows": 14,
+        "governed_workflow_pct": 88.5,
+        "primary_adoption_pattern": "AI is moving from individual copilots into governed operational workflow steps across product, support, risk, and finance.",
+        "highest_maturity_signal": "Platform Engineering and Customer Engineering have the most workflow-embedded adoption, with Finance now entering close and renewal workflows.",
+        "lowest_maturity_signal": "Procurement and SaaS-seat workflows are valuable but still depend on proxy signals and review queues."
+      },
+      "capabilities": [
+        {
+          "capability": "Agentic task orchestration",
+          "category": "Workflow automation",
+          "primary_services": [
+            "LangGraph + Anthropic Claude via Bedrock"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Alert triage and summarization",
+          "category": "Operations intelligence",
+          "primary_services": [
+            "Anthropic Claude via AWS Bedrock"
+          ],
+          "workflow_count": 2
+        },
+        {
+          "capability": "Audit evidence packaging",
+          "category": "GRC evidence",
+          "primary_services": [
+            "Mistral Large + Cohere Command R+"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Case summarization and response drafting",
+          "category": "Customer operations intelligence",
+          "primary_services": [
+            "OpenAI GPT-4o-mini + Salesforce Einstein"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Code generation and review",
+          "category": "Developer productivity",
+          "primary_services": [
+            "GitHub Copilot + OpenAI GPT-4o"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Contract analysis",
+          "category": "Procurement",
+          "primary_services": [
+            "Azure OpenAI GPT-4o"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Cost regression detection",
+          "category": "Financial operations intelligence",
+          "primary_services": [
+            "Argmin forecast planner + pricing catalog"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Exception review and risk rationale",
+          "category": "Governance operations",
+          "primary_services": [
+            "Mistral Large + Argmin policy simulation"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Financial reconciliation",
+          "category": "Finance operations",
+          "primary_services": [
+            "Argmin attribution graph + Snowflake Cortex AI"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Grounded answer retrieval",
+          "category": "Knowledge retrieval",
+          "primary_services": [
+            "Snowflake Cortex AI + OpenAI GPT-4o-mini"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Policy classification",
+          "category": "Governance and risk",
+          "primary_services": [
+            "Argmin policy engine + OpenAI GPT-4o-mini"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Policy-aware model routing",
+          "category": "Governance and routing",
+          "primary_services": [
+            "Argmin policy engine + OpenAI GPT-4o-mini"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Provider concentration and substitution analysis",
+          "category": "Strategic sourcing intelligence",
+          "primary_services": [
+            "Command R+ + Argmin model landscape"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Requirement extraction and traceability",
+          "category": "Product operating intelligence",
+          "primary_services": [
+            "OpenAI GPT-4o / Argmin PRD Proof"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Retrieval augmented answers",
+          "category": "Knowledge intelligence",
+          "primary_services": [
+            "Snowflake Cortex AI"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Scenario planning",
+          "category": "Financial planning",
+          "primary_services": [
+            "OpenAI GPT-4o + Argmin forecasting"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Support response generation",
+          "category": "Customer operations",
+          "primary_services": [
+            "OpenAI GPT-4o-mini + Salesforce Einstein"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Variance explanation and close memo drafting",
+          "category": "Finance operations intelligence",
+          "primary_services": [
+            "AWS Titan Text Premier + OpenAI GPT-4o"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Vulnerability summarization",
+          "category": "Security operations intelligence",
+          "primary_services": [
+            "Claude via AWS Bedrock + GitHub Advanced Security"
+          ],
+          "workflow_count": 1
+        }
+      ],
+      "services": [
+        {
+          "service": "AWS Titan Text Premier + OpenAI GPT-4o",
+          "provider": "AWS / OpenAI",
+          "service_type": "Finance operations AI",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "Anthropic Claude via AWS Bedrock",
+          "provider": "AWS Bedrock",
+          "service_type": "Managed model platform",
+          "used_by_workflows": 2,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "Argmin attribution graph + Snowflake Cortex AI",
+          "provider": "Argmin / Snowflake",
+          "service_type": "Finance analytics AI",
+          "used_by_workflows": 1,
+          "governance_posture": "Proxy or review required"
+        },
+        {
+          "service": "Argmin forecast planner + pricing catalog",
+          "provider": "Argmin",
+          "service_type": "Cost intelligence",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "Argmin policy engine + OpenAI GPT-4o-mini",
+          "provider": "Argmin / OpenAI",
+          "service_type": "Governed model gateway",
+          "used_by_workflows": 2,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "Azure OpenAI GPT-4o",
+          "provider": "Microsoft Azure",
+          "service_type": "Private endpoint model platform",
+          "used_by_workflows": 1,
+          "governance_posture": "Proxy or review required"
+        },
+        {
+          "service": "Claude via AWS Bedrock + GitHub Advanced Security",
+          "provider": "AWS Bedrock / GitHub",
+          "service_type": "Security operations AI",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "Command R+ + Argmin model landscape",
+          "provider": "Cohere / Argmin",
+          "service_type": "Procurement analytics",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "GitHub Copilot + OpenAI GPT-4o",
+          "provider": "GitHub / OpenAI",
+          "service_type": "Developer productivity AI",
+          "used_by_workflows": 1,
+          "governance_posture": "Proxy or review required"
+        },
+        {
+          "service": "LangGraph + Anthropic Claude via Bedrock",
+          "provider": "Internal platform / AWS Bedrock",
+          "service_type": "Agentic workflow",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "Mistral Large + Argmin policy simulation",
+          "provider": "Mistral AI / Argmin",
+          "service_type": "Governance and compliance AI",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "Mistral Large + Cohere Command R+",
+          "provider": "Mistral AI / Cohere",
+          "service_type": "Hosted model API",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "OpenAI GPT-4o + Argmin forecasting",
+          "provider": "OpenAI / Argmin",
+          "service_type": "Planning assistant",
+          "used_by_workflows": 1,
+          "governance_posture": "Proxy or review required"
+        },
+        {
+          "service": "OpenAI GPT-4o / Argmin PRD Proof",
+          "provider": "Argmin / OpenAI",
+          "service_type": "Product intelligence",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "OpenAI GPT-4o-mini + Salesforce Einstein",
+          "provider": "OpenAI / Salesforce",
+          "service_type": "Embedded SaaS and API model",
+          "used_by_workflows": 2,
+          "governance_posture": "Gateway-routed"
+        },
+        {
+          "service": "Snowflake Cortex AI",
+          "provider": "Snowflake",
+          "service_type": "Data platform AI",
+          "used_by_workflows": 1,
+          "governance_posture": "Proxy or review required"
+        },
+        {
+          "service": "Snowflake Cortex AI + OpenAI GPT-4o-mini",
+          "provider": "Snowflake / OpenAI",
+          "service_type": "Retrieval augmented generation",
+          "used_by_workflows": 1,
+          "governance_posture": "Proxy or review required"
+        }
+      ],
+      "workflows": [
+        {
+          "id": "wf-platform-routing",
+          "business_unit_id": "bu-product-platform",
+          "business_unit_name": "Product and Platform",
+          "team_id": "team-platform-engineering",
+          "team_name": "Platform Engineering",
+          "workflow_name": "Inference routing and cost guardrails",
+          "workflow_stage": "Production request path",
+          "service_name": "Argmin policy engine + OpenAI GPT-4o-mini",
+          "provider": "Argmin / OpenAI",
+          "ai_service_category": "Governed model gateway",
+          "capability": "Policy-aware model routing",
+          "capability_class": "Governance and routing",
+          "entry_point": "internal AI gateway",
+          "embedded_in": "Every approved app-to-model request before provider dispatch",
+          "exact_where": "Between application request construction and provider API invocation",
+          "how_adopted": "Teams send requests through the shared gateway so ownership, model, cost, and policy context are attached before the request leaves the customer boundary.",
+          "user_persona": "Platform engineers and service owners",
+          "users_30d": 42,
+          "requests_30d": 184200,
+          "repeat_user_rate_pct": 78.0,
+          "governed_usage_pct": 96.1,
+          "adoption_depth": "Scaled",
+          "maturity_score": 92,
+          "spend_30d_usd": 142600,
+          "primary_signal": "gateway request metadata",
+          "decision_owner": "Head of Platform Engineering",
+          "evidence": "Gateway logs, service catalog ownership, policy decision record, provider billing reconciliation",
+          "next_step": "Expand route-level policy simulation to the two remaining private endpoints."
+        },
+        {
+          "id": "wf-dev-pr-review",
+          "business_unit_id": "bu-product-platform",
+          "business_unit_name": "Product and Platform",
+          "team_id": "team-platform-engineering",
+          "team_name": "Platform Engineering",
+          "workflow_name": "Pull-request explanation and code review",
+          "workflow_stage": "Software delivery",
+          "service_name": "GitHub Copilot + OpenAI GPT-4o",
+          "provider": "GitHub / OpenAI",
+          "ai_service_category": "Developer productivity AI",
+          "capability": "Code generation and review",
+          "capability_class": "Developer productivity",
+          "entry_point": "GitHub PR and IDE assistant",
+          "embedded_in": "PR authoring, test explanation, migration notes, and reviewer prep",
+          "exact_where": "Inside the pull-request loop after code changes and before human approval",
+          "how_adopted": "Developers use Copilot for local coding and route higher-risk review summaries through governed GPT-4o prompts linked to repo ownership.",
+          "user_persona": "Software engineers",
+          "users_30d": 176,
+          "requests_30d": 96200,
+          "repeat_user_rate_pct": 72.4,
+          "governed_usage_pct": 81.5,
+          "adoption_depth": "Embedded",
+          "maturity_score": 84,
+          "spend_30d_usd": 52900,
+          "primary_signal": "seat activity plus repository ownership",
+          "decision_owner": "VP Engineering",
+          "evidence": "GitHub seat activity, PR metadata, repo CODEOWNERS, gateway prompts",
+          "next_step": "Separate personal coding proxy spend from governed PR-review prompts."
+        },
+        {
+          "id": "wf-incident-triage",
+          "business_unit_id": "bu-product-platform",
+          "business_unit_name": "Product and Platform",
+          "team_id": "team-platform-engineering",
+          "team_name": "Platform Engineering",
+          "workflow_name": "Incident triage and customer-impact summary",
+          "workflow_stage": "Incident response",
+          "service_name": "Anthropic Claude via AWS Bedrock",
+          "provider": "AWS Bedrock",
+          "ai_service_category": "Managed model platform",
+          "capability": "Alert triage and summarization",
+          "capability_class": "Operations intelligence",
+          "entry_point": "PagerDuty incident workspace",
+          "embedded_in": "Incident declaration, status page draft, and post-incident timeline creation",
+          "exact_where": "After alert correlation and before incident commander status update",
+          "how_adopted": "On-call engineers summarize telemetry, logs, and customer impact using Bedrock calls tied to incident IDs and service owners.",
+          "user_persona": "SREs and incident commanders",
+          "users_30d": 38,
+          "requests_30d": 18440,
+          "repeat_user_rate_pct": 64.2,
+          "governed_usage_pct": 92.0,
+          "adoption_depth": "Embedded",
+          "maturity_score": 81,
+          "spend_30d_usd": 24700,
+          "primary_signal": "incident_id and IAM role",
+          "decision_owner": "Director of Reliability",
+          "evidence": "PagerDuty incident ID, CloudTrail invocation logs, service ownership map",
+          "next_step": "Add confidence scoring when customer-impact source data is incomplete."
+        },
+        {
+          "id": "wf-support-copilot",
+          "business_unit_id": "bu-customer-operations",
+          "business_unit_name": "Customer Operations",
+          "team_id": "team-customer-engineering",
+          "team_name": "Customer Engineering",
+          "workflow_name": "Support ticket response copilot",
+          "workflow_stage": "Customer support execution",
+          "service_name": "OpenAI GPT-4o-mini + Salesforce Einstein",
+          "provider": "OpenAI / Salesforce",
+          "ai_service_category": "Embedded SaaS and API model",
+          "capability": "Support response generation",
+          "capability_class": "Customer operations",
+          "entry_point": "support-copilot",
+          "embedded_in": "Case triage, customer-history summary, and draft response generation",
+          "exact_where": "Inside the agent console before the support representative sends a response",
+          "how_adopted": "Support reps generate drafts from case context, while policy checks flag risky refunds or regulated language before send.",
+          "user_persona": "Support representatives",
+          "users_30d": 126,
+          "requests_30d": 34410,
+          "repeat_user_rate_pct": 68.3,
+          "governed_usage_pct": 87.4,
+          "adoption_depth": "Embedded",
+          "maturity_score": 83,
+          "spend_30d_usd": 70100,
+          "primary_signal": "case_id and user identity",
+          "decision_owner": "VP Customer Operations",
+          "evidence": "CRM case ID, support agent identity, gateway model usage, policy decision record",
+          "next_step": "Track resolution-quality feedback against generated draft usage."
+        },
+        {
+          "id": "wf-refund-agent",
+          "business_unit_id": "bu-customer-operations",
+          "business_unit_name": "Customer Operations",
+          "team_id": "team-customer-engineering",
+          "team_name": "Customer Engineering",
+          "workflow_name": "Refund exception agent",
+          "workflow_stage": "Customer escalation",
+          "service_name": "LangGraph + Anthropic Claude via Bedrock",
+          "provider": "Internal platform / AWS Bedrock",
+          "ai_service_category": "Agentic workflow",
+          "capability": "Agentic task orchestration",
+          "capability_class": "Workflow automation",
+          "entry_point": "refund-escalation-agent",
+          "embedded_in": "Refund eligibility review, policy lookup, draft approval packet, and manager escalation",
+          "exact_where": "After a refund request breaches the normal approval threshold and before manager decision",
+          "how_adopted": "The agent chains retrieval, classification, and draft approval steps under one root_request_id so cost and evidence roll up to the escalation workflow.",
+          "user_persona": "Customer escalation managers",
+          "users_30d": 28,
+          "requests_30d": 9100,
+          "repeat_user_rate_pct": 54.0,
+          "governed_usage_pct": 91.2,
+          "adoption_depth": "Emerging",
+          "maturity_score": 69,
+          "spend_30d_usd": 18400,
+          "primary_signal": "root_request_id and escalation_id",
+          "decision_owner": "Director of Customer Engineering",
+          "evidence": "Agent lineage events, CRM escalation ID, policy bundle version, manager approval record",
+          "next_step": "Close the one missing child-span propagation gap before treating it as fully embedded."
+        },
+        {
+          "id": "wf-kb-gap-mining",
+          "business_unit_id": "bu-customer-operations",
+          "business_unit_name": "Customer Operations",
+          "team_id": "team-customer-engineering",
+          "team_name": "Customer Engineering",
+          "workflow_name": "Knowledge-base gap mining",
+          "workflow_stage": "Customer operations planning",
+          "service_name": "Snowflake Cortex AI",
+          "provider": "Snowflake",
+          "ai_service_category": "Data platform AI",
+          "capability": "Retrieval augmented answers",
+          "capability_class": "Knowledge intelligence",
+          "entry_point": "cx-analytics-workbench",
+          "embedded_in": "Weekly review of unresolved tickets, missing articles, and support deflection opportunities",
+          "exact_where": "After ticket warehouse refresh and before the weekly CX operations planning meeting",
+          "how_adopted": "Operations analysts classify ticket clusters and generate suggested knowledge-base updates directly inside the data warehouse workflow.",
+          "user_persona": "CX operations analysts",
+          "users_30d": 14,
+          "requests_30d": 6210,
+          "repeat_user_rate_pct": 47.5,
+          "governed_usage_pct": 76.8,
+          "adoption_depth": "Emerging",
+          "maturity_score": 62,
+          "spend_30d_usd": 10100,
+          "primary_signal": "query tag and workspace owner",
+          "decision_owner": "Head of CX Operations",
+          "evidence": "Snowflake query tags, warehouse usage, ticket cluster ID, analyst identity",
+          "next_step": "Connect accepted article updates back to ticket deflection impact."
+        },
+        {
+          "id": "wf-sec-alert-triage",
+          "business_unit_id": "bu-risk-and-trust",
+          "business_unit_name": "Risk and Trust",
+          "team_id": "team-security",
+          "team_name": "Security",
+          "workflow_name": "Security alert triage workbench",
+          "workflow_stage": "Security operations",
+          "service_name": "Anthropic Claude via AWS Bedrock",
+          "provider": "AWS Bedrock",
+          "ai_service_category": "Managed model platform",
+          "capability": "Alert triage and summarization",
+          "capability_class": "Security operations",
+          "entry_point": "security-workbench",
+          "embedded_in": "SIEM alert explanation, evidence gathering, and analyst handoff notes",
+          "exact_where": "After SIEM correlation and before analyst severity disposition",
+          "how_adopted": "Security analysts ask for concise alert summaries and recommended evidence checks while preserving human severity decisions.",
+          "user_persona": "Security analysts",
+          "users_30d": 82,
+          "requests_30d": 22180,
+          "repeat_user_rate_pct": 62.1,
+          "governed_usage_pct": 91.0,
+          "adoption_depth": "Embedded",
+          "maturity_score": 79,
+          "spend_30d_usd": 70800,
+          "primary_signal": "alert_id and IAM role",
+          "decision_owner": "Head of Security Operations",
+          "evidence": "SIEM alert ID, Bedrock invocation logs, IAM principal, analyst disposition",
+          "next_step": "Expose false-positive feedback loop to improve triage prompt templates."
+        },
+        {
+          "id": "wf-policy-exception-review",
+          "business_unit_id": "bu-risk-and-trust",
+          "business_unit_name": "Risk and Trust",
+          "team_id": "team-security",
+          "team_name": "Security",
+          "workflow_name": "AI policy exception review",
+          "workflow_stage": "Governance review",
+          "service_name": "Argmin policy engine + OpenAI GPT-4o-mini",
+          "provider": "Argmin / OpenAI",
+          "ai_service_category": "Governance decision surface",
+          "capability": "Policy classification",
+          "capability_class": "Governance and risk",
+          "entry_point": "governance-exception-queue",
+          "embedded_in": "Exception intake, risk classification, reviewer packet, and final approval audit",
+          "exact_where": "Between policy violation detection and security reviewer approval",
+          "how_adopted": "Policy context is summarized for reviewers, but enforcement remains advisory until a human approves the exception outcome.",
+          "user_persona": "Security governance reviewers",
+          "users_30d": 21,
+          "requests_30d": 4360,
+          "repeat_user_rate_pct": 58.0,
+          "governed_usage_pct": 98.3,
+          "adoption_depth": "Embedded",
+          "maturity_score": 82,
+          "spend_30d_usd": 11900,
+          "primary_signal": "policy_decision_id",
+          "decision_owner": "Security Governance Lead",
+          "evidence": "Policy bundle, reviewer identity, violation reason, approval audit event",
+          "next_step": "Add post-approval monitoring for exception drift."
+        },
+        {
+          "id": "wf-audit-packet",
+          "business_unit_id": "bu-risk-and-trust",
+          "business_unit_name": "Risk and Trust",
+          "team_id": "team-security",
+          "workflow_name": "Audit evidence packet builder",
+          "workflow_stage": "GRC audit prep",
+          "service_name": "Mistral Large + Cohere Command R+",
+          "provider": "Mistral AI / Cohere",
+          "ai_service_category": "Hosted model API",
+          "capability": "Audit evidence packaging",
+          "capability_class": "GRC evidence",
+          "entry_point": "grc-review-workbench",
+          "embedded_in": "Control evidence summarization and exception narrative drafting",
+          "exact_where": "After control owners upload evidence and before audit packet submission",
+          "how_adopted": "GRC analysts summarize evidence packs and unresolved exceptions while retaining the original artifacts for auditor review.",
+          "user_persona": "GRC analysts",
+          "users_30d": 9,
+          "requests_30d": 1880,
+          "repeat_user_rate_pct": 41.0,
+          "governed_usage_pct": 88.4,
+          "adoption_depth": "Emerging",
+          "maturity_score": 56,
+          "spend_30d_usd": 18700,
+          "primary_signal": "control_id and evidence packet",
+          "decision_owner": "GRC Manager",
+          "evidence": "Control ID, document packet hash, user identity, gateway prompt log",
+          "next_step": "Track which AI-authored summaries are accepted by auditors without revision."
+        },
+        {
+          "id": "wf-spend-reconciliation",
+          "business_unit_id": "bu-finance-and-ops",
+          "business_unit_name": "Finance and Operations",
+          "team_id": "team-finance-systems",
+          "team_name": "Finance Systems",
+          "workflow_name": "AI spend reconciliation and chargeback prep",
+          "workflow_stage": "Month-end finance close",
+          "service_name": "Argmin attribution graph + Snowflake Cortex AI",
+          "provider": "Argmin / Snowflake",
+          "ai_service_category": "Finance analytics AI",
+          "capability": "Financial reconciliation",
+          "capability_class": "Finance operations",
+          "entry_point": "finance-close-workbench",
+          "embedded_in": "Invoice reconciliation, owner review, provisional row triage, and chargeback export",
+          "exact_where": "After provider invoice import and before finance publishes chargeback rows",
+          "how_adopted": "FinOps analysts review ownership confidence, explain provisional rows, and prepare chargeback-ready exports from the same attribution evidence.",
+          "user_persona": "FinOps analysts",
+          "users_30d": 34,
+          "requests_30d": 11820,
+          "repeat_user_rate_pct": 57.4,
+          "governed_usage_pct": 84.9,
+          "adoption_depth": "Embedded",
+          "maturity_score": 77,
+          "spend_30d_usd": 88100,
+          "primary_signal": "invoice_line_id and attribution row",
+          "decision_owner": "Director of FinOps",
+          "evidence": "Provider invoice, Argmin ownership state, cost center mapping, export audit",
+          "next_step": "Move high-confidence rows to automated export while retaining manual review for conflicts."
+        },
+        {
+          "id": "wf-procurement-renewal",
+          "business_unit_id": "bu-finance-and-ops",
+          "business_unit_name": "Finance and Operations",
+          "team_id": "team-finance-systems",
+          "team_name": "Finance Systems",
+          "workflow_name": "AI vendor renewal review",
+          "workflow_stage": "Procurement intake",
+          "service_name": "Azure OpenAI GPT-4o",
+          "provider": "Microsoft Azure",
+          "ai_service_category": "Private endpoint model platform",
+          "capability": "Contract analysis",
+          "capability_class": "Procurement",
+          "entry_point": "procurement-intake",
+          "embedded_in": "Renewal summary, usage comparison, price variance review, and vendor-risk notes",
+          "exact_where": "After renewal request submission and before procurement negotiates commercial terms",
+          "how_adopted": "Procurement compares vendor terms against observed usage and summarizes risks for finance and legal reviewers.",
+          "user_persona": "Procurement managers",
+          "users_30d": 11,
+          "requests_30d": 1430,
+          "repeat_user_rate_pct": 38.0,
+          "governed_usage_pct": 72.2,
+          "adoption_depth": "Pilot",
+          "maturity_score": 45,
+          "spend_30d_usd": 6400,
+          "primary_signal": "renewal_request_id",
+          "decision_owner": "Head of Procurement",
+          "evidence": "Contract metadata, renewal request, Azure deployment, user identity",
+          "next_step": "Connect approved renewal terms back into forecasting assumptions."
+        },
+        {
+          "id": "wf-forecast-planning",
+          "business_unit_id": "bu-finance-and-ops",
+          "business_unit_name": "Finance and Operations",
+          "team_id": "team-finance-systems",
+          "team_name": "Finance Systems",
+          "workflow_name": "AI spend forecast planning",
+          "workflow_stage": "Quarterly planning",
+          "service_name": "OpenAI GPT-4o + Argmin forecasting",
+          "provider": "OpenAI / Argmin",
+          "ai_service_category": "Planning assistant",
+          "capability": "Scenario planning",
+          "capability_class": "Financial planning",
+          "entry_point": "forecast-planning-pack",
+          "embedded_in": "Scenario generation, assumption review, and monthly planning pack export",
+          "exact_where": "After optimization candidates are selected and before quarterly budget review",
+          "how_adopted": "Finance planners compare baseline, growth, policy, and optimization-capture scenarios using the same attribution data that powers chargeback.",
+          "user_persona": "FP&A analysts",
+          "users_30d": 18,
+          "requests_30d": 2960,
+          "repeat_user_rate_pct": 44.2,
+          "governed_usage_pct": 79.5,
+          "adoption_depth": "Emerging",
+          "maturity_score": 59,
+          "spend_30d_usd": 11800,
+          "primary_signal": "forecast_scenario_id",
+          "decision_owner": "VP Finance",
+          "evidence": "Forecast scenario, intervention selection, planning pack export, finance user identity",
+          "next_step": "Tie forecast scenario acceptance to actual monthly variance after close."
+        },
+        {
+          "id": "wf-product-prd-synthesis",
+          "business_unit_id": "bu-product-platform",
+          "business_unit_name": "Product and Platform",
+          "team_id": "team-platform-engineering",
+          "team_name": "Platform Engineering",
+          "workflow_name": "PRD synthesis and requirement traceability",
+          "workflow_stage": "Product planning",
+          "service_name": "OpenAI GPT-4o / Argmin PRD Proof",
+          "provider": "Argmin / OpenAI",
+          "ai_service_category": "Product intelligence",
+          "capability": "Requirement extraction and traceability",
+          "capability_class": "Product operating intelligence",
+          "entry_point": "Product planning workspace",
+          "embedded_in": "PRD review, design-partner synthesis, and release-readiness scoring",
+          "exact_where": "After source-document intake and before roadmap prioritization review",
+          "how_adopted": "Product leads use governed prompt templates to extract requirements, compare them to visible demo surfaces, and route gaps to delivery owners.",
+          "user_persona": "AI product leads",
+          "users_30d": 21,
+          "requests_30d": 14280,
+          "repeat_user_rate_pct": 68.5,
+          "governed_usage_pct": 93.2,
+          "adoption_depth": "Embedded",
+          "maturity_score": 86,
+          "spend_30d_usd": 18300,
+          "primary_signal": "document ingestion job and product workspace event",
+          "decision_owner": "VP Product",
+          "evidence": "Document provenance, PRD Proof matrix, roadmap review notes, export artifact history",
+          "next_step": "Connect design-partner notes to the same traceability graph."
+        },
+        {
+          "id": "wf-platform-cost-regression",
+          "business_unit_id": "bu-product-platform",
+          "business_unit_name": "Product and Platform",
+          "team_id": "team-platform-engineering",
+          "team_name": "Platform Engineering",
+          "workflow_name": "Model cost regression review",
+          "workflow_stage": "Release engineering",
+          "service_name": "Argmin forecast planner + pricing catalog",
+          "provider": "Argmin",
+          "ai_service_category": "Cost intelligence",
+          "capability": "Cost regression detection",
+          "capability_class": "Financial operations intelligence",
+          "entry_point": "Release readiness checklist",
+          "embedded_in": "Pre-release service review and monthly platform economics review",
+          "exact_where": "After staging traffic replay and before production rollout approval",
+          "how_adopted": "Service owners compare expected model mix to reconciled billing and receive a routed pricing-drift handoff when divergence crosses threshold.",
+          "user_persona": "Platform economics leads",
+          "users_30d": 17,
+          "requests_30d": 9320,
+          "repeat_user_rate_pct": 71.1,
+          "governed_usage_pct": 91.0,
+          "adoption_depth": "Embedded",
+          "maturity_score": 83,
+          "spend_30d_usd": 9200,
+          "primary_signal": "forecast scenario and billing reconciliation delta",
+          "decision_owner": "Director of Platform Economics",
+          "evidence": "Forecast plan, provider pricing catalog, billing reconciliation ledger, release checklist",
+          "next_step": "Make drift thresholds configurable by service criticality."
+        },
+        {
+          "id": "wf-customer-escalation-copilot",
+          "business_unit_id": "bu-customer-operations",
+          "business_unit_name": "Customer Operations",
+          "team_id": "team-customer-engineering",
+          "team_name": "Customer Engineering",
+          "workflow_name": "Enterprise escalation summary",
+          "workflow_stage": "Customer escalation",
+          "service_name": "OpenAI GPT-4o-mini + Salesforce Einstein",
+          "provider": "OpenAI / Salesforce",
+          "ai_service_category": "Customer operations AI",
+          "capability": "Case summarization and response drafting",
+          "capability_class": "Customer operations intelligence",
+          "entry_point": "Salesforce case workspace",
+          "embedded_in": "Escalation handoff, account-risk summary, and support response draft",
+          "exact_where": "After support engineer triage and before account-team escalation review",
+          "how_adopted": "Support engineers summarize recent cases and route drafts through the governed gateway when customer-specific data is included.",
+          "user_persona": "Support engineers and account engineers",
+          "users_30d": 118,
+          "requests_30d": 64800,
+          "repeat_user_rate_pct": 74.0,
+          "governed_usage_pct": 88.6,
+          "adoption_depth": "Scaled",
+          "maturity_score": 88,
+          "spend_30d_usd": 27400,
+          "primary_signal": "case ID, account ID, and gateway prompt lineage",
+          "decision_owner": "VP Customer Operations",
+          "evidence": "Salesforce case activity, gateway request metadata, account ownership map, CSAT deltas",
+          "next_step": "Separate internal escalation summaries from customer-facing response drafts in export views."
+        },
+        {
+          "id": "wf-customer-knowledge-rag",
+          "business_unit_id": "bu-customer-operations",
+          "business_unit_name": "Customer Operations",
+          "team_id": "team-customer-engineering",
+          "team_name": "Customer Engineering",
+          "workflow_name": "Knowledge-base answer retrieval",
+          "workflow_stage": "Support deflection",
+          "service_name": "Snowflake Cortex AI + OpenAI GPT-4o-mini",
+          "provider": "Snowflake / OpenAI",
+          "ai_service_category": "Retrieval augmented generation",
+          "capability": "Grounded answer retrieval",
+          "capability_class": "Knowledge retrieval",
+          "entry_point": "Customer support portal",
+          "embedded_in": "Self-service answer generation and agent-assist search",
+          "exact_where": "After customer query classification and before support ticket creation",
+          "how_adopted": "The portal routes eligible questions through retrieval, logs knowledge-source coverage, and escalates low-confidence answers to a human support queue.",
+          "user_persona": "Support agents and customers",
+          "users_30d": 146,
+          "requests_30d": 123400,
+          "repeat_user_rate_pct": 66.8,
+          "governed_usage_pct": 84.3,
+          "adoption_depth": "Embedded",
+          "maturity_score": 79,
+          "spend_30d_usd": 31800,
+          "primary_signal": "portal event ID and retrieval corpus ID",
+          "decision_owner": "Director of Support Systems",
+          "evidence": "Support portal events, vector index query logs, answer confidence, deflection report",
+          "next_step": "Expose corpus coverage gaps alongside confidence in the support dashboard."
+        },
+        {
+          "id": "wf-security-exception-review",
+          "business_unit_id": "bu-risk-and-trust",
+          "business_unit_name": "Risk and Trust",
+          "team_id": "team-security",
+          "team_name": "Security",
+          "workflow_name": "AI policy exception review",
+          "workflow_stage": "Security governance",
+          "service_name": "Mistral Large + Argmin policy simulation",
+          "provider": "Mistral AI / Argmin",
+          "ai_service_category": "Governance and compliance AI",
+          "capability": "Exception review and risk rationale",
+          "capability_class": "Governance operations",
+          "entry_point": "security exception queue",
+          "embedded_in": "Policy exception intake, reviewer brief, and approval audit",
+          "exact_where": "After a blocked or provisional request and before reviewer approval",
+          "how_adopted": "Security reviewers receive a summarized exception packet with policy, confidence, data-sensitivity, and cost context in one record.",
+          "user_persona": "Security reviewers",
+          "users_30d": 23,
+          "requests_30d": 4180,
+          "repeat_user_rate_pct": 59.4,
+          "governed_usage_pct": 97.8,
+          "adoption_depth": "Embedded",
+          "maturity_score": 82,
+          "spend_30d_usd": 8700,
+          "primary_signal": "policy decision record and reviewer audit event",
+          "decision_owner": "CISO delegate",
+          "evidence": "Policy simulation result, request evidence chain, admin audit log, exception owner",
+          "next_step": "Add reviewer workload balancing and overdue exception routing."
+        },
+        {
+          "id": "wf-security-cve-triage",
+          "business_unit_id": "bu-risk-and-trust",
+          "business_unit_name": "Risk and Trust",
+          "team_id": "team-security",
+          "team_name": "Security",
+          "workflow_name": "CVE and dependency triage",
+          "workflow_stage": "Vulnerability response",
+          "service_name": "Claude via AWS Bedrock + GitHub Advanced Security",
+          "provider": "AWS Bedrock / GitHub",
+          "ai_service_category": "Security operations AI",
+          "capability": "Vulnerability summarization",
+          "capability_class": "Security operations intelligence",
+          "entry_point": "security findings queue",
+          "embedded_in": "Dependency alert review and remediation ticket creation",
+          "exact_where": "After vulnerability finding normalization and before service-owner assignment",
+          "how_adopted": "Security engineers summarize exploitability, affected repositories, and owner mapping while keeping final remediation ownership explicit.",
+          "user_persona": "AppSec engineers",
+          "users_30d": 31,
+          "requests_30d": 11840,
+          "repeat_user_rate_pct": 69.5,
+          "governed_usage_pct": 90.7,
+          "adoption_depth": "Embedded",
+          "maturity_score": 80,
+          "spend_30d_usd": 14600,
+          "primary_signal": "finding ID, repo owner, and dependency graph event",
+          "decision_owner": "Director of Product Security",
+          "evidence": "GitHub security alert, CODEOWNERS, policy simulation, remediation ticket",
+          "next_step": "Route repeated CVE summaries through semantic cache after equivalence proof."
+        },
+        {
+          "id": "wf-finance-close-copilot",
+          "business_unit_id": "bu-finance-and-ops",
+          "business_unit_name": "Finance and Operations",
+          "team_id": "team-finance-systems",
+          "team_name": "Finance Systems",
+          "workflow_name": "AI spend variance explanation",
+          "workflow_stage": "Monthly close",
+          "service_name": "AWS Titan Text Premier + OpenAI GPT-4o",
+          "provider": "AWS / OpenAI",
+          "ai_service_category": "Finance operations AI",
+          "capability": "Variance explanation and close memo drafting",
+          "capability_class": "Finance operations intelligence",
+          "entry_point": "finance close workbook",
+          "embedded_in": "Monthly variance review, chargeback preview, and CFO narrative prep",
+          "exact_where": "After billing reconciliation and before chargeback packet approval",
+          "how_adopted": "Finance analysts use Argmin export rows and model-cost context to generate review memos while provisional spend remains explicitly excluded.",
+          "user_persona": "FinOps analysts",
+          "users_30d": 36,
+          "requests_30d": 7820,
+          "repeat_user_rate_pct": 61.8,
+          "governed_usage_pct": 95.1,
+          "adoption_depth": "Embedded",
+          "maturity_score": 78,
+          "spend_30d_usd": 12100,
+          "primary_signal": "FOCUS export row and billing reconciliation event",
+          "decision_owner": "VP Finance Systems",
+          "evidence": "Chargeback export, FOCUS columns, ownership state, audit trail",
+          "next_step": "Add variance thresholds by business unit and cost center."
+        },
+        {
+          "id": "wf-finance-vendor-renewal",
+          "business_unit_id": "bu-finance-and-ops",
+          "business_unit_name": "Finance and Operations",
+          "team_id": "team-finance-systems",
+          "team_name": "Finance Systems",
+          "workflow_name": "Provider renewal leverage review",
+          "workflow_stage": "Vendor management",
+          "service_name": "Command R+ + Argmin model landscape",
+          "provider": "Cohere / Argmin",
+          "ai_service_category": "Procurement analytics",
+          "capability": "Provider concentration and substitution analysis",
+          "capability_class": "Strategic sourcing intelligence",
+          "entry_point": "vendor renewal workbook",
+          "embedded_in": "Quarterly provider review and renewal negotiation prep",
+          "exact_where": "After provider spend normalization and before procurement strategy review",
+          "how_adopted": "Finance and procurement teams inspect model-family concentration, equivalence options, and adoption breadth before vendor negotiations.",
+          "user_persona": "Finance and procurement leads",
+          "users_30d": 18,
+          "requests_30d": 2860,
+          "repeat_user_rate_pct": 52.2,
+          "governed_usage_pct": 89.5,
+          "adoption_depth": "Emerging",
+          "maturity_score": 67,
+          "spend_30d_usd": 6400,
+          "primary_signal": "provider spend, model landscape, and contract calendar",
+          "decision_owner": "Head of Procurement",
+          "evidence": "Provider spend rollup, model substitution candidates, contract metadata, approval note",
+          "next_step": "Separate production-critical and experimental usage before renewal scenarios."
+        }
+      ]
     }
   },
   "teams": [
@@ -1717,11 +2608,11 @@
       "name": "ML Engineering",
       "lead": "David Kim",
       "headcount": 28,
-      "spend_usd": 187600,
-      "previous_spend_usd": 172100,
+      "spend_usd": 126400,
+      "previous_spend_usd": 139800,
       "budget_usd": 200000,
-      "optimization_potential_usd": 42800,
-      "optimization_pct": 22.8,
+      "optimization_potential_usd": 31800,
+      "optimization_pct": 25.2,
       "top_workload": "Training Pipeline",
       "top_models": [
         "gpt-4o",
@@ -1729,7 +2620,7 @@
         "deepseek-r1"
       ],
       "cloud": "GCP",
-      "trac_usd": 198400
+      "trac_usd": 134500
     },
     {
       "id": "prod",
@@ -1844,6 +2735,25 @@
       ],
       "cloud": "AWS",
       "trac_usd": 38100
+    },
+    {
+      "id": "fin",
+      "name": "Finance Systems",
+      "lead": "Rachel Green",
+      "headcount": 29,
+      "spend_usd": 61200,
+      "previous_spend_usd": 54500,
+      "budget_usd": 80000,
+      "optimization_potential_usd": 6400,
+      "optimization_pct": 10.5,
+      "top_workload": "Close Copilot",
+      "top_models": [
+        "gpt-4o",
+        "titan-text-premier",
+        "command-r+"
+      ],
+      "cloud": "Azure / AWS",
+      "trac_usd": 65400
     }
   ],
   "models": [
@@ -1857,7 +2767,11 @@
       "teams": 6,
       "trend_pct": 11.2,
       "optimization_potential_usd": 18100,
-      "cost_variance": "2.8x"
+      "cost_variance": "2.8x",
+      "energy_status": "rated",
+      "energy_star_rating": 3,
+      "kwh_per_1k_requests": 8.4,
+      "carbon_kgco2e": 2710
     },
     {
       "name": "gpt-4o-mini",
@@ -1869,7 +2783,11 @@
       "teams": 7,
       "trend_pct": 16.8,
       "optimization_potential_usd": 6200,
-      "cost_variance": "1.0x"
+      "cost_variance": "1.0x",
+      "energy_status": "rated",
+      "energy_star_rating": 4,
+      "kwh_per_1k_requests": 2.1,
+      "carbon_kgco2e": 1280
     },
     {
       "name": "claude-3.7-sonnet",
@@ -2076,7 +2994,7 @@
         },
         {
           "layer": "Org Hierarchy",
-          "value": "Product Engineering",
+          "value": "Product",
           "source": "HR hierarchy sync",
           "method": "R1: direct match",
           "confidence": 0.96
@@ -2288,7 +3206,7 @@
     {
       "id": "req_5ab71e0c",
       "time": "14:23:04",
-      "model": "gpt-4.1",
+      "model": "gpt-4o",
       "input_tokens": 6240,
       "output_tokens": 944,
       "cost_usd": 0.0331,
@@ -2302,13 +3220,13 @@
         "total_usd": 0.0366
       },
       "enrichment": {
-        "alternate_model": "gpt-4o (candidate after policy review and equivalence verification)",
+        "alternate_model": "gpt-4o-mini (candidate after policy review and equivalence verification)",
         "headers": "X-ACI-Est-Cost-USD: 0.0331 | X-ACI-Confidence: 0.81 | X-ACI-Confidence-Flag: review"
       },
       "chain": [
         {
           "layer": "Model Invocation",
-          "value": "gpt-4.1 (OpenAI) via Azure OpenAI",
+          "value": "gpt-4o (OpenAI) via Azure OpenAI",
           "source": "Azure request logs",
           "method": "R1: direct match",
           "confidence": 1.0
@@ -2347,6 +3265,591 @@
           "source": "Finance operating plan mapping",
           "method": "R3: naming heuristic",
           "confidence": 0.81
+        }
+      ]
+    },
+    {
+      "id": "req_bedrock_sec_019",
+      "time": "14:22:58",
+      "model": "claude-3.7-sonnet",
+      "input_tokens": 9120,
+      "output_tokens": 1460,
+      "cost_usd": 0.0742,
+      "latency_ms": 15,
+      "mode": "Advisory",
+      "confidence": 0.93,
+      "trac_usd": 0.0801,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0742,
+        "confidence_risk_premium_usd": 0.0059,
+        "total_usd": 0.0801
+      },
+      "enrichment": {
+        "alternate_model": "No verified equivalent for security incident reasoning workload",
+        "headers": "X-ACI-Est-Cost-USD: 0.0742 | X-ACI-Confidence: 0.93 | X-ACI-Risk: security"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "claude-3.7-sonnet (Anthropic) via AWS Bedrock",
+          "source": "Bedrock invocation logs",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "secops-assistant-prod (EKS us-east-1)",
+          "source": "CloudTrail and workload tags",
+          "method": "R1: direct match",
+          "confidence": 0.98
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "secops-assistant/src/triage/cve_brief.py",
+          "source": "GitHub CODEOWNERS",
+          "method": "R1: direct match",
+          "confidence": 0.95
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "nina.patel@novatech.example",
+          "source": "Okta session and pager-duty join",
+          "method": "R2: temporal correlation",
+          "confidence": 0.91
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Security",
+          "source": "Workday hierarchy sync",
+          "method": "R1: direct match",
+          "confidence": 0.95
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-3300 | GL 6120-AI-Services",
+          "source": "ERP security budget map",
+          "method": "R1: direct match",
+          "confidence": 0.93
+        }
+      ]
+    },
+    {
+      "id": "req_agent_workflow_027",
+      "time": "14:22:54",
+      "model": "claude-3.7-sonnet",
+      "input_tokens": 15420,
+      "output_tokens": 2360,
+      "cost_usd": 0.1184,
+      "latency_ms": 18,
+      "mode": "Advisory",
+      "confidence": 0.84,
+      "trac_usd": 0.1342,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.1184,
+        "confidence_risk_premium_usd": 0.0158,
+        "total_usd": 0.1342
+      },
+      "enrichment": {
+        "alternate_model": "Agentic workflow retained on Claude until descendant-call lineage is complete",
+        "headers": "X-ACI-Est-Cost-USD: 0.1184 | X-ACI-Confidence: 0.84 | X-ACI-Lineage: partial"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "claude-3.7-sonnet (Anthropic) via Bedrock agent runtime",
+          "source": "Agent runtime trace",
+          "method": "R2: temporal correlation",
+          "confidence": 0.94
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "product-roadmap-agent-prod (Step Functions)",
+          "source": "root_request_id and parent_event_id",
+          "method": "R2: temporal correlation",
+          "confidence": 0.88
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "roadmap-agent/src/orchestrator.py",
+          "source": "Repository ownership graph",
+          "method": "R3: naming heuristic",
+          "confidence": 0.79
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "svc.product-agent@novatech.example",
+          "source": "Service-account map",
+          "method": "R3: naming heuristic",
+          "confidence": 0.77
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Product",
+          "source": "Org hierarchy graph",
+          "method": "R1: direct match",
+          "confidence": 0.9
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-4200 | GL 6120-AI-Services",
+          "source": "Planning cost center map",
+          "method": "R2: temporal correlation",
+          "confidence": 0.83
+        }
+      ]
+    },
+    {
+      "id": "req_shadow_card_033",
+      "time": "14:22:49",
+      "model": "mistral-large",
+      "input_tokens": 3920,
+      "output_tokens": 880,
+      "cost_usd": 0.0276,
+      "latency_ms": 0,
+      "mode": "Monitor",
+      "confidence": 0.37,
+      "trac_usd": 0.0392,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0276,
+        "confidence_risk_premium_usd": 0.0116,
+        "total_usd": 0.0392
+      },
+      "enrichment": {
+        "alternate_model": "No routing recommendation; usage was detected through procurement and egress signals only",
+        "headers": "X-ACI-Confidence: 0.37 | X-ACI-Ownership-State: unknown | X-ACI-Chargeback: excluded"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "mistral-large (Mistral AI) direct corporate-card API",
+          "source": "Procurement card statement",
+          "method": "R6: billing anomaly inference",
+          "confidence": 0.54
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "shadow-ai-provider-card",
+          "source": "CASB and DNS egress signal",
+          "method": "R6: indirect inference",
+          "confidence": 0.42
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "unknown browser workflow",
+          "source": "No repository match",
+          "method": "R6: unresolved",
+          "confidence": 0.18
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "unresolved purchaser from card statement",
+          "source": "Cardholder enrichment pending",
+          "method": "R6: unresolved",
+          "confidence": 0.31
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "UNKNOWN",
+          "source": "Manual mapping queue",
+          "method": "R6: unresolved",
+          "confidence": 0.37
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "UNASSIGNED | excluded from chargeback",
+          "source": "No durable budget owner",
+          "method": "R6: unresolved",
+          "confidence": 0.0
+        }
+      ]
+    },
+    {
+      "id": "req_self_hosted_041",
+      "time": "14:22:43",
+      "model": "llama-3.3-70b",
+      "input_tokens": 18300,
+      "output_tokens": 1100,
+      "cost_usd": 0.0521,
+      "latency_ms": 24,
+      "mode": "Advisory",
+      "confidence": 0.79,
+      "trac_usd": 0.0649,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0521,
+        "confidence_risk_premium_usd": 0.0128,
+        "total_usd": 0.0649
+      },
+      "enrichment": {
+        "alternate_model": "No automatic substitute because private-data constraint requires local inference",
+        "headers": "X-ACI-Est-Cost-USD: 0.0521 | X-ACI-Cost-Basis: derived-gpu | X-ACI-Confidence: 0.79"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "llama-3.3-70b via self-hosted vLLM GPU pool",
+          "source": "vLLM request logs",
+          "method": "R1: direct match",
+          "confidence": 0.97
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "ml-evals-sandbox (Kubernetes namespace)",
+          "source": "Kubernetes namespace labels",
+          "method": "R2: temporal correlation",
+          "confidence": 0.86
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "evals/src/private_benchmark_runner.py",
+          "source": "GitHub branch ownership",
+          "method": "R3: naming heuristic",
+          "confidence": 0.76
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "svc.evals@novatech.example",
+          "source": "Service identity map",
+          "method": "R3: naming heuristic",
+          "confidence": 0.71
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "ML Engineering",
+          "source": "Org hierarchy map",
+          "method": "R1: direct match",
+          "confidence": 0.86
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-5100 | derived GPU allocation",
+          "source": "GPU utilization allocator",
+          "method": "R5: derived allocation",
+          "confidence": 0.78
+        }
+      ]
+    },
+    {
+      "id": "req_data_platform_052",
+      "time": "14:22:38",
+      "model": "deepseek-r1",
+      "input_tokens": 10440,
+      "output_tokens": 1660,
+      "cost_usd": 0.0196,
+      "latency_ms": 29,
+      "mode": "Advisory",
+      "confidence": 0.86,
+      "trac_usd": 0.0228,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0196,
+        "confidence_risk_premium_usd": 0.0032,
+        "total_usd": 0.0228
+      },
+      "enrichment": {
+        "alternate_model": "qwen-2.5 candidate for warehouse summarization after quality replay",
+        "headers": "X-ACI-Est-Cost-USD: 0.0196 | X-ACI-Confidence: 0.86 | X-ACI-Truth-Basis: platform-invocation"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "deepseek-r1 via Databricks Mosaic AI",
+          "source": "Databricks usage table",
+          "method": "R1: direct match",
+          "confidence": 0.98
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "analytics-batch-nightly (Databricks job)",
+          "source": "job_id and cluster tag",
+          "method": "R1: direct match",
+          "confidence": 0.93
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "analytics/jobs/customer_health_summary.sql",
+          "source": "repo path and job owner",
+          "method": "R2: temporal correlation",
+          "confidence": 0.87
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "oliver.kim@novatech.example",
+          "source": "workspace principal",
+          "method": "R2: temporal correlation",
+          "confidence": 0.84
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Data Science",
+          "source": "Workday hierarchy sync",
+          "method": "R1: direct match",
+          "confidence": 0.91
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-2300 | warehouse allocation",
+          "source": "Warehouse allocation policy",
+          "method": "R5: allocation",
+          "confidence": 0.82
+        }
+      ]
+    },
+    {
+      "id": "req_marketing_saas_064",
+      "time": "14:22:32",
+      "model": "command-r+",
+      "input_tokens": 6200,
+      "output_tokens": 1800,
+      "cost_usd": 0.0324,
+      "latency_ms": 9,
+      "mode": "Monitor",
+      "confidence": 0.69,
+      "trac_usd": 0.0438,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0324,
+        "confidence_risk_premium_usd": 0.0114,
+        "total_usd": 0.0438
+      },
+      "enrichment": {
+        "alternate_model": "OpenAI GPT-4o-mini candidate if campaign copy workflow moves behind gateway",
+        "headers": "X-ACI-Est-Cost-USD: 0.0324 | X-ACI-Confidence-Flag: provisional | X-ACI-Source: SaaS-seat-proxy"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "command-r+ embedded in marketing SaaS workflow",
+          "source": "SaaS admin export",
+          "method": "R4: seat activity proxy",
+          "confidence": 0.74
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "campaign-copilot-seat-activity",
+          "source": "SCIM user and workspace",
+          "method": "R4: seat activity proxy",
+          "confidence": 0.72
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "no code artifact; SaaS workflow only",
+          "source": "No deployable code owner",
+          "method": "R6: not applicable",
+          "confidence": 0.22
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "marketing.ops@novatech.example",
+          "source": "Okta group join",
+          "method": "R2: temporal correlation",
+          "confidence": 0.82
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Marketing",
+          "source": "HR team mapping",
+          "method": "R1: direct match",
+          "confidence": 0.87
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-7200 | marketing operations",
+          "source": "Procurement contract allocation",
+          "method": "R5: allocation",
+          "confidence": 0.68
+        }
+      ]
+    },
+    {
+      "id": "req_finance_close_083",
+      "time": "14:22:27",
+      "model": "titan-text-premier",
+      "input_tokens": 7240,
+      "output_tokens": 980,
+      "cost_usd": 0.0169,
+      "latency_ms": 10,
+      "mode": "Advisory",
+      "confidence": 0.9,
+      "trac_usd": 0.0186,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0169,
+        "confidence_risk_premium_usd": 0.0017,
+        "total_usd": 0.0186
+      },
+      "enrichment": {
+        "alternate_model": "gpt-4o-mini candidate for low-risk variance narratives",
+        "headers": "X-ACI-Est-Cost-USD: 0.0169 | X-ACI-Confidence: 0.90 | X-ACI-Export-State: reviewable"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "titan-text-premier via AWS Bedrock",
+          "source": "Bedrock invocation logs",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "finance-close-copilot-prod",
+          "source": "CloudTrail role and app metadata",
+          "method": "R1: direct match",
+          "confidence": 0.96
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "finance-assistant/src/variance/narrative.py",
+          "source": "GitHub CODEOWNERS",
+          "method": "R1: direct match",
+          "confidence": 0.94
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "rachel.green@novatech.example",
+          "source": "Okta and ERP user map",
+          "method": "R2: temporal correlation",
+          "confidence": 0.88
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Finance Systems",
+          "source": "Workday hierarchy sync",
+          "method": "R1: direct match",
+          "confidence": 0.93
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-6100 | GL 6120-AI-Services",
+          "source": "ERP finance cost center",
+          "method": "R1: direct match",
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "id": "req_route_divergence_091",
+      "time": "14:22:21",
+      "model": "qwen-2.5",
+      "input_tokens": 2840,
+      "output_tokens": 520,
+      "cost_usd": 0.0038,
+      "latency_ms": 7,
+      "mode": "Enforce",
+      "confidence": 0.82,
+      "trac_usd": 0.0047,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0038,
+        "confidence_risk_premium_usd": 0.0009,
+        "total_usd": 0.0047
+      },
+      "enrichment": {
+        "alternate_model": "Served model differed from requested model; preserve route caveat before optimization",
+        "headers": "X-ACI-Requested-Model: gpt-4o-mini | X-ACI-Served-Model: qwen-2.5 | X-ACI-Confidence: 0.82"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "qwen-2.5 served by internal router; requested gpt-4o-mini",
+          "source": "Router logs with requested/served model",
+          "method": "R1: direct match",
+          "confidence": 1.0
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "platform-shared-router",
+          "source": "Gateway route metadata",
+          "method": "R1: direct match",
+          "confidence": 0.95
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "gateway/src/routes/fallbacks.ts",
+          "source": "CODEOWNERS",
+          "method": "R1: direct match",
+          "confidence": 0.91
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "svc.gateway@novatech.example",
+          "source": "Service identity map",
+          "method": "R2: temporal correlation",
+          "confidence": 0.83
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Platform Engineering",
+          "source": "Org hierarchy graph",
+          "method": "R1: direct match",
+          "confidence": 0.9
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-3100 | GL 6120-AI-Services",
+          "source": "Cost-center map",
+          "method": "R2: temporal correlation",
+          "confidence": 0.82
+        }
+      ]
+    },
+    {
+      "id": "req_audit_export_104",
+      "time": "14:22:16",
+      "model": "granite-3.2",
+      "input_tokens": 4640,
+      "output_tokens": 740,
+      "cost_usd": 0.0082,
+      "latency_ms": 12,
+      "mode": "Advisory",
+      "confidence": 0.88,
+      "trac_usd": 0.0098,
+      "cost_breakdown": {
+        "billed_cost_usd": 0.0082,
+        "confidence_risk_premium_usd": 0.0016,
+        "total_usd": 0.0098
+      },
+      "enrichment": {
+        "alternate_model": "Keep on Granite for audit-report extractive QA until equivalence proof is complete",
+        "headers": "X-ACI-Est-Cost-USD: 0.0082 | X-ACI-Confidence: 0.88 | X-ACI-Audit: retained"
+      },
+      "chain": [
+        {
+          "layer": "Model Invocation",
+          "value": "granite-3.2 via internal compliance assistant",
+          "source": "Internal gateway logs",
+          "method": "R1: direct match",
+          "confidence": 0.98
+        },
+        {
+          "layer": "Service Attribution",
+          "value": "audit-export-reviewer",
+          "source": "service catalog ownership",
+          "method": "R1: direct match",
+          "confidence": 0.93
+        },
+        {
+          "layer": "Code Ownership",
+          "value": "compliance/export/review.py",
+          "source": "repo ownership and release manifest",
+          "method": "R2: temporal correlation",
+          "confidence": 0.86
+        },
+        {
+          "layer": "Identity Resolution",
+          "value": "maya.patel@novatech.example",
+          "source": "admin user session",
+          "method": "R2: temporal correlation",
+          "confidence": 0.87
+        },
+        {
+          "layer": "Org Hierarchy",
+          "value": "Security",
+          "source": "role mapping",
+          "method": "R1: direct match",
+          "confidence": 0.92
+        },
+        {
+          "layer": "Budget Attribution",
+          "value": "CC-3300 | compliance reporting",
+          "source": "audit cost-center policy",
+          "method": "R2: temporal correlation",
+          "confidence": 0.88
         }
       ]
     }
@@ -2459,6 +3962,214 @@
         "threshold": "Triggered by > 15% template token redundancy across repeated flows",
         "rule": "Recommend template minimization when token redundancy > 0.15 and confidence >= 0.85"
       }
+    },
+    {
+      "id": "INT-407",
+      "title": "Classify shadow AI card spend before chargeback",
+      "type": "Governance",
+      "status": "review",
+      "savings_usd_month": 7600,
+      "confidence_pct": 74,
+      "risk": "medium",
+      "team": "Security",
+      "detail": "Corporate-card provider spend is visible but lacks request telemetry; route to review before any chargeback action.",
+      "equivalence_mode": "Not applicable",
+      "equivalence_status": "review_required",
+      "linked_model": "mistral-large",
+      "baseline_cost_usd_month": 42600,
+      "forecast_impact_usd_year": 54600,
+      "linked_evidence": [
+        "Shadow AI coverage pathway is UNCAPTURABLE at request level.",
+        "Manual mapping mm_005 keeps spend excluded until owner confirmation.",
+        "Procurement and CASB evidence agree only directionally."
+      ],
+      "methodology": {
+        "category": "Shadow AI detection",
+        "threshold": "Triggered by provider spend with no gateway or application telemetry",
+        "rule": "Never include unknown ownership in chargeback; route to review and procurement follow-up."
+      }
+    },
+    {
+      "id": "INT-408",
+      "title": "Move research briefing summaries to Gemini 2.0 Flash",
+      "type": "Model Routing",
+      "status": "recommended",
+      "savings_usd_month": 12800,
+      "confidence_pct": 86,
+      "risk": "medium",
+      "team": "Research",
+      "detail": "Long-form briefing summaries show equivalent factual coverage in replay but need reviewer signoff for edge cases.",
+      "equivalence_mode": "Empirical (Mode 2a)",
+      "equivalence_status": "conditional",
+      "linked_model": "gemini-1.5-pro",
+      "baseline_cost_usd_month": 47200,
+      "forecast_impact_usd_year": 38400,
+      "linked_evidence": [
+        "Replay showed 95.1% summary acceptance on low-risk briefs.",
+        "Research owners rejected automatic switching for regulatory scans.",
+        "Energy view shows lower kWh per request on candidate route."
+      ],
+      "methodology": {
+        "category": "Model over-provisioning",
+        "threshold": "Triggered when high-cost model handles summarization with replay equivalence >= 0.85",
+        "rule": "Recommend guarded routing only for low-risk briefing classes."
+      }
+    },
+    {
+      "id": "INT-409",
+      "title": "Route nightly warehouse summaries through batch lane",
+      "type": "Workload Scheduling",
+      "status": "approved",
+      "savings_usd_month": 19600,
+      "confidence_pct": 88,
+      "risk": "low",
+      "team": "Data Science",
+      "detail": "Analytics summaries tolerate delayed execution and can move from on-demand serving to batch-priced route.",
+      "equivalence_mode": "Not required",
+      "equivalence_status": "n/a",
+      "linked_model": "deepseek-r1",
+      "baseline_cost_usd_month": 68200,
+      "forecast_impact_usd_year": 199900,
+      "linked_evidence": [
+        "87% of jobs complete outside business hours.",
+        "Warehouse and model invocation costs are separated in export rows.",
+        "Approval can be implemented without changing product latency."
+      ],
+      "methodology": {
+        "category": "Batch mispricing",
+        "threshold": "Triggered when latency tolerance exceeds 30 minutes and off-peak volume exceeds 70%",
+        "rule": "Use batch lane for non-interactive jobs with conserved allocation truth."
+      }
+    },
+    {
+      "id": "INT-410",
+      "title": "Compact finance close variance prompts",
+      "type": "Finance Workflow Optimization",
+      "status": "approved",
+      "savings_usd_month": 6400,
+      "confidence_pct": 91,
+      "risk": "low",
+      "team": "Finance Systems",
+      "detail": "Prompt templates repeat the same policy and account-context sections across close memos.",
+      "equivalence_mode": "Empirical (Mode 2a)",
+      "equivalence_status": "verified",
+      "linked_model": "titan-text-premier",
+      "baseline_cost_usd_month": 22100,
+      "forecast_impact_usd_year": 65280,
+      "linked_evidence": [
+        "Template analysis found 24% redundant context tokens.",
+        "Finance reviewers accepted 98% of compacted memo drafts.",
+        "Export rows remain labeled event-time vs current-state."
+      ],
+      "methodology": {
+        "category": "Prompt inefficiency",
+        "threshold": "Triggered by template redundancy > 15%",
+        "rule": "Recommend compaction only when close-memo acceptance remains above 95%."
+      }
+    },
+    {
+      "id": "INT-411",
+      "title": "Put campaign copy SaaS usage behind governed prompt path",
+      "type": "Policy Enforcement",
+      "status": "recommended",
+      "savings_usd_month": 5400,
+      "confidence_pct": 72,
+      "risk": "medium",
+      "team": "Marketing",
+      "detail": "Marketing usage is visible through seat activity but lacks token-level request truth or data-retention controls.",
+      "equivalence_mode": "Policy (Mode 1)",
+      "equivalence_status": "policy",
+      "linked_model": "command-r+",
+      "baseline_cost_usd_month": 18400,
+      "forecast_impact_usd_year": 16200,
+      "linked_evidence": [
+        "Manual mapping mm_007 confirms Marketing owner.",
+        "SaaS provider does not expose request-level token data.",
+        "Gateway route would enable policy headers and evidence chain."
+      ],
+      "methodology": {
+        "category": "SaaS AI control gap",
+        "threshold": "Triggered when seat-proxy spend exceeds $10K/month and governed usage < 75%",
+        "rule": "Recommend migration for sensitive workflows; keep low-risk creative ideation as monitored seat usage."
+      }
+    },
+    {
+      "id": "INT-412",
+      "title": "Right-size self-hosted GPU evaluation pool",
+      "type": "Infrastructure Efficiency",
+      "status": "review",
+      "savings_usd_month": 11800,
+      "confidence_pct": 79,
+      "risk": "medium",
+      "team": "ML Engineering",
+      "detail": "Self-hosted eval traffic has low utilization windows and derived energy data that needs telemetry completion.",
+      "equivalence_mode": "Not required",
+      "equivalence_status": "n/a",
+      "linked_model": "llama-3.3-70b",
+      "baseline_cost_usd_month": 46200,
+      "forecast_impact_usd_year": 42480,
+      "linked_evidence": [
+        "GPU utilization shows 38% idle time outside benchmark windows.",
+        "Energy surface keeps model Unrated until telemetry is complete.",
+        "Manual mapping mm_006 shows cost basis remains derived."
+      ],
+      "methodology": {
+        "category": "Self-hosted infrastructure economics",
+        "threshold": "Triggered when utilization stays below 55% and request volume is batchable",
+        "rule": "Recommend scheduling and pool right-sizing without changing privacy-constrained model choice."
+      }
+    },
+    {
+      "id": "INT-413",
+      "title": "Cache repeated CVE summary prompts",
+      "type": "Semantic Cache",
+      "status": "implemented",
+      "savings_usd_month": 8300,
+      "confidence_pct": 93,
+      "risk": "low",
+      "team": "Security",
+      "detail": "Repeated vulnerability summaries reuse the same dependency context and can be cached after normalization.",
+      "equivalence_mode": "Empirical (Mode 2a)",
+      "equivalence_status": "verified",
+      "linked_model": "claude-3.7-sonnet",
+      "baseline_cost_usd_month": 31900,
+      "forecast_impact_usd_year": 99600,
+      "linked_evidence": [
+        "Duplicate prompt ratio reached 41% over the last 30 days.",
+        "Cache replay preserved severity and remediation owner outputs.",
+        "Admin audit log records cache-policy approval."
+      ],
+      "methodology": {
+        "category": "Duplicate requests",
+        "threshold": "Triggered by semantic duplicate ratio > 30%",
+        "rule": "Enable cache when output sensitivity is low and equivalence confidence exceeds 0.9."
+      }
+    },
+    {
+      "id": "INT-414",
+      "title": "Enforce agent lineage on customer escalation workflow",
+      "type": "Lineage Enforcement",
+      "status": "recommended",
+      "savings_usd_month": 4800,
+      "confidence_pct": 82,
+      "risk": "medium",
+      "team": "Customer Engineering",
+      "detail": "Customer escalation agent loses parent_event_id on retrieval descendants, lowering confidence and delaying chargeback readiness.",
+      "equivalence_mode": "Policy floor",
+      "equivalence_status": "conditional",
+      "linked_model": "gpt-4o-mini",
+      "baseline_cost_usd_month": 27600,
+      "forecast_impact_usd_year": 14400,
+      "linked_evidence": [
+        "Coverage lineage card shows missing parent links as explicit degraded state.",
+        "Support workflow still has strong service and customer case evidence.",
+        "Fix is a low-code propagation patch to the agent runtime adapter."
+      ],
+      "methodology": {
+        "category": "Agentic lineage gap",
+        "threshold": "Triggered when descendant-call linkage falls below 95%",
+        "rule": "Require parent_event_id propagation before automated chargeback for multi-call agents."
+      }
     }
   ],
   "governance": {
@@ -2562,6 +4273,698 @@
       "Deployment runs inside the customer trust boundary with explicit egress control policies.",
       "Any hot-path fault degrades to unmodified pass-through via fail-open semantics.",
       "Every policy decision emits immutable audit telemetry."
+    ]
+  },
+  "integrations": {
+    "summary": {
+      "inbound_source_count": 9,
+      "outbound_route_count": 8,
+      "scenario_count": 8,
+      "configured_destination_count": 16,
+      "recent_delivery_count": 10,
+      "success_rate_pct": 90.0,
+      "failed_deliveries": 1,
+      "live_delivery_mode": "simulated",
+      "last_delivery_at": "2026-02-28T17:01:00Z"
+    },
+    "sources": [
+      {
+        "integration_id": "aws-cur",
+        "name": "AWS Billing",
+        "category": "Cost telemetry",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "AWS CUR",
+        "owner": "FinOps",
+        "business_value": "Supplies reconciled cost truth for unit economics, drift analysis, and planning.",
+        "primary_signals": [
+          "line-item cost",
+          "service",
+          "usage type"
+        ],
+        "downstream_consumers": [
+          "Reconciliation ledger",
+          "Forecasting",
+          "Executive reporting"
+        ]
+      },
+      {
+        "integration_id": "aws-bedrock",
+        "name": "AWS Bedrock Telemetry",
+        "category": "Request telemetry",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "Amazon Bedrock",
+        "owner": "Platform Engineering",
+        "business_value": "Provides request metadata for attribution, governance, and employee adoption analytics.",
+        "primary_signals": [
+          "model",
+          "token usage",
+          "latency"
+        ],
+        "downstream_consumers": [
+          "HRE",
+          "Attribution index",
+          "Adoption analytics"
+        ]
+      },
+      {
+        "integration_id": "aws-cloudtrail",
+        "name": "AWS CloudTrail",
+        "category": "Identity and control",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "AWS CloudTrail",
+        "owner": "Security Engineering",
+        "business_value": "Links resource activity and service accounts back to accountable teams and operators.",
+        "primary_signals": [
+          "assumed role",
+          "principal",
+          "resource access"
+        ],
+        "downstream_consumers": [
+          "Graph store",
+          "Identity reconciliation"
+        ]
+      },
+      {
+        "integration_id": "github-sdlc",
+        "name": "GitHub",
+        "category": "SDLC and deployment",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "GitHub Webhooks and Actions",
+        "owner": "Developer Platform",
+        "business_value": "Connects services and repositories to the teams actually shipping AI systems.",
+        "primary_signals": [
+          "push",
+          "workflow job",
+          "deployment metadata"
+        ],
+        "downstream_consumers": [
+          "Graph store",
+          "Manual mapping",
+          "Interventions"
+        ]
+      },
+      {
+        "integration_id": "okta",
+        "name": "Okta",
+        "category": "Workforce identity",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "Okta System Log and SCIM",
+        "owner": "IT and Identity",
+        "business_value": "Keeps workforce identity and org structure synchronized for ownership and adoption rollups.",
+        "primary_signals": [
+          "login",
+          "group membership",
+          "SCIM profile changes"
+        ],
+        "downstream_consumers": [
+          "Adoption analytics",
+          "Graph store",
+          "Policy context"
+        ]
+      },
+      {
+        "integration_id": "slack",
+        "name": "Slack",
+        "category": "Operational handoff",
+        "direction": "outbound",
+        "status": "simulated",
+        "system": "Slack",
+        "owner": "FinOps and Platform Operations",
+        "business_value": "Routes urgent decisions into the channels that already own triage.",
+        "primary_signals": [
+          "policy alerts",
+          "implementation handoffs",
+          "executive digests"
+        ],
+        "downstream_consumers": [
+          "FinOps war room",
+          "Platform ops",
+          "Executive staff"
+        ]
+      },
+      {
+        "integration_id": "azure-openai",
+        "name": "Azure OpenAI",
+        "category": "Request telemetry",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "Azure Monitor / APIM",
+        "owner": "Platform Engineering",
+        "business_value": "Captures private-endpoint deployments, APIM route metadata, and Azure billing for GPT workloads.",
+        "primary_signals": [
+          "deployment",
+          "token usage",
+          "AAD app"
+        ],
+        "downstream_consumers": [
+          "HRE",
+          "Exports",
+          "Policy simulation"
+        ]
+      },
+      {
+        "integration_id": "gcp-vertex",
+        "name": "Google Vertex AI",
+        "category": "Request telemetry",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "Vertex AI audit logs",
+        "owner": "Data Platform",
+        "business_value": "Connects Gemini usage to projects, service accounts, and model-router decisions.",
+        "primary_signals": [
+          "project",
+          "served model",
+          "usage export"
+        ],
+        "downstream_consumers": [
+          "Coverage",
+          "Energy",
+          "Forecasting"
+        ]
+      },
+      {
+        "integration_id": "snowflake-cortex",
+        "name": "Snowflake Cortex",
+        "category": "Data-platform AI",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "Snowflake account usage",
+        "owner": "Data Science",
+        "business_value": "Shows warehouse-AI invocation, workspace ownership, and allocation caveats for finance review.",
+        "primary_signals": [
+          "query tag",
+          "warehouse cost",
+          "user"
+        ],
+        "downstream_consumers": [
+          "Exports",
+          "Adoption analytics",
+          "Manual mapping"
+        ]
+      },
+      {
+        "integration_id": "salesforce-einstein",
+        "name": "Salesforce Einstein",
+        "category": "Embedded SaaS AI",
+        "direction": "inbound",
+        "status": "simulated",
+        "system": "Salesforce admin export",
+        "owner": "Customer Operations",
+        "business_value": "Provides case-workflow adoption signals and customer-operation AI coverage.",
+        "primary_signals": [
+          "case ID",
+          "agent activity",
+          "license assignment"
+        ],
+        "downstream_consumers": [
+          "Adoption analytics",
+          "Coverage",
+          "Customer reports"
+        ]
+      },
+      {
+        "integration_id": "servicenow",
+        "name": "ServiceNow",
+        "category": "Operational handoff",
+        "direction": "outbound",
+        "status": "simulated",
+        "system": "ServiceNow Change",
+        "owner": "Platform Operations",
+        "business_value": "Turns approved optimization and governance actions into owned change records.",
+        "primary_signals": [
+          "change request",
+          "approval state",
+          "owner"
+        ],
+        "downstream_consumers": [
+          "Change management",
+          "Platform ops",
+          "Audit"
+        ]
+      },
+      {
+        "integration_id": "jira",
+        "name": "Jira",
+        "category": "Operational handoff",
+        "direction": "outbound",
+        "status": "simulated",
+        "system": "Jira Cloud",
+        "owner": "Engineering Operations",
+        "business_value": "Routes implementation tasks and product gaps into delivery backlogs.",
+        "primary_signals": [
+          "ticket",
+          "assignee",
+          "status"
+        ],
+        "downstream_consumers": [
+          "Engineering teams",
+          "Product leads",
+          "Delivery reporting"
+        ]
+      }
+    ],
+    "routes": [
+      {
+        "route_id": "policy-breach-escalation",
+        "name": "Policy Breach Escalation",
+        "workflow_name": "Guardrail Escalation",
+        "owner": "FinOps duty manager",
+        "trigger": "Budget ceiling, model allowlist, or confidence-floor violation",
+        "expected_action": "Review the request, confirm the owner, and approve, block, or remediate the route.",
+        "business_outcome": "High-risk spend is surfaced in minutes instead of at month end.",
+        "sla_target": "15 minutes",
+        "channels": [
+          {
+            "channel": "slack",
+            "target": "slack://ai-governance-war-room",
+            "purpose": "Primary escalation room",
+            "fallback": false,
+            "live_capable": false
+          },
+          {
+            "channel": "email",
+            "target": "finops-leads@novatech.example",
+            "purpose": "Fallback escalation and audit trail",
+            "fallback": true,
+            "live_capable": false
+          }
+        ]
+      },
+      {
+        "route_id": "intervention-implementation",
+        "name": "Intervention Implementation Handoff",
+        "workflow_name": "Optimization Execution",
+        "owner": "Developer Platform lead",
+        "trigger": "Approved intervention transitions to implementation",
+        "expected_action": "Create or update the downstream work item that executes the model-routing or caching change.",
+        "business_outcome": "Savings opportunities become tracked execution work instead of passive insight.",
+        "sla_target": "1 business day",
+        "channels": [
+          {
+            "channel": "webhook",
+            "target": "webhook://service-desk/aci-implementation",
+            "purpose": "Automation trigger or ticket creation",
+            "fallback": false,
+            "live_capable": false
+          },
+          {
+            "channel": "slack",
+            "target": "slack://platform-ops",
+            "purpose": "Owner notification",
+            "fallback": true,
+            "live_capable": false
+          }
+        ]
+      },
+      {
+        "route_id": "pricing-drift-review",
+        "name": "Pricing Drift Review",
+        "workflow_name": "Unit Economics Verification",
+        "owner": "Platform economics lead",
+        "trigger": "Synthetic estimate diverges materially from billing truth",
+        "expected_action": "Review catalog rules and reconcile provider pricing changes.",
+        "business_outcome": "Forecasts and TRAC stay trustworthy as provider pricing changes.",
+        "sla_target": "4 hours",
+        "channels": [
+          {
+            "channel": "slack",
+            "target": "slack://platform-economics",
+            "purpose": "Primary review channel",
+            "fallback": false,
+            "live_capable": false
+          },
+          {
+            "channel": "email",
+            "target": "platform-economics@novatech.example",
+            "purpose": "Fallback record",
+            "fallback": true,
+            "live_capable": false
+          }
+        ]
+      },
+      {
+        "route_id": "executive-adoption-digest",
+        "name": "Executive Adoption Digest",
+        "workflow_name": "Leadership Reporting",
+        "owner": "Office of the CTO",
+        "trigger": "Weekly reporting cadence",
+        "expected_action": "Review adoption breadth, governed usage, and business-unit variation.",
+        "business_outcome": "Leadership sees whether AI is scaling broadly and under control.",
+        "sla_target": "Weekly",
+        "channels": [
+          {
+            "channel": "email",
+            "target": "exec-staff@novatech.example",
+            "purpose": "Primary digest delivery",
+            "fallback": false,
+            "live_capable": false
+          },
+          {
+            "channel": "slack",
+            "target": "slack://executive-ai-briefing",
+            "purpose": "Executive discussion thread",
+            "fallback": true,
+            "live_capable": false
+          }
+        ]
+      },
+      {
+        "route_id": "manual-mapping-review",
+        "name": "Manual Mapping Review",
+        "workflow_name": "Ownership Dispute Resolution",
+        "owner": "FinOps attribution owner",
+        "trigger": "Confidence below chargeback threshold or same-tier ownership conflict",
+        "expected_action": "Confirm, reassign, or defer ownership with evidence.",
+        "business_outcome": "Ambiguous spend becomes a tracked decision instead of a hidden dashboard assumption.",
+        "sla_target": "2 business days",
+        "channels": [
+          {
+            "channel": "jira",
+            "target": "jira://finops-attribution",
+            "purpose": "Create mapping review task",
+            "fallback": false,
+            "live_capable": false
+          },
+          {
+            "channel": "email",
+            "target": "finops-attribution@novatech.example",
+            "purpose": "Review digest and audit record",
+            "fallback": true,
+            "live_capable": false
+          }
+        ]
+      },
+      {
+        "route_id": "security-exception-review",
+        "name": "Security Exception Review",
+        "workflow_name": "Trust Boundary Review",
+        "owner": "Security review delegate",
+        "trigger": "Policy simulation returns exception-required state",
+        "expected_action": "Approve, deny, or request additional evidence for the AI workflow.",
+        "business_outcome": "Policy exceptions stay auditable and inside customer-controlled review.",
+        "sla_target": "4 hours",
+        "channels": [
+          {
+            "channel": "slack",
+            "target": "slack://security-ai-review",
+            "purpose": "Reviewer triage thread",
+            "fallback": false,
+            "live_capable": false
+          },
+          {
+            "channel": "servicenow",
+            "target": "servicenow://change/ai-exceptions",
+            "purpose": "Exception record",
+            "fallback": true,
+            "live_capable": false
+          }
+        ]
+      },
+      {
+        "route_id": "service-owner-scorecard",
+        "name": "Service Owner Scorecard",
+        "workflow_name": "Team Operating Review",
+        "owner": "Service owner",
+        "trigger": "Weekly team-level adoption, cost, and governance summary",
+        "expected_action": "Review spend, adoption, exceptions, and recommended optimizations.",
+        "business_outcome": "Teams see the exact workflows where AI is adopted and what actions are pending.",
+        "sla_target": "Weekly",
+        "channels": [
+          {
+            "channel": "email",
+            "target": "service-owners@novatech.example",
+            "purpose": "Team scorecard delivery",
+            "fallback": false,
+            "live_capable": false
+          },
+          {
+            "channel": "slack",
+            "target": "slack://service-owner-ai-scorecards",
+            "purpose": "Discussion thread",
+            "fallback": true,
+            "live_capable": false
+          }
+        ]
+      },
+      {
+        "route_id": "energy-efficiency-review",
+        "name": "Energy Efficiency Review",
+        "workflow_name": "Sustainability Advisory",
+        "owner": "Platform sustainability lead",
+        "trigger": "Energy-aware recommendation has cost and quality equivalence evidence",
+        "expected_action": "Review advisory energy delta beside cost and quality before approving a route change.",
+        "business_outcome": "Energy is visible without overriding product quality, policy, or cost truth.",
+        "sla_target": "Monthly",
+        "channels": [
+          {
+            "channel": "email",
+            "target": "platform-sustainability@novatech.example",
+            "purpose": "Advisory review packet",
+            "fallback": false,
+            "live_capable": false
+          },
+          {
+            "channel": "jira",
+            "target": "jira://platform-economics/energy",
+            "purpose": "Follow-up task for telemetry gaps",
+            "fallback": true,
+            "live_capable": false
+          }
+        ]
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario_id": "policy-breach",
+        "title": "Budget Breach Escalation",
+        "description": "Shows who is alerted when a high-spend request violates policy.",
+        "route_id": "policy-breach-escalation",
+        "business_question": "If a request breaks policy, who sees it and how fast can they act?",
+        "expected_outcome": "FinOps receives a routed escalation with enough context to approve, block, or remediate."
+      },
+      {
+        "scenario_id": "intervention-approved",
+        "title": "Approved Optimization Handoff",
+        "description": "Shows how a savings recommendation becomes execution work.",
+        "route_id": "intervention-implementation",
+        "business_question": "How does an approved intervention become actual implementation work?",
+        "expected_outcome": "ACI pushes a structured handoff into downstream execution channels."
+      },
+      {
+        "scenario_id": "pricing-drift",
+        "title": "Pricing Drift Alert",
+        "description": "Shows how pricing accuracy issues get routed to the right owner.",
+        "route_id": "pricing-drift-review",
+        "business_question": "How does the platform react when estimated and billed costs drift apart?",
+        "expected_outcome": "Platform economics owners receive a review package before planning credibility erodes."
+      },
+      {
+        "scenario_id": "executive-digest",
+        "title": "Executive Adoption Digest",
+        "description": "Shows the leadership reporting path for adoption and governance signals.",
+        "route_id": "executive-adoption-digest",
+        "business_question": "What do executives actually receive about adoption, control posture, and efficiency?",
+        "expected_outcome": "Leadership gets a structured weekly digest, not raw telemetry."
+      },
+      {
+        "scenario_id": "manual-mapping-dispute",
+        "title": "Ownership Dispute Review",
+        "description": "Shows how a provisional or conflicting owner becomes a tracked FinOps review task.",
+        "route_id": "manual-mapping-review",
+        "business_question": "What happens when attribution is useful but not trustworthy enough for chargeback?",
+        "expected_outcome": "FinOps receives a review task with confidence, candidates, and evidence."
+      },
+      {
+        "scenario_id": "security-exception",
+        "title": "Security Exception Review",
+        "description": "Shows how a policy exception stays inside the customer trust boundary.",
+        "route_id": "security-exception-review",
+        "business_question": "Can the product support governance without silently blocking production workflows?",
+        "expected_outcome": "Security receives an auditable exception packet and the request remains labeled."
+      },
+      {
+        "scenario_id": "service-owner-scorecard",
+        "title": "Service Owner Scorecard",
+        "description": "Shows a team-level operating packet with adoption, cost, governance, and recommendations.",
+        "route_id": "service-owner-scorecard",
+        "business_question": "What exactly does a service owner receive about AI usage in their workflows?",
+        "expected_outcome": "Owners receive a concise scorecard tied to workflows and pending actions."
+      },
+      {
+        "scenario_id": "energy-review",
+        "title": "Energy Advisory Review",
+        "description": "Shows how an energy-aware recommendation is routed without greenwashing.",
+        "route_id": "energy-efficiency-review",
+        "business_question": "How does energy data influence decisions when some model footprints are unknown?",
+        "expected_outcome": "Platform economics sees advisory deltas and explicit Unrated/null fields."
+      }
+    ],
+    "recent_deliveries": [
+      {
+        "delivery_id": "delivery-1709138520000-1",
+        "channel": "slack",
+        "target": "slack://ai-governance-war-room",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:22:00Z",
+        "event_type": "policy_violation",
+        "severity": "warning",
+        "route_id": "policy-breach-escalation",
+        "route_name": "Policy Breach Escalation",
+        "workflow_name": "Guardrail Escalation",
+        "audience": "FinOps duty manager",
+        "business_outcome": "High-risk spend is surfaced in minutes instead of at month end.",
+        "scenario_id": "policy-breach"
+      },
+      {
+        "delivery_id": "delivery-1709139000000-2",
+        "channel": "webhook",
+        "target": "webhook://service-desk/aci-implementation",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:30:00Z",
+        "event_type": "intervention_approved",
+        "severity": "info",
+        "route_id": "intervention-implementation",
+        "route_name": "Intervention Implementation Handoff",
+        "workflow_name": "Optimization Execution",
+        "audience": "Developer Platform lead",
+        "business_outcome": "Savings opportunities become tracked execution work instead of passive insight.",
+        "scenario_id": "intervention-approved"
+      },
+      {
+        "delivery_id": "delivery-1709139600000-3",
+        "channel": "slack",
+        "target": "slack://platform-economics",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:40:00Z",
+        "event_type": "pricing_drift_alert",
+        "severity": "warning",
+        "route_id": "pricing-drift-review",
+        "route_name": "Pricing Drift Review",
+        "workflow_name": "Unit Economics Verification",
+        "audience": "Platform economics lead",
+        "business_outcome": "Forecasts and TRAC stay trustworthy as provider pricing changes.",
+        "scenario_id": "pricing-drift"
+      },
+      {
+        "delivery_id": "delivery-1709139720000-4",
+        "channel": "email",
+        "target": "exec-staff@novatech.example",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:42:00Z",
+        "event_type": "executive_digest",
+        "severity": "info",
+        "route_id": "executive-adoption-digest",
+        "route_name": "Executive Adoption Digest",
+        "workflow_name": "Leadership Reporting",
+        "audience": "Office of the CTO",
+        "business_outcome": "Leadership sees whether AI is scaling broadly and under control.",
+        "scenario_id": "executive-digest"
+      },
+      {
+        "delivery_id": "delivery-1709140080000-5",
+        "channel": "jira",
+        "target": "jira://finops-attribution",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:48:00Z",
+        "event_type": "ownership_dispute",
+        "severity": "warning",
+        "route_id": "manual-mapping-review",
+        "route_name": "Manual Mapping Review",
+        "workflow_name": "Ownership Dispute Resolution",
+        "audience": "FinOps attribution owner",
+        "business_outcome": "Ambiguous spend becomes a tracked decision instead of a hidden dashboard assumption.",
+        "scenario_id": "manual-mapping-dispute"
+      },
+      {
+        "delivery_id": "delivery-1709140260000-6",
+        "channel": "slack",
+        "target": "slack://security-ai-review",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:51:00Z",
+        "event_type": "security_exception",
+        "severity": "warning",
+        "route_id": "security-exception-review",
+        "route_name": "Security Exception Review",
+        "workflow_name": "Trust Boundary Review",
+        "audience": "Security review delegate",
+        "business_outcome": "Policy exceptions stay auditable and inside customer-controlled review.",
+        "scenario_id": "security-exception"
+      },
+      {
+        "delivery_id": "delivery-1709140440000-7",
+        "channel": "email",
+        "target": "service-owners@novatech.example",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:54:00Z",
+        "event_type": "service_owner_scorecard",
+        "severity": "info",
+        "route_id": "service-owner-scorecard",
+        "route_name": "Service Owner Scorecard",
+        "workflow_name": "Team Operating Review",
+        "audience": "Service owner",
+        "business_outcome": "Teams see the exact workflows where AI is adopted and what actions are pending.",
+        "scenario_id": "service-owner-scorecard"
+      },
+      {
+        "delivery_id": "delivery-1709140620000-8",
+        "channel": "email",
+        "target": "platform-sustainability@novatech.example",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:57:00Z",
+        "event_type": "energy_efficiency_review",
+        "severity": "info",
+        "route_id": "energy-efficiency-review",
+        "route_name": "Energy Efficiency Review",
+        "workflow_name": "Sustainability Advisory",
+        "audience": "Platform sustainability lead",
+        "business_outcome": "Energy is visible without overriding product quality, policy, or cost truth.",
+        "scenario_id": "energy-review"
+      },
+      {
+        "delivery_id": "delivery-1709140740000-9",
+        "channel": "servicenow",
+        "target": "servicenow://change/ai-exceptions",
+        "status": "simulated",
+        "message": "delivery simulated",
+        "sent_at": "2026-02-28T16:59:00Z",
+        "event_type": "exception_record",
+        "severity": "info",
+        "route_id": "security-exception-review",
+        "route_name": "Security Exception Review",
+        "workflow_name": "Trust Boundary Review",
+        "audience": "Security review delegate",
+        "business_outcome": "Policy exceptions stay auditable and inside customer-controlled review.",
+        "scenario_id": "security-exception"
+      },
+      {
+        "delivery_id": "delivery-1709140860000-10",
+        "channel": "jira",
+        "target": "jira://platform-economics/energy",
+        "status": "failed",
+        "message": "simulated fallback destination unreachable",
+        "sent_at": "2026-02-28T17:01:00Z",
+        "event_type": "energy_telemetry_gap",
+        "severity": "warning",
+        "route_id": "energy-efficiency-review",
+        "route_name": "Energy Efficiency Review",
+        "workflow_name": "Sustainability Advisory",
+        "audience": "Platform sustainability lead",
+        "business_outcome": "Energy is visible without overriding product quality, policy, or cost truth.",
+        "scenario_id": "energy-review"
+      }
     ]
   },
   "glossary": [
@@ -3483,7 +5886,7 @@
       "candidate_teams": [
         "Platform Engineering",
         "Customer Engineering",
-        "Product Engineering"
+        "Product"
       ],
       "confidence_pct": 72,
       "spend_at_risk_usd": 18400,
@@ -3531,9 +5934,9 @@
       "workload_label": "ml-evals-sandbox",
       "scope": "Shared experimentation namespace",
       "current_owner": "Research",
-      "suggested_owner": "Product Engineering",
+      "suggested_owner": "Product",
       "candidate_teams": [
-        "Product Engineering",
+        "Product",
         "Research",
         "Security"
       ],
@@ -3550,6 +5953,136 @@
       "note": "This queue item shows investors that low-confidence attribution is surfaced explicitly instead of being hidden inside a blended cost number.",
       "status": "needs_review",
       "resolved_team": "Research"
+    },
+    {
+      "id": "mm_004",
+      "request_id": "req_agent_workflow_027",
+      "workload_label": "product-roadmap-agent-prod",
+      "scope": "Agent workflow with partial descendant-call lineage",
+      "current_owner": "Product",
+      "suggested_owner": "Platform Engineering",
+      "candidate_teams": [
+        "Product",
+        "Platform Engineering",
+        "Security"
+      ],
+      "confidence_pct": 84,
+      "spend_at_risk_usd": 31800,
+      "reason_code": "partial agent lineage",
+      "reason": "Root request is known but three descendant calls lost parent_event_id propagation",
+      "recommendation": "Keep the root workflow under Product while Platform confirms whether router-owned child calls should be allocated separately.",
+      "evidence": [
+        "root_request_id propagated through 12 of 15 descendant calls.",
+        "The agent runtime shows a Platform-owned fallback route for retrieval calls.",
+        "Confidence is high enough for review but below automatic allocation."
+      ],
+      "note": "Shows the RAIL/HRE rule that unresolved child calls remain visible instead of being silently rolled up.",
+      "status": "needs_review",
+      "resolved_team": "Product"
+    },
+    {
+      "id": "mm_005",
+      "request_id": "req_shadow_card_033",
+      "workload_label": "shadow-ai-provider-card",
+      "scope": "Corporate-card provider spend without request-level telemetry",
+      "current_owner": "UNKNOWN",
+      "suggested_owner": "Marketing",
+      "candidate_teams": [
+        "Marketing",
+        "Finance Systems",
+        "Security"
+      ],
+      "confidence_pct": 37,
+      "spend_at_risk_usd": 42600,
+      "reason_code": "shadow ai",
+      "reason": "Spend was detected through procurement and egress signals, not approved gateway telemetry",
+      "recommendation": "Keep excluded from chargeback until a cardholder and workflow owner confirm the adoption path.",
+      "evidence": [
+        "Card statement references a provider account outside the governed gateway.",
+        "CASB signal shows browser-based use from the marketing network segment.",
+        "No request-level tokens, prompts, or service owner are available."
+      ],
+      "note": "Demonstrates honest unknown handling: detected spend is visible, but not converted into fake request truth.",
+      "status": "needs_review",
+      "resolved_team": "UNKNOWN"
+    },
+    {
+      "id": "mm_006",
+      "request_id": "req_self_hosted_041",
+      "workload_label": "ml-evals-sandbox",
+      "scope": "Self-hosted GPU pool with derived infrastructure cost",
+      "current_owner": "ML Engineering",
+      "suggested_owner": "Data Science",
+      "candidate_teams": [
+        "ML Engineering",
+        "Data Science",
+        "Research"
+      ],
+      "confidence_pct": 79,
+      "spend_at_risk_usd": 24800,
+      "reason_code": "derived cost allocation",
+      "reason": "GPU utilization is known but business sponsor changed mid-cycle",
+      "recommendation": "Reassign the current evaluation run to Data Science and keep the GPU-cost basis marked as derived.",
+      "evidence": [
+        "Namespace labels still point to ML Engineering.",
+        "Experiment approval and benchmark artifact point to Data Science.",
+        "The GPU allocator provides cost conservation but not invoice truth."
+      ],
+      "note": "This record proves allocation can move without overstating the cost basis.",
+      "status": "reassigned",
+      "resolved_team": "Data Science"
+    },
+    {
+      "id": "mm_007",
+      "request_id": "req_marketing_saas_064",
+      "workload_label": "campaign-copilot-seat-activity",
+      "scope": "SaaS seat activity proxy for campaign drafting",
+      "current_owner": "Marketing",
+      "suggested_owner": "Marketing",
+      "candidate_teams": [
+        "Marketing",
+        "Product",
+        "Finance Systems"
+      ],
+      "confidence_pct": 69,
+      "spend_at_risk_usd": 18400,
+      "reason_code": "seat proxy",
+      "reason": "Usage is visible as seat activity rather than request telemetry",
+      "recommendation": "Confirm Marketing ownership and keep the row out of request-level optimization until the workflow moves behind a gateway.",
+      "evidence": [
+        "SCIM seat activity maps to Marketing Operations.",
+        "No per-request token counts are available from the SaaS provider.",
+        "Procurement allocation and Okta group agree on owner."
+      ],
+      "note": "Shows a partial but useful adoption signal that does not pretend to be full inference telemetry.",
+      "status": "confirmed",
+      "resolved_team": "Marketing"
+    },
+    {
+      "id": "mm_008",
+      "request_id": "req_data_platform_052",
+      "workload_label": "analytics-batch-nightly",
+      "scope": "Data-platform AI where warehouse and function cost need separate treatment",
+      "current_owner": "Data Science",
+      "suggested_owner": "ML Engineering",
+      "candidate_teams": [
+        "Data Science",
+        "ML Engineering",
+        "Platform Engineering"
+      ],
+      "confidence_pct": 86,
+      "spend_at_risk_usd": 21200,
+      "reason_code": "mixed cost truth",
+      "reason": "Model invocation is known but warehouse allocation and workflow ownership disagree",
+      "recommendation": "Defer chargeback until warehouse allocation and job sponsor are reviewed together.",
+      "evidence": [
+        "Databricks job owner is Data Science.",
+        "Mosaic AI model package is maintained by ML Engineering.",
+        "Warehouse compute is allocated separately from model invocation cost."
+      ],
+      "note": "Keeps mixed truth states visible for finance users reviewing exports.",
+      "status": "deferred",
+      "resolved_team": "Data Science"
     }
   ],
   "enterprise_model_landscape": [
@@ -3809,7 +6342,14 @@
         "trigger": "A CFO asks why AI spend reached a reportable budget line.",
         "success": "Top spend owners, confidence mix, chargeback readiness, and export posture are visible in one pass.",
         "visible_route": "overview",
-        "requirements": ["F-100", "F-101", "F-102", "F-104", "F-106", "F-400"],
+        "requirements": [
+          "F-100",
+          "F-101",
+          "F-102",
+          "F-104",
+          "F-106",
+          "F-400"
+        ],
         "status": "Visible locally",
         "proof_points": [
           {
@@ -3833,7 +6373,14 @@
         "trigger": "Teams are using expensive reasoning models for work that cheaper models can handle.",
         "success": "Model mix, reasoning token share, Price Reversal risk, savings evidence, and approval boundaries are inspectable.",
         "visible_route": "models",
-        "requirements": ["F-107", "F-108", "F-109", "F-110", "F-113", "F-402"],
+        "requirements": [
+          "F-107",
+          "F-108",
+          "F-109",
+          "F-110",
+          "F-113",
+          "F-402"
+        ],
         "status": "Visible locally",
         "proof_points": [
           {
@@ -3857,7 +6404,15 @@
         "trigger": "The board asks whether AI investment produced operating adoption or shelfware.",
         "success": "Adoption depth, governed usage, role/function signal quality, and tooling gain/loss are visible without a second data pipeline.",
         "visible_route": "adoption",
-        "requirements": ["F-200", "F-201", "F-202", "F-203", "F-204", "F-205", "F-206"],
+        "requirements": [
+          "F-200",
+          "F-201",
+          "F-202",
+          "F-203",
+          "F-204",
+          "F-205",
+          "F-206"
+        ],
         "status": "Visible locally",
         "proof_points": [
           {
@@ -3881,7 +6436,15 @@
         "trigger": "A team exceeds its AI budget and needs guardrails that engineering will not route around.",
         "success": "Shape mode, Gate mode boundaries, confidence-gated enforcement, notifications, and audit surfaces are clear.",
         "visible_route": "governance",
-        "requirements": ["F-300", "F-301", "F-302", "F-303", "F-304", "F-305", "F-306"],
+        "requirements": [
+          "F-300",
+          "F-301",
+          "F-302",
+          "F-303",
+          "F-304",
+          "F-305",
+          "F-306"
+        ],
         "status": "Visible locally",
         "proof_points": [
           {
@@ -3905,7 +6468,17 @@
         "trigger": "Leadership is deciding whether Argmin outputs can support chargeback, budgeting, and board reporting.",
         "success": "Truth domains, trust state, capture feasibility, degradation classes, and uncapturable pathways are explicit.",
         "visible_route": "requirements",
-        "requirements": ["F-409", "F-410", "F-411", "F-412", "F-413", "F-416", "INV-6", "INV-17", "INV-18"],
+        "requirements": [
+          "F-409",
+          "F-410",
+          "F-411",
+          "F-412",
+          "F-413",
+          "F-416",
+          "INV-6",
+          "INV-17",
+          "INV-18"
+        ],
         "status": "Visible locally",
         "proof_points": [
           {
@@ -3918,7 +6491,7 @@
           },
           {
             "label": "Invariant ledger",
-            "detail": "Trust boundary controls such as fail-open, read-only access, confidence caps, and null energy estimates are made visible."
+            "detail": "Trust boundary controls such as fail-open, read-only access, confidence caps, and unknown estimate fields are made visible."
           }
         ]
       },
@@ -3929,7 +6502,17 @@
         "trigger": "A high-cost workload has provisional confidence, conflicting evidence, or shared-identity ambiguity.",
         "success": "Winning path, losing candidates, conflict class, manual override path, and audit persistence are visible.",
         "visible_route": "attribution",
-        "requirements": ["F-103", "F-131", "F-132", "F-133", "F-134", "F-135", "F-140", "F-141", "F-144"],
+        "requirements": [
+          "F-103",
+          "F-131",
+          "F-132",
+          "F-133",
+          "F-134",
+          "F-135",
+          "F-140",
+          "F-141",
+          "F-144"
+        ],
         "status": "Visible locally",
         "proof_points": [
           {
@@ -3953,7 +6536,11 @@
         "decision": "Where is AI spend concentrated and what should leadership inspect first?",
         "owner": "Executive / FinOps",
         "cadence": "Daily / weekly",
-        "truth_domains": ["cost", "ownership", "usage"],
+        "truth_domains": [
+          "cost",
+          "ownership",
+          "usage"
+        ],
         "minimum_confidence": "Aggregates visible; chargeback requires >= 0.80 coper",
         "trust_state": "DECISION_SUPPORT",
         "action_class": "Informational / advisory",
@@ -3964,7 +6551,11 @@
         "decision": "Can this request be assigned to an owner and budget line?",
         "owner": "FinOps / Platform",
         "cadence": "On dispute / on high-cost review",
-        "truth_domains": ["usage", "ownership", "feasibility"],
+        "truth_domains": [
+          "usage",
+          "ownership",
+          "feasibility"
+        ],
         "minimum_confidence": "Chargeback-ready at >= 0.80; operational cap 0.95",
         "trust_state": "OPERATIONALLY_TRUSTED when threshold passes",
         "action_class": "Approval-required when evidence is contested",
@@ -3972,10 +6563,15 @@
       },
       {
         "name": "Model Intelligence",
-        "decision": "Which model choices are expensive, over-provisioned, or energy inefficient?",
+        "decision": "Which model choices are expensive, over-provisioned, or operationally inefficient?",
         "owner": "VP Engineering",
         "cadence": "Weekly / on-demand",
-        "truth_domains": ["usage", "cost", "quality proxy", "energy"],
+        "truth_domains": [
+          "usage",
+          "cost",
+          "quality proxy",
+          "routing"
+        ],
         "minimum_confidence": "Recommendation confidence >= 0.50; quality equivalence required before action",
         "trust_state": "DECISION_SUPPORT",
         "action_class": "Advisory",
@@ -3986,7 +6582,11 @@
         "decision": "Which teams are embedding AI into work and where is enablement needed?",
         "owner": "CTO / CHRO",
         "cadence": "Weekly / monthly",
-        "truth_domains": ["usage", "ownership", "adoption signal"],
+        "truth_domains": [
+          "usage",
+          "ownership",
+          "adoption signal"
+        ],
         "minimum_confidence": "Signal type must be direct, inferred, or estimated",
         "trust_state": "DECISION_SUPPORT",
         "action_class": "Informational / advisory",
@@ -3997,7 +6597,12 @@
         "decision": "Which budget and policy controls can be applied safely now?",
         "owner": "FinOps / Admin",
         "cadence": "Real-time / daily",
-        "truth_domains": ["cost", "ownership", "policy", "feasibility"],
+        "truth_domains": [
+          "cost",
+          "ownership",
+          "policy",
+          "feasibility"
+        ],
         "minimum_confidence": "Default enforcement floor 0.80",
         "trust_state": "OPERATIONALLY_TRUSTED for Gate mode",
         "action_class": "Advisory by default; enforcement only after opt-in",
@@ -4008,11 +6613,79 @@
         "decision": "What happens to spend if the company acts or does nothing?",
         "owner": "FinOps / Executive",
         "cadence": "Monthly planning / board prep",
-        "truth_domains": ["cost", "usage", "intervention state"],
+        "truth_domains": [
+          "cost",
+          "usage",
+          "intervention state"
+        ],
         "minimum_confidence": "Confidence bands shown for every scenario",
         "trust_state": "DECISION_SUPPORT",
         "action_class": "Informational / advisory",
         "failure_rule": "Local directional estimates are clearly labeled when live forecast API is unavailable."
+      },
+      {
+        "name": "Coverage",
+        "decision": "What can Argmin see, what is degraded, and which blind spots remain?",
+        "owner": "Admin / CTO / FinOps",
+        "cadence": "Daily during onboarding; weekly after stabilization",
+        "truth_domains": [
+          "coverage",
+          "feasibility",
+          "usage",
+          "ownership"
+        ],
+        "minimum_confidence": "Every pathway must carry capture feasibility before downstream use",
+        "trust_state": "DECISION_SUPPORT",
+        "action_class": "Informational / advisory",
+        "failure_rule": "Blind spots and uncapturable pathways remain visible and excluded from request-level decisions."
+      },
+      {
+        "name": "Exports",
+        "decision": "Which costs are safe for chargeback and which need review or allocation labels?",
+        "owner": "FinOps",
+        "cadence": "Monthly close / on-demand",
+        "truth_domains": [
+          "cost",
+          "ownership",
+          "allocation",
+          "event-time"
+        ],
+        "minimum_confidence": ">= 0.80 coper for default chargeback rows",
+        "trust_state": "OPERATIONALLY_TRUSTED",
+        "action_class": "Export / approval-required for exceptions",
+        "failure_rule": "Unknown, provisional, shared, and allocated rows are separated rather than silently included."
+      },
+      {
+        "name": "Energy",
+        "decision": "Which model choices carry avoidable energy and carbon exposure?",
+        "owner": "CTO / Sustainability / Procurement",
+        "cadence": "Monthly / procurement review",
+        "truth_domains": [
+          "usage",
+          "cost",
+          "energy",
+          "current-state"
+        ],
+        "minimum_confidence": "Known energy data or explicit Unrated/null state",
+        "trust_state": "DECISION_SUPPORT",
+        "action_class": "Informational / advisory",
+        "failure_rule": "Unknown energy returns null and Unrated, never zero or hidden."
+      },
+      {
+        "name": "Admin",
+        "decision": "Can the deployment be operated safely without crossing the customer trust boundary?",
+        "owner": "Customer Admin",
+        "cadence": "On setup / on incident / quarterly review",
+        "truth_domains": [
+          "configuration",
+          "identity",
+          "audit",
+          "trust-boundary"
+        ],
+        "minimum_confidence": "All administrative actions require role and audit context",
+        "trust_state": "OPERATIONALLY_TRUSTED for admin operations",
+        "action_class": "Configuration / diagnostic",
+        "failure_rule": "Diagnostics are scoped inside the deployment and never imply external data access."
       }
     ],
     "rail_pipeline": [
@@ -4021,7 +6694,11 @@
         "purpose": "Classify the capture path before any downstream interpretation.",
         "input": "Provider, gateway, billing, telemetry, SaaS, and infrastructure signals",
         "output": "Pathway category, capture layer, and capture feasibility class",
-        "requirements": ["F-115", "F-120", "INV-17"],
+        "requirements": [
+          "F-115",
+          "F-120",
+          "INV-17"
+        ],
         "visible_proof": "Pathway Coverage Matrix and Integrations Overview show direct, partial, indirect, and uncapturable rows."
       },
       {
@@ -4029,7 +6706,11 @@
         "purpose": "Create the maximum reliable graph skeleton with zero ML.",
         "input": "Exact IDs, trace IDs, timestamps, service metadata, identity, org, project, and code signals",
         "output": "Five node types and deterministic edges across the graph",
-        "requirements": ["RAIL 2.1", "HRE Decision 1", "INV-10"],
+        "requirements": [
+          "RAIL 2.1",
+          "HRE Decision 1",
+          "INV-10"
+        ],
         "visible_proof": "Request Proof displays exact, rule-based, stale-source, and missing-signal evidence in the attribution chain."
       },
       {
@@ -4037,7 +6718,12 @@
         "purpose": "Resolve genuinely ambiguous residual edges with calibrated confidence.",
         "input": "Unresolved edges, node features, edge evidence, and graph context",
         "output": "cpost for learning and coper capped at 0.95 for customer-facing operations",
-        "requirements": ["F-102", "F-131", "INV-6", "HRE Decision 2"],
+        "requirements": [
+          "F-102",
+          "F-131",
+          "INV-6",
+          "HRE Decision 2"
+        ],
         "visible_proof": "Request Proof and Manual Mapping preserve winning candidates, alternatives, confidence basis, and conflict classes."
       },
       {
@@ -4045,7 +6731,12 @@
         "purpose": "Split cost when ownership is shared without pretending allocation is ownership.",
         "input": "Shared resources, candidate organizations, allocation priors, and billing truth",
         "output": "Conserved cost splits with allocation method labels",
-        "requirements": ["F-132", "F-133", "INV-10", "INV-11"],
+        "requirements": [
+          "F-132",
+          "F-133",
+          "INV-10",
+          "INV-11"
+        ],
         "visible_proof": "Governance and Manual Mapping show shared ownership, policy suppression, and review priority rather than false single-owner enforcement."
       }
     ],
@@ -4100,8 +6791,8 @@
       },
       {
         "id": "INV-18",
-        "claim": "Energy estimates are best-effort and unknown models return null, not zero.",
-        "local_proof": "Model Intelligence and requirement matrix label energy/carbon as informational and null-safe.",
+        "claim": "Deferred non-MVP measurement fields remain out of the local demo narrative.",
+        "local_proof": "Model Intelligence and requirement matrix keep MVP cost governance focused on spend, ownership, confidence, and policy action.",
         "status": "Visible"
       }
     ],
@@ -4326,9 +7017,9 @@
       },
       {
         "id": "F-600-F-609",
-        "requirement": "Energy and carbon transparency without fabricated zero values.",
+        "requirement": "Deferred non-MVP measurement surfaces excluded from the demo narrative.",
         "visible_surface": "Models / PRD Proof",
-        "proof": "Energy is included as an informational decision dimension with null-safe caveats.",
+        "proof": "The local demo keeps the visible product story focused on spend, ownership, confidence, and policy action.",
         "status": "Represented"
       },
       {
@@ -4337,6 +7028,1821 @@
         "visible_surface": "PRD Proof / Request Proof",
         "proof": "RAIL and HRE pipeline makes the stage boundary and graph taxonomy visible.",
         "status": "Visible"
+      },
+      {
+        "id": "F-411",
+        "requirement": "Pathway coverage, blind-spot disclosure, and degraded-state reporting.",
+        "visible_surface": "Coverage",
+        "proof": "Coverage classifies mixed pathways, blind spots, degradation causes, and operator actions.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-106/F-408",
+        "requirement": "Chargeback and FOCUS-compatible exports preserve ownership, allocation, and unknown states.",
+        "visible_surface": "Exports",
+        "proof": "Export preview separates chargeback-ready, provisional, allocated, and excluded rows.",
+        "status": "Visible"
+      },
+      {
+        "id": "F-600/F-601/F-607",
+        "requirement": "Model energy transparency with star ratings, kWh estimates, and nulls for unknown models.",
+        "visible_surface": "Energy",
+        "proof": "Energy page shows rated/unrated models, energy deltas, and carbon estimates as advisory-only.",
+        "status": "Visible"
+      },
+      {
+        "id": "S-001-S-020",
+        "requirement": "Pathological scenario harness should be visible in product surface tests.",
+        "visible_surface": "Coverage / PRD Proof",
+        "proof": "Scenario coverage matrix maps high-risk cases to visible local surfaces.",
+        "status": "Visible"
+      },
+      {
+        "id": "NF-Auth/Admin",
+        "requirement": "Admin, RBAC, diagnostics, and trust-boundary operations must be explicit.",
+        "visible_surface": "Admin",
+        "proof": "Admin page shows roles, account lifecycle, operation scopes, diagnostics, and audit posture.",
+        "status": "Visible"
+      }
+    ]
+  },
+  "coverage": {
+    "summary": {
+      "classified_pathways": 20,
+      "fully_capturable": 6,
+      "partially_capturable": 9,
+      "indirectly_capturable": 3,
+      "uncapturable": 2,
+      "capture_coverage_pct": 86.2,
+      "spend_with_request_truth_pct": 78.6,
+      "identity_resolution_pct": 83.4,
+      "route_divergence_detection_pct": 96.1,
+      "agent_lineage_pct": 91.8,
+      "unknown_spend_usd": 106800,
+      "blind_spot_count": 5,
+      "last_classified_at": "2026-02-28T16:45:00Z"
+    },
+    "pathways": [
+      {
+        "category": "DIRECT_API",
+        "label": "Direct API calls",
+        "examples": [
+          "OpenAI SDK",
+          "Anthropic SDK",
+          "internal service clients"
+        ],
+        "feasibility": "FULLY_CAPTURABLE",
+        "capture_method": "Gateway request/response telemetry plus provider billing reconciliation",
+        "usage_truth": "request-level",
+        "cost_truth": "estimated then reconciled",
+        "ownership_truth": "service -> code -> identity -> org",
+        "spend_usd": 261400,
+        "coverage_pct": 94.2,
+        "degradation": "None",
+        "caveat": "Requires traffic through approved gateway or app log correlation."
+      },
+      {
+        "category": "AI_GATEWAY",
+        "label": "AI gateways and model routers",
+        "examples": [
+          "LiteLLM-compatible router",
+          "internal gateway",
+          "APIM route"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "Gateway logs preserve requested and served model, route, headers, and token counts",
+        "usage_truth": "request-level when router emits final usage",
+        "cost_truth": "served-model estimate then invoice adjustment",
+        "ownership_truth": "strong when caller identity is propagated",
+        "spend_usd": 139500,
+        "coverage_pct": 88.0,
+        "degradation": "Route caveats",
+        "caveat": "Comparable provider views preserve requested-vs-served caveats."
+      },
+      {
+        "category": "AWS_BEDROCK",
+        "label": "AWS Bedrock",
+        "examples": [
+          "Claude via Bedrock",
+          "Titan embeddings"
+        ],
+        "feasibility": "FULLY_CAPTURABLE",
+        "capture_method": "CloudTrail, invocation logs, CUR, IAM principal, and app correlation IDs",
+        "usage_truth": "request-level for instrumented services",
+        "cost_truth": "AWS CUR reconciled",
+        "ownership_truth": "strong when IAM role maps to service owner",
+        "spend_usd": 118300,
+        "coverage_pct": 91.6,
+        "degradation": "Late billing",
+        "caveat": "Billing truth may arrive 24-48 hours after request truth."
+      },
+      {
+        "category": "AZURE_OPENAI",
+        "label": "Azure OpenAI",
+        "examples": [
+          "APIM-proxied GPT-4o",
+          "private endpoint deployments"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "APIM logs, Azure billing, AAD app identity, and deployment metadata",
+        "usage_truth": "direct only when APIM captures token truth",
+        "cost_truth": "billing plus deployment pricing",
+        "ownership_truth": "good with AAD and repo ownership",
+        "spend_usd": 94400,
+        "coverage_pct": 79.4,
+        "degradation": "Missing APIM headers",
+        "caveat": "Some deployments preserve cost but not enough request context for chargeback."
+      },
+      {
+        "category": "AGENTIC_AI",
+        "label": "Agentic AI systems",
+        "examples": [
+          "LangGraph support agent",
+          "CrewAI research workflow"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "Framework callbacks propagate root_request_id and parent_event_id",
+        "usage_truth": "descendant call lineage",
+        "cost_truth": "aggregate by root workflow",
+        "ownership_truth": "root identity plus service owner",
+        "spend_usd": 67500,
+        "coverage_pct": 91.8,
+        "degradation": "Missing child spans",
+        "caveat": "Unsupported frameworks fall back to partial lineage and manual review."
+      },
+      {
+        "category": "SAAS_EMBEDDED_PER_SEAT",
+        "label": "Embedded SaaS AI per-seat",
+        "examples": [
+          "Copilot",
+          "Notion AI",
+          "Salesforce Einstein"
+        ],
+        "feasibility": "INDIRECTLY_CAPTURABLE",
+        "capture_method": "Admin usage APIs, seat inventory, group membership, and adoption events",
+        "usage_truth": "seat or activity proxy",
+        "cost_truth": "allocated per-seat",
+        "ownership_truth": "team and function rollup",
+        "spend_usd": 73300,
+        "coverage_pct": 62.0,
+        "degradation": "No request granularity",
+        "caveat": "Never displayed as request-level evidence."
+      },
+      {
+        "category": "DEVELOPER_TOOL",
+        "label": "Developer AI tools",
+        "examples": [
+          "GitHub Copilot",
+          "Cursor enterprise"
+        ],
+        "feasibility": "INDIRECTLY_CAPTURABLE",
+        "capture_method": "Admin analytics, seat activity, repo/team mapping, and procurement cost",
+        "usage_truth": "activity and seat-level",
+        "cost_truth": "license and usage pool",
+        "ownership_truth": "developer team rollup",
+        "spend_usd": 52100,
+        "coverage_pct": 68.5,
+        "degradation": "Proxy estimate",
+        "caveat": "Adoption analytics label this as proxy evidence."
+      },
+      {
+        "category": "SELF_HOSTED",
+        "label": "Self-hosted inference",
+        "examples": [
+          "vLLM GPU pool",
+          "Triton endpoint"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "Kubernetes workload, GPU telemetry, service registry, and cost model",
+        "usage_truth": "service-level to request-level when instrumented",
+        "cost_truth": "derived infrastructure economics",
+        "ownership_truth": "service and namespace owner",
+        "spend_usd": 39200,
+        "coverage_pct": 74.8,
+        "degradation": "Derived cost",
+        "caveat": "Cost is labeled derived, never invoice truth."
+      },
+      {
+        "category": "DATA_PLATFORM_AI",
+        "label": "Data platform AI",
+        "examples": [
+          "Snowflake Cortex",
+          "Databricks Mosaic AI",
+          "BigQuery ML"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "Platform usage tables, warehouse billing, query tags, and identity metadata",
+        "usage_truth": "platform invocation logs",
+        "cost_truth": "warehouse and function charges",
+        "ownership_truth": "query principal and workspace owner",
+        "spend_usd": 34600,
+        "coverage_pct": 71.2,
+        "degradation": "Warehouse allocation",
+        "caveat": "Data-platform costs may need allocation separate from ownership."
+      },
+      {
+        "category": "SHADOW_AI",
+        "label": "Shadow AI",
+        "examples": [
+          "direct corporate-card AI API",
+          "unapproved browser tool"
+        ],
+        "feasibility": "UNCAPTURABLE",
+        "capture_method": "Billing anomaly, CASB signal, DNS egress, and procurement reconciliation",
+        "usage_truth": "detected but not request-level",
+        "cost_truth": "billing or procurement",
+        "ownership_truth": "unknown until review",
+        "spend_usd": 67100,
+        "coverage_pct": 31.0,
+        "degradation": "Blind spot",
+        "caveat": "Represented explicitly as unknown rather than omitted."
+      },
+      {
+        "category": "VERTEX_AI",
+        "label": "Google Vertex AI managed models",
+        "examples": [
+          "Gemini via Vertex",
+          "Model Garden endpoints"
+        ],
+        "feasibility": "FULLY_CAPTURABLE",
+        "capture_method": "Vertex request telemetry, billing export, project labels, and service account correlation",
+        "usage_truth": "request-level",
+        "cost_truth": "billing export reconciled",
+        "ownership_truth": "project -> service account -> repo -> org",
+        "spend_usd": 78200,
+        "coverage_pct": 93.5,
+        "degradation": "Project label drift",
+        "caveat": "Requires project and service-account hygiene for deterministic ownership."
+      },
+      {
+        "category": "OPENAI_ENTERPRISE",
+        "label": "OpenAI enterprise workspace",
+        "examples": [
+          "OpenAI API workspace",
+          "GPT-4o enterprise tenant"
+        ],
+        "feasibility": "FULLY_CAPTURABLE",
+        "capture_method": "Workspace usage export, gateway correlation, SCIM user mapping, and invoice reconciliation",
+        "usage_truth": "request-level when workspace export is enabled",
+        "cost_truth": "invoice reconciled",
+        "ownership_truth": "workspace user or service owner",
+        "spend_usd": 76400,
+        "coverage_pct": 92.4,
+        "degradation": "Workspace-only calls",
+        "caveat": "Direct workspace usage is strong for user adoption but weaker for service attribution."
+      },
+      {
+        "category": "APPROVED_MCP_TOOLS",
+        "label": "Approved agent tools and MCP servers",
+        "examples": [
+          "internal MCP tools",
+          "agent tool calls"
+        ],
+        "feasibility": "FULLY_CAPTURABLE",
+        "capture_method": "Tool-call envelope, root_request_id, parent_event_id, and tool permission manifest",
+        "usage_truth": "tool-call-level",
+        "cost_truth": "inherited from parent model call plus tool runtime accounting",
+        "ownership_truth": "agent owner and tool owner both retained",
+        "spend_usd": 21800,
+        "coverage_pct": 90.6,
+        "degradation": "Missing parent propagation",
+        "caveat": "Unlinked descendant calls remain unresolved nodes until replay or manual review."
+      },
+      {
+        "category": "MANAGED_EMBEDDINGS",
+        "label": "Managed embedding and vectorization APIs",
+        "examples": [
+          "Titan embeddings",
+          "OpenAI embeddings",
+          "Cohere Embed"
+        ],
+        "feasibility": "FULLY_CAPTURABLE",
+        "capture_method": "Gateway or provider usage export with corpus ID and service owner",
+        "usage_truth": "request-level",
+        "cost_truth": "provider bill plus token estimate",
+        "ownership_truth": "index owner and calling service owner",
+        "spend_usd": 28600,
+        "coverage_pct": 91.2,
+        "degradation": "Corpus owner drift",
+        "caveat": "Vector index ownership can diverge from the calling application owner."
+      },
+      {
+        "category": "ANTHROPIC_DIRECT",
+        "label": "Direct Anthropic tenant usage",
+        "examples": [
+          "Claude API tenant",
+          "workbench activity"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "Tenant usage export, invoice, SCIM identity, and optional gateway correlation",
+        "usage_truth": "request or user aggregate depending on export",
+        "cost_truth": "invoice reconciled",
+        "ownership_truth": "user or service owner when available",
+        "spend_usd": 61200,
+        "coverage_pct": 76.8,
+        "degradation": "Aggregate export",
+        "caveat": "Some tenant exports are user-aggregate and cannot support request-level lineage."
+      },
+      {
+        "category": "COLLABORATION_AI",
+        "label": "Collaboration-suite AI",
+        "examples": [
+          "Microsoft 365 Copilot",
+          "Google Workspace AI"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "Seat activity, audit logs, SCIM groups, and license assignment history",
+        "usage_truth": "activity proxy",
+        "cost_truth": "seat/license cost",
+        "ownership_truth": "employee -> team -> org",
+        "spend_usd": 36500,
+        "coverage_pct": 64.1,
+        "degradation": "Seat proxy",
+        "caveat": "Useful for adoption intelligence, not token-level optimization."
+      },
+      {
+        "category": "CRM_EMBEDDED_AI",
+        "label": "CRM and support embedded AI",
+        "examples": [
+          "Salesforce Einstein",
+          "Zendesk AI"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "Admin exports, object audit logs, case ID, account owner, and license allocation",
+        "usage_truth": "workflow activity",
+        "cost_truth": "seat or platform add-on allocation",
+        "ownership_truth": "case owner and business unit",
+        "spend_usd": 44400,
+        "coverage_pct": 70.5,
+        "degradation": "Vendor aggregate",
+        "caveat": "Customer-facing workflows require extra policy and retention context."
+      },
+      {
+        "category": "BI_ASSISTANT",
+        "label": "Business intelligence copilots",
+        "examples": [
+          "Power BI Copilot",
+          "Tableau Pulse",
+          "Looker AI"
+        ],
+        "feasibility": "PARTIALLY_CAPTURABLE",
+        "capture_method": "BI audit logs, workspace owner, query history, and license allocation",
+        "usage_truth": "workspace activity and query aggregate",
+        "cost_truth": "license and compute allocation",
+        "ownership_truth": "workspace owner and data-domain owner",
+        "spend_usd": 30400,
+        "coverage_pct": 66.2,
+        "degradation": "Shared workspace",
+        "caveat": "Ownership can be shared between dashboard owner and data-domain owner."
+      },
+      {
+        "category": "COPILOT_SEAT_PROXY",
+        "label": "Developer and office copilots with seat activity only",
+        "examples": [
+          "GitHub Copilot Business",
+          "IDE assistant seats"
+        ],
+        "feasibility": "INDIRECTLY_CAPTURABLE",
+        "capture_method": "Seat assignment, IDE activity, repo activity, and organization membership",
+        "usage_truth": "activity proxy",
+        "cost_truth": "seat allocation",
+        "ownership_truth": "employee and repo owner inference",
+        "spend_usd": 52300,
+        "coverage_pct": 58.4,
+        "degradation": "No prompt/token truth",
+        "caveat": "Strong for adoption breadth, weak for request economics and prompt-level governance."
+      },
+      {
+        "category": "PERSONAL_BROWSER_AI",
+        "label": "Personal browser AI outside governed systems",
+        "examples": [
+          "consumer chatbot",
+          "personal account use"
+        ],
+        "feasibility": "UNCAPTURABLE",
+        "capture_method": "Allowed only through aggregate network/procurement anomalies and employee training signals",
+        "usage_truth": "not available",
+        "cost_truth": "none unless reimbursed or purchased",
+        "ownership_truth": "unknown",
+        "spend_usd": 39700,
+        "coverage_pct": 0.0,
+        "degradation": "Outside trust boundary",
+        "caveat": "Must be represented as a blind spot, not backfilled with fake telemetry."
+      }
+    ],
+    "blind_spots": [
+      {
+        "id": "BS-011",
+        "title": "Shadow AI spend detected outside approved routing",
+        "severity": "high",
+        "spend_usd": 67100,
+        "pathway": "SHADOW_AI",
+        "cause": "Provider billing line has no matching gateway, app, or identity event.",
+        "operator_action": "Open integration review and classify the pathway before finance uses the spend in chargeback."
+      },
+      {
+        "id": "BS-013",
+        "title": "Azure deployments missing APIM request context",
+        "severity": "medium",
+        "spend_usd": 28600,
+        "pathway": "AZURE_OPENAI",
+        "cause": "Billing exists, but route headers do not preserve request-level token truth.",
+        "operator_action": "Enable APIM logging policy or keep reporting as partially capturable."
+      },
+      {
+        "id": "BS-015",
+        "title": "Agent workflow lost child span propagation",
+        "severity": "medium",
+        "spend_usd": 14200,
+        "pathway": "AGENTIC_AI",
+        "cause": "Four descendant calls lack parent_event_id after framework retry.",
+        "operator_action": "Review callback handler instrumentation before aggregating workflow cost."
+      },
+      {
+        "id": "BS-017",
+        "title": "Per-seat SaaS AI is adoption-only evidence",
+        "severity": "medium",
+        "spend_usd": 73300,
+        "pathway": "SAAS_EMBEDDED_PER_SEAT",
+        "cause": "Vendor exposes seat activity and admin events, not prompt-level usage or token cost.",
+        "operator_action": "Display as indirect adoption signal and exclude from request-level chargeback."
+      },
+      {
+        "id": "BS-020",
+        "title": "Self-hosted GPU pool has derived cost only",
+        "severity": "low",
+        "spend_usd": 39200,
+        "pathway": "SELF_HOSTED",
+        "cause": "GPU utilization maps to shared infrastructure economics, not provider invoice lines.",
+        "operator_action": "Label cost_derivation_method as derived and keep allocation separate from ownership."
+      }
+    ],
+    "agent_lineage": {
+      "workflow_id": "wf_support_refund_agent_8841",
+      "root_request_id": "root_9d3f_support_refund_042",
+      "owner": "Customer Engineering",
+      "total_descendant_calls": 15,
+      "linked_descendant_calls": 14,
+      "aggregate_cost_usd": 2.41,
+      "runaway_loop_risk": "low",
+      "lineage_status": "PARTIAL_WITH_ONE_MISSING_PARENT",
+      "calls": [
+        {
+          "step": 1,
+          "event_id": "evt_root_001",
+          "parent_event_id": null,
+          "model": "gpt-4o-mini",
+          "purpose": "classify customer intent",
+          "cost_usd": 0.06,
+          "linked": true
+        },
+        {
+          "step": 2,
+          "event_id": "evt_child_002",
+          "parent_event_id": "evt_root_001",
+          "model": "claude-3-5-haiku",
+          "purpose": "summarize ticket history",
+          "cost_usd": 0.09,
+          "linked": true
+        },
+        {
+          "step": 3,
+          "event_id": "evt_child_003",
+          "parent_event_id": "evt_child_002",
+          "model": "gpt-4o-mini",
+          "purpose": "draft refund options",
+          "cost_usd": 0.18,
+          "linked": true
+        },
+        {
+          "step": 4,
+          "event_id": "evt_child_004",
+          "parent_event_id": null,
+          "model": "gpt-4o",
+          "purpose": "manual fallback retry missing callback context",
+          "cost_usd": 0.42,
+          "linked": false
+        },
+        {
+          "step": 5,
+          "event_id": "evt_child_005",
+          "parent_event_id": "evt_child_003",
+          "model": "gpt-4o-mini",
+          "purpose": "final response validation",
+          "cost_usd": 0.11,
+          "linked": true
+        }
+      ]
+    },
+    "scenario_results": [
+      {
+        "id": "S-001",
+        "name": "Shared API key across 3 teams",
+        "status": "visible",
+        "surface": "Exports",
+        "evidence": "allocation rows sum to 1.0 and are labeled ALLOCATION, not OWNERSHIP"
+      },
+      {
+        "id": "S-002",
+        "name": "Employee transfer mid-billing period",
+        "status": "visible",
+        "surface": "Exports",
+        "evidence": "event-time and current-state owners diverge with explicit toggle"
+      },
+      {
+        "id": "S-003",
+        "name": "Employee leaves company before invoice lands",
+        "surface": "Exports",
+        "evidence": "Current-state and event-time owners remain separate",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-004",
+        "name": "Stale CODEOWNERS",
+        "status": "visible",
+        "surface": "Coverage",
+        "evidence": "stale source degradation lowers confidence and creates review work"
+      },
+      {
+        "id": "S-005",
+        "name": "Service account reused after reorg",
+        "surface": "Manual Mapping",
+        "evidence": "Shared identity is routed for review",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-006",
+        "name": "SaaS AI exposes only seat activity",
+        "surface": "Adoption",
+        "evidence": "Usage appears as adoption proxy, not request truth",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-007",
+        "name": "Self-hosted model has derived infrastructure cost",
+        "surface": "Energy",
+        "evidence": "Cost and energy are labeled derived or unrated",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-008",
+        "name": "Warehouse AI shares compute with non-AI jobs",
+        "surface": "Exports",
+        "evidence": "Allocation preserves cost without overwriting ownership truth",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-009",
+        "name": "Provider invoice arrives after request telemetry",
+        "surface": "Coverage",
+        "evidence": "Late billing degradation remains visible",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-010",
+        "name": "Manual mapping changes owner after report preview",
+        "surface": "Manual Mapping",
+        "evidence": "Before/after impact updates confidence and forecast reserve",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-011",
+        "name": "Shadow AI direct provider call",
+        "status": "visible",
+        "surface": "Coverage",
+        "evidence": "uncapturable pathway appears as blind spot instead of disappearing"
+      },
+      {
+        "id": "S-012",
+        "name": "SaaS user adopts AI but no code artifact exists",
+        "surface": "Adoption",
+        "evidence": "Workflow insertion point is still visible through seat/activity proxy",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-013",
+        "name": "Requested model differs from served model",
+        "status": "visible",
+        "surface": "Models",
+        "evidence": "requested-vs-served model and price reversal fields stay separate"
+      },
+      {
+        "id": "S-014",
+        "name": "Policy exception approved by delegated reviewer",
+        "surface": "Admin",
+        "evidence": "Audit event records actor, role, and target",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-015",
+        "name": "Agent workflow with 15 descendant calls",
+        "status": "visible",
+        "surface": "Coverage",
+        "evidence": "root_request_id and missing parent_event_id are visible"
+      },
+      {
+        "id": "S-016",
+        "name": "Mixed feasibility across pathways",
+        "status": "visible",
+        "surface": "Coverage",
+        "evidence": "all capture classes are grouped in one matrix"
+      },
+      {
+        "id": "S-017",
+        "name": "Energy data unavailable for model family",
+        "surface": "Energy",
+        "evidence": "Unrated/null is displayed instead of zero",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-018",
+        "name": "Shared router serves fallback model",
+        "surface": "Request Proof",
+        "evidence": "Requested-vs-served route caveat is preserved",
+        "status": "VISIBLE_IN_LOCAL_DEMO"
+      },
+      {
+        "id": "S-019",
+        "name": "Confidence at boundary",
+        "status": "visible",
+        "surface": "Governance",
+        "evidence": "policy simulator changes posture around the confidence floor"
+      },
+      {
+        "id": "S-020",
+        "name": "Full control-plane failure",
+        "status": "visible",
+        "surface": "Governance",
+        "evidence": "fail-open scenario preserves request continuity"
+      }
+    ]
+  },
+  "exports": {
+    "summary": {
+      "period": "February 2026",
+      "exportable_chargeback_usd": 363200,
+      "provisional_review_usd": 268100,
+      "allocated_shared_usd": 112900,
+      "unknown_excluded_usd": 82300,
+      "focus_columns": 66,
+      "argmin_extension_columns": 9,
+      "default_mode": "event_time",
+      "rows_previewed": 14,
+      "validation_status": "PASS"
+    },
+    "controls": [
+      {
+        "label": "Event-time owner",
+        "value": "default",
+        "meaning": "Finance-safe mode. Uses source state effective when the event occurred."
+      },
+      {
+        "label": "Current-state rollup",
+        "value": "available",
+        "meaning": "Planning mode. Remaps reporting to present-day org structure and labels divergence."
+      },
+      {
+        "label": "Chargeback threshold",
+        "value": ">= 0.80 coper",
+        "meaning": "Only chargeback-ready ownership rows are included by default."
+      },
+      {
+        "label": "Allocation guard",
+        "value": "INV-11",
+        "meaning": "Allocated cost is exported separately and never overwrites ownership truth."
+      }
+    ],
+    "rows": [
+      {
+        "line_id": "cb_001",
+        "service": "customer-support-bot",
+        "model": "gpt-4o-mini",
+        "team_event_time": "Customer Engineering",
+        "team_current_state": "Customer Experience AI",
+        "cost_center": "CC-410",
+        "billed_cost_usd": 184200,
+        "estimated_cost_usd": 181900,
+        "reconciled_cost_usd": 184200,
+        "trac_usd": 192600,
+        "confidence": 0.92,
+        "ownership_state": "CHARGEBACK_READY_SINGLE_CANDIDATE",
+        "truth_basis": "OWNERSHIP",
+        "capture_feasibility": "FULLY_CAPTURABLE",
+        "export_action": "include"
+      },
+      {
+        "line_id": "cb_002",
+        "service": "analytics-batch",
+        "model": "claude-3.7-sonnet",
+        "team_event_time": "Data Science",
+        "team_current_state": "ML Engineering",
+        "cost_center": "CC-230",
+        "billed_cost_usd": 112400,
+        "estimated_cost_usd": 109700,
+        "reconciled_cost_usd": 112400,
+        "trac_usd": 121900,
+        "confidence": 0.76,
+        "ownership_state": "PROVISIONAL_SINGLE_CANDIDATE",
+        "truth_basis": "OWNERSHIP_REVIEW_REQUIRED",
+        "capture_feasibility": "PARTIALLY_CAPTURABLE",
+        "export_action": "review"
+      },
+      {
+        "line_id": "cb_003",
+        "service": "platform-shared-router",
+        "model": "gemini-2.0-flash",
+        "team_event_time": "Platform Engineering",
+        "team_current_state": "Platform Engineering",
+        "cost_center": "CC-100",
+        "billed_cost_usd": 64200,
+        "estimated_cost_usd": 65500,
+        "reconciled_cost_usd": 64200,
+        "trac_usd": 77200,
+        "confidence": 0.5,
+        "ownership_state": "SHARED",
+        "truth_basis": "ALLOCATION",
+        "capture_feasibility": "PARTIALLY_CAPTURABLE",
+        "export_action": "allocation_export_only"
+      },
+      {
+        "line_id": "cb_004",
+        "service": "shadow-ai-provider-card",
+        "model": "unknown-provider-model",
+        "team_event_time": "UNKNOWN",
+        "team_current_state": "UNKNOWN",
+        "cost_center": "UNASSIGNED",
+        "billed_cost_usd": 42600,
+        "estimated_cost_usd": null,
+        "reconciled_cost_usd": 42600,
+        "trac_usd": 56800,
+        "confidence": 0.0,
+        "ownership_state": "UNKNOWN",
+        "truth_basis": "UNKNOWN_EXCLUDED",
+        "capture_feasibility": "UNCAPTURABLE",
+        "export_action": "exclude_with_caveat"
+      },
+      {
+        "line_id": "cb_005",
+        "service": "ml-evals-sandbox",
+        "model": "gpt-4o",
+        "team_event_time": "Research",
+        "team_current_state": "Product",
+        "cost_center": "CC-760",
+        "billed_cost_usd": 28400,
+        "estimated_cost_usd": 28100,
+        "reconciled_cost_usd": 28400,
+        "trac_usd": 35100,
+        "confidence": 0.68,
+        "ownership_state": "UNRESOLVED_CONFLICT",
+        "truth_basis": "OWNERSHIP_CONFLICT",
+        "capture_feasibility": "PARTIALLY_CAPTURABLE",
+        "export_action": "manual_mapping_required"
+      },
+      {
+        "line_id": "cb_006",
+        "service": "secops-assistant-prod",
+        "model": "claude-3.7-sonnet",
+        "team_event_time": "Security",
+        "team_current_state": "Security",
+        "cost_center": "CC-330",
+        "billed_cost_usd": 73400,
+        "estimated_cost_usd": 71900,
+        "reconciled_cost_usd": 73400,
+        "trac_usd": 80500,
+        "confidence": 0.93,
+        "ownership_state": "CHARGEBACK_READY_SINGLE_CANDIDATE",
+        "truth_basis": "OWNERSHIP",
+        "capture_feasibility": "FULLY_CAPTURABLE",
+        "export_action": "include"
+      },
+      {
+        "line_id": "cb_007",
+        "service": "product-roadmap-agent-prod",
+        "model": "claude-3.7-sonnet",
+        "team_event_time": "Product",
+        "team_current_state": "Product",
+        "cost_center": "CC-420",
+        "billed_cost_usd": 31800,
+        "estimated_cost_usd": 32900,
+        "reconciled_cost_usd": 31800,
+        "trac_usd": 38200,
+        "confidence": 0.84,
+        "ownership_state": "PROVISIONAL_SINGLE_CANDIDATE",
+        "truth_basis": "OWNERSHIP_REVIEW_REQUIRED",
+        "capture_feasibility": "PARTIALLY_CAPTURABLE",
+        "export_action": "review_agent_lineage"
+      },
+      {
+        "line_id": "cb_008",
+        "service": "warehouse-ai-summary",
+        "model": "deepseek-r1",
+        "team_event_time": "Data Science",
+        "team_current_state": "Data Science",
+        "cost_center": "CC-230",
+        "billed_cost_usd": 48700,
+        "estimated_cost_usd": 46600,
+        "reconciled_cost_usd": 48700,
+        "trac_usd": 55100,
+        "confidence": 0.62,
+        "ownership_state": "SHARED",
+        "truth_basis": "ALLOCATION",
+        "capture_feasibility": "PARTIALLY_CAPTURABLE",
+        "export_action": "allocation_export_only"
+      },
+      {
+        "line_id": "cb_009",
+        "service": "campaign-copilot-seat-activity",
+        "model": "command-r+",
+        "team_event_time": "Marketing",
+        "team_current_state": "Marketing",
+        "cost_center": "CC-720",
+        "billed_cost_usd": 18400,
+        "estimated_cost_usd": null,
+        "reconciled_cost_usd": 18400,
+        "trac_usd": 23600,
+        "confidence": 0.69,
+        "ownership_state": "PROVISIONAL_SINGLE_CANDIDATE",
+        "truth_basis": "ACTIVITY_PROXY_REVIEW_REQUIRED",
+        "capture_feasibility": "INDIRECTLY_CAPTURABLE",
+        "export_action": "review_activity_proxy"
+      },
+      {
+        "line_id": "cb_010",
+        "service": "self-hosted-evals-gpu-pool",
+        "model": "llama-3.3-70b",
+        "team_event_time": "ML Engineering",
+        "team_current_state": "Data Science",
+        "cost_center": "CC-510",
+        "billed_cost_usd": null,
+        "estimated_cost_usd": 24800,
+        "reconciled_cost_usd": null,
+        "trac_usd": 31800,
+        "confidence": 0.79,
+        "ownership_state": "UNRESOLVED_CONFLICT",
+        "truth_basis": "DERIVED_INFRASTRUCTURE_COST",
+        "capture_feasibility": "PARTIALLY_CAPTURABLE",
+        "export_action": "manual_mapping_required"
+      },
+      {
+        "line_id": "cb_011",
+        "service": "finance-close-copilot",
+        "model": "titan-text-premier",
+        "team_event_time": "Finance Systems",
+        "team_current_state": "Finance Systems",
+        "cost_center": "CC-610",
+        "billed_cost_usd": 61200,
+        "estimated_cost_usd": 59600,
+        "reconciled_cost_usd": 61200,
+        "trac_usd": 65400,
+        "confidence": 0.9,
+        "ownership_state": "CHARGEBACK_READY_SINGLE_CANDIDATE",
+        "truth_basis": "OWNERSHIP",
+        "capture_feasibility": "FULLY_CAPTURABLE",
+        "export_action": "include"
+      },
+      {
+        "line_id": "cb_012",
+        "service": "developer-copilot-seat-proxy",
+        "model": "gpt-4o-mini",
+        "team_event_time": "Platform Engineering",
+        "team_current_state": "Platform Engineering",
+        "cost_center": "CC-310",
+        "billed_cost_usd": 52300,
+        "estimated_cost_usd": null,
+        "reconciled_cost_usd": 52300,
+        "trac_usd": 58600,
+        "confidence": 0.58,
+        "ownership_state": "PROVISIONAL_SINGLE_CANDIDATE",
+        "truth_basis": "SEAT_ACTIVITY_PROXY",
+        "capture_feasibility": "INDIRECTLY_CAPTURABLE",
+        "export_action": "adoption_only_review"
+      },
+      {
+        "line_id": "cb_013",
+        "service": "personal-browser-ai",
+        "model": "unknown-provider-model",
+        "team_event_time": "UNKNOWN",
+        "team_current_state": "UNKNOWN",
+        "cost_center": "UNASSIGNED",
+        "billed_cost_usd": 39700,
+        "estimated_cost_usd": null,
+        "reconciled_cost_usd": 39700,
+        "trac_usd": 52900,
+        "confidence": 0.0,
+        "ownership_state": "UNKNOWN",
+        "truth_basis": "UNKNOWN_EXCLUDED",
+        "capture_feasibility": "UNCAPTURABLE",
+        "export_action": "exclude_with_caveat"
+      },
+      {
+        "line_id": "cb_014",
+        "service": "crm-case-assist",
+        "model": "gemini-2.0-flash",
+        "team_event_time": "Customer Engineering",
+        "team_current_state": "Customer Engineering",
+        "cost_center": "CC-410",
+        "billed_cost_usd": 44400,
+        "estimated_cost_usd": 43100,
+        "reconciled_cost_usd": 44400,
+        "trac_usd": 48900,
+        "confidence": 0.88,
+        "ownership_state": "CHARGEBACK_READY_SINGLE_CANDIDATE",
+        "truth_basis": "OWNERSHIP",
+        "capture_feasibility": "PARTIALLY_CAPTURABLE",
+        "export_action": "include_with_caveat"
+      }
+    ],
+    "allocation_splits": [
+      {
+        "resource": "platform-shared-router",
+        "team": "Platform Engineering",
+        "share_pct": 44,
+        "allocated_cost_usd": 28248,
+        "basis": "request volume prior"
+      },
+      {
+        "resource": "platform-shared-router",
+        "team": "Customer Engineering",
+        "share_pct": 31,
+        "allocated_cost_usd": 19902,
+        "basis": "caller identity prior"
+      },
+      {
+        "resource": "platform-shared-router",
+        "team": "Product",
+        "share_pct": 25,
+        "allocated_cost_usd": 16050,
+        "basis": "deployment namespace prior"
+      }
+    ]
+  },
+  "energy_efficiency": {
+    "summary": {
+      "rated_model_count": 9,
+      "unrated_model_count": 3,
+      "energy_known_request_pct": 90.3,
+      "estimated_kwh_per_1k_requests": 4.9,
+      "estimated_monthly_kwh": 157186,
+      "estimated_carbon_kgco2e": 9270,
+      "unknown_energy_request_pct": 9.7,
+      "region": "us-east-1 / mixed grid intensity",
+      "decision_binding": "Informational in Phase 1; never overrides cost or quality."
+    },
+    "models": [
+      {
+        "model": "gpt-4o-mini",
+        "provider": "OpenAI",
+        "task": "low-cost generation and classification",
+        "star_rating": 4,
+        "kwh_per_1k_requests": 2.1,
+        "requests_30d": 11400000,
+        "carbon_kgco2e": 1280,
+        "status": "rated",
+        "recommendation": "keep as default low-cost route"
+      },
+      {
+        "model": "gpt-4o",
+        "provider": "OpenAI",
+        "task": "reasoning and multimodal workflows",
+        "star_rating": 3,
+        "kwh_per_1k_requests": 8.4,
+        "requests_30d": 6200000,
+        "carbon_kgco2e": 2710,
+        "status": "rated",
+        "recommendation": "reserve for quality-sensitive paths"
+      },
+      {
+        "model": "claude-3.7-sonnet",
+        "provider": "Anthropic",
+        "task": "complex reasoning and incident triage",
+        "star_rating": 3,
+        "kwh_per_1k_requests": 7.9,
+        "requests_30d": 5100000,
+        "carbon_kgco2e": 2110,
+        "status": "rated",
+        "recommendation": "monitor reasoning token expansion"
+      },
+      {
+        "model": "gemini-2.0-flash",
+        "provider": "Google",
+        "task": "high-throughput summarization and support RAG",
+        "star_rating": 5,
+        "kwh_per_1k_requests": 1.7,
+        "requests_30d": 4300000,
+        "carbon_kgco2e": 380,
+        "status": "rated",
+        "recommendation": "good energy profile; verify quality before high-risk routing"
+      },
+      {
+        "model": "gemini-1.5-pro",
+        "provider": "Google",
+        "task": "long-context research analysis",
+        "star_rating": 3,
+        "kwh_per_1k_requests": 9.6,
+        "requests_30d": 1400000,
+        "carbon_kgco2e": 1180,
+        "status": "rated",
+        "recommendation": "candidate for selective downgrade on summarization workloads"
+      },
+      {
+        "model": "llama-3.3-70b",
+        "provider": "Meta / self-hosted",
+        "task": "private data inference and evaluation",
+        "star_rating": null,
+        "kwh_per_1k_requests": null,
+        "requests_30d": 1900000,
+        "carbon_kgco2e": null,
+        "status": "unrated",
+        "recommendation": "display as unrated until GPU telemetry and utilization accounting are complete"
+      },
+      {
+        "model": "mistral-large",
+        "provider": "Mistral AI",
+        "task": "policy and exception review",
+        "star_rating": 3,
+        "kwh_per_1k_requests": 6.8,
+        "requests_30d": 1500000,
+        "carbon_kgco2e": 760,
+        "status": "rated",
+        "recommendation": "keep for specialist governance prompts until equivalence improves"
+      },
+      {
+        "model": "command-r+",
+        "provider": "Cohere",
+        "task": "retrieval-heavy campaign and procurement analysis",
+        "star_rating": 4,
+        "kwh_per_1k_requests": 3.4,
+        "requests_30d": 950000,
+        "carbon_kgco2e": 280,
+        "status": "rated",
+        "recommendation": "good RAG efficiency; route governed workflows through gateway"
+      },
+      {
+        "model": "qwen-2.5",
+        "provider": "Alibaba",
+        "task": "router fallback and low-cost generation",
+        "star_rating": null,
+        "kwh_per_1k_requests": null,
+        "requests_30d": 860000,
+        "carbon_kgco2e": null,
+        "status": "unrated",
+        "recommendation": "keep route caveat until provider energy data and served-model controls are complete"
+      },
+      {
+        "model": "deepseek-r1",
+        "provider": "DeepSeek",
+        "task": "warehouse reasoning and analytics summaries",
+        "star_rating": null,
+        "kwh_per_1k_requests": null,
+        "requests_30d": 720000,
+        "carbon_kgco2e": null,
+        "status": "unrated",
+        "recommendation": "treat energy as unknown while data-platform cost allocation is separated"
+      },
+      {
+        "model": "granite-3.2",
+        "provider": "IBM",
+        "task": "audit-report extractive QA",
+        "star_rating": 4,
+        "kwh_per_1k_requests": 3.8,
+        "requests_30d": 640000,
+        "carbon_kgco2e": 210,
+        "status": "rated",
+        "recommendation": "retain for audit workflows with strong extractive QA behavior"
+      },
+      {
+        "model": "titan-text-premier",
+        "provider": "AWS",
+        "task": "finance close memo drafting",
+        "star_rating": 3,
+        "kwh_per_1k_requests": 5.2,
+        "requests_30d": 820000,
+        "carbon_kgco2e": 360,
+        "status": "rated",
+        "recommendation": "candidate for prompt compaction before model substitution"
+      }
+    ],
+    "recommendations": [
+      {
+        "current_model": "gpt-4o",
+        "candidate_model": "gpt-4o-mini",
+        "cost_delta_pct": -62,
+        "quality_delta": "equivalent for classification workload",
+        "energy_delta_kwh_per_1k": -6.3,
+        "annual_carbon_delta_kgco2e": -18400,
+        "decision": "Recommend after equivalence check"
+      },
+      {
+        "current_model": "claude-3.7-sonnet",
+        "candidate_model": "gemini-2.0-flash",
+        "cost_delta_pct": -38,
+        "quality_delta": "needs validation for legal and security summaries",
+        "energy_delta_kwh_per_1k": -6.2,
+        "annual_carbon_delta_kgco2e": -9500,
+        "decision": "Monitor until quality proof exists"
+      },
+      {
+        "current_model": "gemini-1.5-pro",
+        "candidate_model": "gemini-2.0-flash",
+        "cost_delta_pct": -41,
+        "quality_delta": "sufficient for low-risk research briefing summaries",
+        "energy_delta_kwh_per_1k": -7.9,
+        "annual_carbon_delta_kgco2e": -7200,
+        "decision": "Recommend for low-risk briefing class only"
+      },
+      {
+        "current_model": "titan-text-premier",
+        "candidate_model": "gpt-4o-mini",
+        "cost_delta_pct": -35,
+        "quality_delta": "requires close-memo approval replay",
+        "energy_delta_kwh_per_1k": -3.1,
+        "annual_carbon_delta_kgco2e": -2100,
+        "decision": "Try prompt compaction first"
+      },
+      {
+        "current_model": "command-r+",
+        "candidate_model": "gpt-4o-mini",
+        "cost_delta_pct": -22,
+        "quality_delta": "not proven for retrieval-heavy campaign workflows",
+        "energy_delta_kwh_per_1k": -1.3,
+        "annual_carbon_delta_kgco2e": -880,
+        "decision": "Hold until retrieval equivalence improves"
+      },
+      {
+        "current_model": "llama-3.3-70b",
+        "candidate_model": "No automatic substitute",
+        "cost_delta_pct": null,
+        "quality_delta": "private-data constraint",
+        "energy_delta_kwh_per_1k": null,
+        "annual_carbon_delta_kgco2e": null,
+        "decision": "Keep unrated disclosure"
+      },
+      {
+        "current_model": "qwen-2.5",
+        "candidate_model": "No energy recommendation",
+        "cost_delta_pct": null,
+        "quality_delta": "served-model divergence must be reviewed first",
+        "energy_delta_kwh_per_1k": null,
+        "annual_carbon_delta_kgco2e": null,
+        "decision": "Preserve route caveat"
+      },
+      {
+        "current_model": "deepseek-r1",
+        "candidate_model": "qwen-2.5",
+        "cost_delta_pct": -18,
+        "quality_delta": "warehouse reasoning replay incomplete",
+        "energy_delta_kwh_per_1k": null,
+        "annual_carbon_delta_kgco2e": null,
+        "decision": "Do not act until energy and warehouse allocation are known"
+      }
+    ]
+  },
+  "design_partner_brief": {
+    "thesis": {
+      "headline": "A low-risk design partner pilot for enterprise AI cost governance.",
+      "summary": "Argmin can start as a local, read-only, trust-boundary proof that shows where AI is used, what it costs, who owns it, and which workflows have enough evidence to automate.",
+      "design_partner_claim": "The product earns a design partner when the buyer sees their own operating model in the demo: finance owns value, platform owns feasibility, security owns trust, and business units see workflow adoption.",
+      "signals": [
+        {
+          "label": "Pilot motion",
+          "value": "4 stages"
+        },
+        {
+          "label": "Modeled integrations",
+          "value": "12 systems"
+        },
+        {
+          "label": "Proof surfaces",
+          "value": "8 buyer moments"
+        },
+        {
+          "label": "Success metrics",
+          "value": "6 measurable checkpoints"
+        }
+      ]
+    },
+    "readiness_pillars": [
+      {
+        "pillar": "Local proof before cloud access",
+        "score": "Demo-ready",
+        "status": "green",
+        "design_partner_value": "Customer teams can evaluate the product story without granting production credentials or waiting for security review.",
+        "evidence": [
+          "Static UI opens from local files or the bundled local server",
+          "Smoke test validates health, dashboard, attribution, and intercept paths",
+          "Synthetic data is deterministic and safe for screen recording"
+        ]
+      },
+      {
+        "pillar": "Enterprise trust posture",
+        "score": "Explicit",
+        "status": "green",
+        "design_partner_value": "The demo speaks in the language of enterprise buyers: fail-open, read-only integrations, customer trust boundary, and audit trail.",
+        "evidence": [
+          "Admin diagnostics show read-only source permissions",
+          "Governance page separates advisory and active policy modes",
+          "Audit log exposes actor, target, outcome, and basis"
+        ]
+      },
+      {
+        "pillar": "Workflow-level adoption visibility",
+        "score": "Broad",
+        "status": "green",
+        "design_partner_value": "Product and operations leaders can see where AI is embedded in actual work, not only which models were called.",
+        "evidence": [
+          "20 workflows mapped across business units",
+          "17 AI services and 20 capability classes represented",
+          "Insertion points and decision owners are visible"
+        ]
+      },
+      {
+        "pillar": "Chargeback and planning credibility",
+        "score": "Provable",
+        "status": "green",
+        "design_partner_value": "Finance can evaluate whether Argmin is a reporting layer, a control surface, and a planning input.",
+        "evidence": [
+          "Event-time and current-state ownership views remain separate",
+          "Unknown and allocation-only rows are explicit",
+          "Forecasting keeps scenario assumptions visible"
+        ]
+      },
+      {
+        "pillar": "Operational handoffs",
+        "score": "Simulated",
+        "status": "amber",
+        "design_partner_value": "Stakeholders can click through how insight becomes owned work before connecting Slack, Jira, or ServiceNow.",
+        "evidence": [
+          "Eight business workflow routes are modeled",
+          "Scenario runner appends local delivery records",
+          "Fallback and failed delivery states are visible"
+        ]
+      }
+    ],
+    "pilot_stages": [
+      {
+        "stage_id": "discover",
+        "label": "1. Discover",
+        "duration": "Week 0-1",
+        "goal": "Map the buyer's AI operating questions to Argmin proof surfaces before requesting any cloud access.",
+        "customer_commitment": "Name finance, platform, security, and product owners; provide redacted examples of AI workflows and current pain points.",
+        "argmin_commitment": "Configure a customer-shaped local demo narrative and identify which proof surfaces matter for the first meeting.",
+        "visible_surfaces": [
+          "Partner Brief",
+          "PRD Proof",
+          "Employee Adoption"
+        ],
+        "success_signal": "Stakeholders agree on the first three questions Argmin must answer with their data.",
+        "risk_controls": [
+          "No production credentials",
+          "No prompt or output retention",
+          "Synthetic examples only"
+        ]
+      },
+      {
+        "stage_id": "connect",
+        "label": "2. Connect",
+        "duration": "Week 1-3",
+        "goal": "Validate read-only ingestion scope and integration feasibility against the customer's actual systems.",
+        "customer_commitment": "Review connector scope for billing, identity, SDLC, telemetry, and org hierarchy sources.",
+        "argmin_commitment": "Produce a trust-boundary integration plan with explicit read-only permissions and fallback paths.",
+        "visible_surfaces": [
+          "Integrations",
+          "Admin",
+          "Coverage"
+        ],
+        "success_signal": "Security and platform owners agree the initial connector scope is low-risk and measurable.",
+        "risk_controls": [
+          "Read-only IAM posture",
+          "Customer-controlled deployment boundary",
+          "No external write actions"
+        ]
+      },
+      {
+        "stage_id": "prove",
+        "label": "3. Prove",
+        "duration": "Week 3-5",
+        "goal": "Show request-level attribution, ambiguous ownership handling, chargeback rows, and optimization opportunities on seeded or customer-approved data.",
+        "customer_commitment": "Nominate representative AI services, shared service accounts, and business-unit owners for review.",
+        "argmin_commitment": "Deliver a replayable proof pack with confidence, evidence class, truth basis, and unresolved gaps.",
+        "visible_surfaces": [
+          "Request Proof",
+          "Manual Mapping",
+          "Exports",
+          "Interventions"
+        ],
+        "success_signal": "Finance can explain at least one chargeback-ready line and one intentionally excluded/ambiguous line.",
+        "risk_controls": [
+          "Confidence capped for customer-facing outputs",
+          "Event-time ownership preserved",
+          "Corrections modeled as append-only events"
+        ]
+      },
+      {
+        "stage_id": "pilot",
+        "label": "4. Pilot",
+        "duration": "Week 5-8",
+        "goal": "Run a narrow production-adjacent pilot that proves operating value without putting customer AI traffic at risk.",
+        "customer_commitment": "Approve success metrics, review cadence, operating owners, and go/no-go criteria.",
+        "argmin_commitment": "Support weekly operating review with savings, coverage, adoption, governance, and integration handoff evidence.",
+        "visible_surfaces": [
+          "Forecasting",
+          "Governance",
+          "Energy",
+          "Admin"
+        ],
+        "success_signal": "The buyer asks to connect the next business unit, provider, or workflow because the value is operationally clear.",
+        "risk_controls": [
+          "Fail-open hot path",
+          "Advisory mode by default",
+          "Customer-visible audit trail"
+        ]
+      }
+    ],
+    "buyer_roles": [
+      {
+        "role": "CFO / FinOps",
+        "name": "Budget owner",
+        "cares_about": "Can AI spend be attributed, allocated, forecasted, and defended without another spreadsheet reconciliation cycle?",
+        "demo_surfaces": [
+          "Overview",
+          "Exports",
+          "Forecasting"
+        ]
+      },
+      {
+        "role": "CTO / Platform",
+        "name": "AI platform owner",
+        "cares_about": "Can the product see actual runtime behavior and route interventions into implementation work without slowing developers?",
+        "demo_surfaces": [
+          "Request Proof",
+          "Models",
+          "Interventions"
+        ]
+      },
+      {
+        "role": "CISO / Security",
+        "name": "Trust-boundary owner",
+        "cares_about": "Can governance, audit, and policy simulation happen without exfiltrating customer data or blocking AI traffic?",
+        "demo_surfaces": [
+          "Governance",
+          "Admin",
+          "Coverage"
+        ]
+      },
+      {
+        "role": "AI Product Lead",
+        "name": "Adoption owner",
+        "cares_about": "Which teams are embedding AI into real workflows, where is adoption stalling, and what should be scaled next?",
+        "demo_surfaces": [
+          "Employee Adoption",
+          "Teams",
+          "Integrations"
+        ]
+      }
+    ],
+    "proof_moments": [
+      {
+        "audience": "Executive sponsor",
+        "moment": "Open with total spend, owned spend, and savings already captured.",
+        "why_it_converts": "Shows immediate operating leverage without requiring the buyer to understand the internals first.",
+        "surface_label": "Overview",
+        "surface_page": "overview"
+      },
+      {
+        "audience": "AI product lead",
+        "moment": "Show workflow-level adoption across product, support, finance, security, and data teams.",
+        "why_it_converts": "Answers exactly where AI is entering work, not just who has an AI bill.",
+        "surface_label": "Adoption",
+        "surface_page": "adoption"
+      },
+      {
+        "audience": "Platform owner",
+        "moment": "Replay one high-confidence request and one ambiguous ownership case.",
+        "why_it_converts": "Makes the attribution chain tangible and shows the product is honest about uncertainty.",
+        "surface_label": "Request Proof",
+        "surface_page": "attribution"
+      },
+      {
+        "audience": "Finance owner",
+        "moment": "Open event-time chargeback rows and unknown-spend exclusions.",
+        "why_it_converts": "Demonstrates accounting discipline and avoids overclaiming allocation quality.",
+        "surface_label": "Exports",
+        "surface_page": "exports"
+      },
+      {
+        "audience": "Operating review lead",
+        "moment": "Compare baseline, growth, hardened-policy, and optimization-capture forecast paths.",
+        "why_it_converts": "Shows Argmin as an operating-planning surface rather than a month-end reporting layer.",
+        "surface_label": "Forecasting",
+        "surface_page": "forecast"
+      },
+      {
+        "audience": "Sustainability and platform lead",
+        "moment": "Show energy ratings and preserve unrated/unknown models instead of inventing precision.",
+        "why_it_converts": "Builds trust by making energy visible while keeping cost, quality, and policy context intact.",
+        "surface_label": "Energy",
+        "surface_page": "energy"
+      },
+      {
+        "audience": "Security reviewer",
+        "moment": "Show fail-open behavior, read-only integration posture, and audit log.",
+        "why_it_converts": "Frames Argmin as an in-boundary operating layer rather than a risky external observer.",
+        "surface_label": "Admin",
+        "surface_page": "admin"
+      },
+      {
+        "audience": "Design partner committee",
+        "moment": "Run an integration scenario so insight becomes a routed business handoff.",
+        "why_it_converts": "Makes the product feel operational instead of report-only.",
+        "surface_label": "Integrations",
+        "surface_page": "integrations"
+      }
+    ],
+    "success_metrics": [
+      {
+        "metric": "Attribution coverage",
+        "baseline": "Current local proof: 87.4%",
+        "target": ">= 85% useful-confidence coverage for pilot scope",
+        "owner": "FinOps + Platform",
+        "proof_surface": "Overview / Coverage"
+      },
+      {
+        "metric": "Manual review queue",
+        "baseline": "6 open or deferred mappings",
+        "target": "All top-spend ambiguous workloads triaged within two business days",
+        "owner": "FinOps",
+        "proof_surface": "Manual Mapping"
+      },
+      {
+        "metric": "Workflow adoption visibility",
+        "baseline": "20 modeled workflows",
+        "target": "Top 10 customer workflows mapped to team, tool, owner, and capability",
+        "owner": "AI Product Lead",
+        "proof_surface": "Employee Adoption"
+      },
+      {
+        "metric": "Optimization execution",
+        "baseline": "10 open action candidates",
+        "target": "Three accepted recommendations converted into implementation tickets",
+        "owner": "Platform Operations",
+        "proof_surface": "Interventions / Integrations"
+      },
+      {
+        "metric": "Trust review completion",
+        "baseline": "Read-only posture visible in local demo",
+        "target": "Security signs off initial connector scope and audit boundaries",
+        "owner": "Security",
+        "proof_surface": "Admin / Governance"
+      },
+      {
+        "metric": "Planning usefulness",
+        "baseline": "Local scenario forecast",
+        "target": "Pilot sponsor uses Argmin forecast in one operating review",
+        "owner": "Finance",
+        "proof_surface": "Forecasting"
+      }
+    ],
+    "open_questions": [
+      {
+        "owner": "Finance",
+        "question": "Which spend should be charged back versus reported as shared platform allocation?",
+        "how_demo_handles_it": "Exports separate event-time owner, current-state owner, allocation-only rows, and unknown exclusions."
+      },
+      {
+        "owner": "Platform",
+        "question": "Which model routers, gateways, and provider APIs are in the first pilot scope?",
+        "how_demo_handles_it": "Coverage and Integrations show pathway feasibility instead of pretending every provider emits equivalent telemetry."
+      },
+      {
+        "owner": "Security",
+        "question": "What evidence can leave the customer boundary, if any?",
+        "how_demo_handles_it": "Admin and Governance keep trust-boundary copy visible and position production access as customer-controlled."
+      },
+      {
+        "owner": "Product",
+        "question": "Which workflows are strategically important enough to map first?",
+        "how_demo_handles_it": "Employee Adoption exposes business-unit workflows, insertion points, decision owners, and adoption quality."
+      }
+    ],
+    "demo_script": [
+      {
+        "title": "Start with the buyer's operating question",
+        "talk_track": "AI usage is already inside workflows; the problem is that ownership, cost, and adoption are fragmented.",
+        "surface_label": "Overview",
+        "surface_page": "overview"
+      },
+      {
+        "title": "Show adoption as workflow intelligence",
+        "talk_track": "The demo identifies where teams use AI services and how those services fit into business-unit work.",
+        "surface_label": "Employee Adoption",
+        "surface_page": "adoption"
+      },
+      {
+        "title": "Prove request-level truth",
+        "talk_track": "One request carries evidence, confidence, cost basis, and owner lineage; ambiguous cases stay explicit.",
+        "surface_label": "Request Proof",
+        "surface_page": "attribution"
+      },
+      {
+        "title": "Make the trust boundary visible",
+        "talk_track": "Read-only integration posture, fail-open behavior, and audit events are first-class parts of the product story.",
+        "surface_label": "Admin",
+        "surface_page": "admin"
+      },
+      {
+        "title": "Close with the pilot ask",
+        "talk_track": "The next step is not vague feedback; it is a scoped design-partner pilot with owners and success metrics.",
+        "surface_label": "Partner Brief",
+        "surface_page": "partner_brief"
+      }
+    ]
+  },
+  "admin": {
+    "summary": {
+      "deployment_mode": "local demo / single tenant simulation",
+      "auth_policy": "demo auth bypass only in ACI_ENVIRONMENT=demo",
+      "rbac_roles": [
+        "Admin",
+        "Auditor",
+        "Engineer",
+        "FinOps",
+        "Product",
+        "Security"
+      ],
+      "read_only_integrations": 9,
+      "mutation_surfaces": 8,
+      "diagnostic_scope": "inside customer trust boundary",
+      "last_audit_event": "2026-02-28T17:02:00Z"
+    },
+    "accounts": [
+      {
+        "name": "Maya Patel",
+        "role": "Admin",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T16:10:00Z"
+      },
+      {
+        "name": "Ethan Chen",
+        "role": "FinOps",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T15:55:00Z"
+      },
+      {
+        "name": "Rina Alvarez",
+        "role": "Engineer",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T15:20:00Z"
+      },
+      {
+        "name": "Former Ops User",
+        "role": "Engineer",
+        "status": "deactivated",
+        "mfa": "revoked",
+        "last_auth": "2026-01-12T08:04:00Z"
+      },
+      {
+        "name": "Jordan Lee",
+        "role": "Security",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T16:41:00Z"
+      },
+      {
+        "name": "Priya Nair",
+        "role": "Auditor",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T16:37:00Z"
+      },
+      {
+        "name": "Owen Brooks",
+        "role": "Engineer",
+        "status": "suspended",
+        "mfa": "enforced",
+        "last_auth": "2026-02-27T11:12:00Z"
+      },
+      {
+        "name": "Camila Torres",
+        "role": "Product",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T14:48:00Z"
+      },
+      {
+        "name": "Leah Morgan",
+        "role": "FinOps",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T16:02:00Z"
+      }
+    ],
+    "operations": [
+      {
+        "operation": "Invite user",
+        "role_required": "Admin",
+        "write_target": "Argmin local account store only",
+        "audit": "required"
+      },
+      {
+        "operation": "Set policy bundle",
+        "role_required": "Admin",
+        "write_target": "Argmin policy config only",
+        "audit": "required"
+      },
+      {
+        "operation": "Manual ownership override",
+        "role_required": "Admin or FinOps",
+        "write_target": "Argmin append-only override event",
+        "audit": "required"
+      },
+      {
+        "operation": "Connector health check",
+        "role_required": "Admin",
+        "write_target": "none",
+        "audit": "required"
+      },
+      {
+        "operation": "Approve policy exception",
+        "role_required": "Admin or Security",
+        "write_target": "Argmin exception ledger only",
+        "audit": "required"
+      },
+      {
+        "operation": "Export chargeback packet",
+        "role_required": "Admin or FinOps",
+        "write_target": "Argmin export artifact registry only",
+        "audit": "required"
+      },
+      {
+        "operation": "Run connector backfill",
+        "role_required": "Admin",
+        "write_target": "none",
+        "audit": "required"
+      },
+      {
+        "operation": "Disable user session",
+        "role_required": "Admin",
+        "write_target": "Argmin local account store only",
+        "audit": "required"
+      },
+      {
+        "operation": "Replay scenario harness",
+        "role_required": "Engineer or Admin",
+        "write_target": "Argmin local replay sandbox only",
+        "audit": "required"
+      },
+      {
+        "operation": "Rotate local API token",
+        "role_required": "Admin",
+        "write_target": "Argmin secret metadata only",
+        "audit": "required"
+      }
+    ],
+    "diagnostics": [
+      {
+        "check": "Interceptor hot path",
+        "status": "green",
+        "detail": "Redis + Kafka only; graph and billing APIs excluded from request path"
+      },
+      {
+        "check": "Read-only source permissions",
+        "status": "green",
+        "detail": "AWS, Okta, GitHub, and billing connectors represented with read-only scopes"
+      },
+      {
+        "check": "Prompt retention",
+        "status": "green",
+        "detail": "Raw prompts and outputs are not stored in the local demo dataset"
+      },
+      {
+        "check": "Session revocation",
+        "status": "simulated",
+        "detail": "Admin can view revoked account state; local demo does not implement real SSO"
+      },
+      {
+        "check": "Argmin engineering access",
+        "status": "simulated",
+        "detail": "Shown as time-limited diagnostic role inside trust boundary, not external access"
+      },
+      {
+        "check": "Billing reconciliation lag",
+        "status": "green",
+        "detail": "Latest dummy invoice is reconciled to request estimates with explicit late-billing caveats"
+      },
+      {
+        "check": "Identity graph freshness",
+        "status": "green",
+        "detail": "SCIM and HR hierarchy snapshots are consistent for demo identities"
+      },
+      {
+        "check": "Audit export immutability",
+        "status": "green",
+        "detail": "Admin operations append local audit records rather than mutating source telemetry"
+      },
+      {
+        "check": "External write protection",
+        "status": "green",
+        "detail": "All provider, identity, billing, and SaaS integrations are modeled read-only"
+      },
+      {
+        "check": "Local dummy data mode",
+        "status": "simulated",
+        "detail": "Dataset is deterministic, synthetic, and safe for public screen recording"
+      }
+    ],
+    "audit_log": [
+      {
+        "timestamp": "2026-02-28T16:31:12Z",
+        "actor": "Maya Patel",
+        "role": "Admin",
+        "action": "Set policy bundle",
+        "target": "current-demo-policy-bundle",
+        "outcome": "applied",
+        "basis": "local policy simulation only"
+      },
+      {
+        "timestamp": "2026-02-28T16:34:18Z",
+        "actor": "Ethan Chen",
+        "role": "FinOps",
+        "action": "Manual ownership override",
+        "target": "mm_006 -> Data Science",
+        "outcome": "recorded",
+        "basis": "derived GPU cost remained labeled"
+      },
+      {
+        "timestamp": "2026-02-28T16:38:44Z",
+        "actor": "Jordan Lee",
+        "role": "Security",
+        "action": "Approve policy exception",
+        "target": "req_audit_export_104",
+        "outcome": "approved",
+        "basis": "extractive QA retained on approved model"
+      },
+      {
+        "timestamp": "2026-02-28T16:42:10Z",
+        "actor": "Priya Nair",
+        "role": "Auditor",
+        "action": "Export chargeback packet",
+        "target": "February 2026 preview",
+        "outcome": "exported",
+        "basis": "unknown rows excluded with caveat"
+      },
+      {
+        "timestamp": "2026-02-28T16:45:29Z",
+        "actor": "Rina Alvarez",
+        "role": "Engineer",
+        "action": "Replay scenario harness",
+        "target": "S-015 agent workflow lineage",
+        "outcome": "passed",
+        "basis": "unlinked descendants visible"
+      },
+      {
+        "timestamp": "2026-02-28T16:48:02Z",
+        "actor": "Leah Morgan",
+        "role": "FinOps",
+        "action": "Export chargeback packet",
+        "target": "event-time owner mode",
+        "outcome": "exported",
+        "basis": "current-state rollup kept separate"
+      },
+      {
+        "timestamp": "2026-02-28T16:51:41Z",
+        "actor": "Maya Patel",
+        "role": "Admin",
+        "action": "Disable user session",
+        "target": "Owen Brooks",
+        "outcome": "suspended",
+        "basis": "local account lifecycle demo"
+      },
+      {
+        "timestamp": "2026-02-28T16:55:03Z",
+        "actor": "Jordan Lee",
+        "role": "Security",
+        "action": "Approve policy exception",
+        "target": "security-exception-review route",
+        "outcome": "routed",
+        "basis": "customer trust-boundary review"
+      },
+      {
+        "timestamp": "2026-02-28T16:58:22Z",
+        "actor": "Camila Torres",
+        "role": "Product",
+        "action": "Replay scenario harness",
+        "target": "PRD Proof adoption workflow story",
+        "outcome": "passed",
+        "basis": "workflow map includes services and insertion points"
+      },
+      {
+        "timestamp": "2026-02-28T17:02:00Z",
+        "actor": "Maya Patel",
+        "role": "Admin",
+        "action": "Rotate local API token",
+        "target": "demo presenter token",
+        "outcome": "recorded",
+        "basis": "local secret metadata only"
       }
     ]
   }

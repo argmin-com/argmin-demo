@@ -43,13 +43,25 @@ Open:
 
 The local launcher uses the dedicated `demo` runtime profile. It starts single-worker,
 auto-seeds deterministic attribution/index state, and allows auth bypass only in `demo`.
-It installs runtime dependencies into `.venv` on the first run and reuses that
-environment on later runs unless `requirements.lock` or `pyproject.toml` changes.
+It installs the minimal local-demo dependencies from `requirements-demo.lock` into
+`.venv` on the first run, runs from `src/` directly, and reuses that environment
+on later runs unless `requirements-demo.lock` or `pyproject.toml` changes. The
+full `requirements.lock` remains available when you intentionally want the
+production/shared-backend dependency set.
+
+To restore an already running demo to the known seeded baseline:
+
+```bash
+./scripts/reset_demo.sh
+```
+
+The browser can also reset local session state and backend runtime state at
+`http://localhost:8000/platform/?reset=1`.
 
 ## Recommended UI Flow
 
 1. In the top bar, open **Guided Demo**.
-2. Click **Start 90-sec Walkthrough**.
+2. Click **Start Full Walkthrough**.
 3. Confirm the drawer shows the three decision-time proof points:
    - attributed request
    - policy intervention
@@ -64,25 +76,32 @@ Then walk views in this order:
 
 1. **Overview**: financial summary, spend distributions, team attribution.
 2. **PRD Proof**: source-document journeys, decision-surface trust states, RAIL/HRE stages, invariants, pathway caveats, and requirement coverage.
-3. **Employee Adoption**: organization, business-unit, and team-level uptake with CEO/CFO/COO/CTO lenses.
-4. **Request Proof**: request-level evidence trail, staged decision replay, evidence quality, cost explanation, and safety rationale.
-5. **Interventions**: approve/reject/dismiss lifecycle, operational evidence, implementation effort, and forecast effect.
-6. **Forecasting**: scenario-based planning horizons, compare mode, and assumptions/drivers broken into demand, model mix, governance drag, optimization capture, and unresolved attribution risk.
-7. **Governance**: mode controls, active policies, fail-open posture, trust boundary notes, and a request-level policy simulator.
-8. **Manual Mapping**: human correction flow with explicit before/after business impact, including confidence lift, owner reassignment, budget effect, intervention reprioritization, and planning delta.
-9. **Models** and **Teams**: model-family and organizational optimization surfaces with the same active request/team/model context carried across pages.
-10. **Integrations**: show connected enterprise systems, owned business handoff workflows, and scenario-driven downstream actions.
-11. **Glossary / FAQ**: diligence-ready terminology and methodology references.
+3. **Coverage**: explicit pathway classes, capture feasibility, blind spots, degraded states, scenario harness proof, and agent lineage gaps.
+4. **Employee Adoption**: organization, business-unit, and team-level uptake with CEO/CFO/COO/CTO lenses.
+5. **Request Proof**: request-level evidence trail, staged decision replay, evidence quality, cost explanation, and safety rationale.
+6. **Exports**: finance-ready chargeback preview with event-time/current-state toggle, provisional rows, allocation-only rows, and unknown exclusions.
+7. **Interventions**: approve/reject/dismiss lifecycle, operational evidence, implementation effort, and forecast effect.
+8. **Energy**: model energy ratings, kWh estimates, carbon estimates, and explicit Unrated/null treatment for unknown models.
+9. **Forecasting**: scenario-based planning horizons, compare mode, and assumptions/drivers broken into demand, model mix, governance drag, optimization capture, and unresolved attribution risk.
+10. **Governance**: mode controls, active policies, fail-open posture, trust boundary notes, and a request-level policy simulator.
+11. **Admin**: local simulation of RBAC, account lifecycle, read-only permissions, scoped diagnostics, and audited operations.
+12. **Manual Mapping**: human correction flow with explicit before/after business impact, including confidence lift, owner reassignment, budget effect, intervention reprioritization, and planning delta.
+13. **Models** and **Teams**: model-family and organizational optimization surfaces with the same active request/team/model context carried across pages.
+14. **Integrations**: show connected enterprise systems, owned business handoff workflows, and scenario-driven downstream actions.
+15. **Glossary / FAQ**: diligence-ready terminology and methodology references.
 
 ## Equivalent API Walkthrough
 
-### 1) Seed deterministic demo entries
+### 1) Restore deterministic demo entries
 
 ```bash
-curl -s -X POST http://localhost:8000/v1/demo/bootstrap | jq
+curl -s -X POST http://localhost:8000/v1/demo/reset | jq
 ```
 
-The platform is already seeded on startup in demo mode; this endpoint is a reset hook.
+The platform is already seeded on startup in demo mode; this endpoint restores
+the fixed baseline, including seeded accounts, scenario IDs, simulated
+integration deliveries, intervention status, event-log idempotency state, and
+interceptor counters.
 
 ### 2) Enriched outcome
 
@@ -181,4 +200,10 @@ Run the end-to-end local smoke test:
 
 ```bash
 ./scripts/smoke_demo.sh
+```
+
+For a quick reset of a running instance without starting a new server:
+
+```bash
+./scripts/reset_demo.sh
 ```

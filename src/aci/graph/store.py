@@ -14,14 +14,20 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from datetime import UTC, datetime
-from typing import Any, Literal, Protocol, cast, overload
+from typing import TYPE_CHECKING, Any, Literal, Protocol, cast, overload
 
 import structlog
-from neo4j import Driver, GraphDatabase
-from neo4j.exceptions import Neo4jError, ServiceUnavailable
 
 from aci.config import PlatformConfig, _secret_value
 from aci.models.graph import EdgeProvenance, EdgeType, GraphEdge, GraphNode, NodeType
+from aci.optional_deps import (
+    Neo4jPackageError,
+    Neo4jServiceUnavailablePackageError,
+    load_neo4j_graph_database,
+)
+
+if TYPE_CHECKING:
+    from neo4j import Driver
 
 logger = structlog.get_logger()
 
@@ -286,7 +292,8 @@ class Neo4jGraphStore(_GraphTraversalMixin):
     def start(self) -> None:
         if self._driver is not None:
             return
-        self._driver = GraphDatabase.driver(self._uri, auth=(self._user, self._password))
+        graph_database = load_neo4j_graph_database("Neo4j graph backend")
+        self._driver = graph_database.driver(self._uri, auth=(self._user, self._password))
         self._driver.verify_connectivity()
         self._ensure_schema()
 
@@ -301,7 +308,7 @@ class Neo4jGraphStore(_GraphTraversalMixin):
             with driver.session(database=self._database) as session:
                 session.run("RETURN 1 AS ok").single(strict=True)
             return True
-        except (Neo4jError, ServiceUnavailable, RuntimeError):
+        except (Neo4jPackageError, Neo4jServiceUnavailablePackageError, RuntimeError):
             return False
 
     def clear(self) -> None:

@@ -58,6 +58,16 @@ ACI_DEMO_PORT=8010 ./scripts/run_demo.sh
 
 Then open `http://localhost:8010/platform/`.
 
+To restore a running demo to the same seeded state before another recording or
+stakeholder walkthrough:
+
+```bash
+ACI_DEMO_PORT=8010 ./scripts/reset_demo.sh
+```
+
+You can also open `http://localhost:8010/platform/?reset=1` to clear browser
+session state and ask the local backend to reload the fixed demo baseline.
+
 If you prefer not to `cd` into the repo first, you can also launch it with an
 absolute path:
 
@@ -71,6 +81,11 @@ absolute path:
 - in-memory graph/event/index backends
 - deterministic startup seeding
 - auth bypass enabled only for the demo profile
+- outbound notifications forced to simulation mode
+
+The demo launcher refuses `ACI_ENVIRONMENT=production` or `ACI_ENVIRONMENT=staging`
+and forces local-only memory backends so cloud or shared-backend shell variables
+cannot leak into an investor or design-partner walkthrough.
 
 The dashboard and control-plane views are populated on startup. Use **Reset Demo**
 in the Guided Demo drawer to restore the baseline presentation state, or
@@ -81,15 +96,19 @@ continues on deterministic local demo data so the story still plays cleanly.
 In the UI:
 
 1. Open **Guided Demo** from the top bar.
-2. Click **Start 90-sec Walkthrough**.
-3. Narrate the walkthrough in the same seven-step order the UI uses:
+2. Click **Start Full Walkthrough**.
+3. Narrate the walkthrough in the same product-proof order the UI uses:
    - Overview
    - PRD Proof
+   - Coverage
    - Employee Adoption
    - Request Proof
+   - Exports
    - Interventions
+   - Energy
    - Forecasting
    - Governance
+   - Admin
 4. If the forecast API is unavailable, the Forecasting view continues using a
    local directional estimate derived from the demo dataset and scenario
    assumptions.
@@ -98,14 +117,18 @@ In the UI:
 6. Navigate the left rail across:
    - Overview
    - PRD Proof
+   - Coverage
    - Employee Adoption
    - Models
    - Teams
    - Manual Mapping
    - Interventions
+   - Exports
+   - Energy
    - Forecasting
    - Governance
    - Integrations
+   - Admin
    - Request Proof
    - Glossary
    - FAQ
@@ -115,11 +138,17 @@ For the view-by-view demo reference, see [docs/demo-feature-matrix.md](docs/demo
 For policy semantics and enforcement behavior, see [docs/policy-reference.md](docs/policy-reference.md).
 For ingestion contracts and examples, see [docs/ingestion-reference.md](docs/ingestion-reference.md).
 For automated end-to-end demo verification, run `./scripts/smoke_demo.sh`.
+For a non-destructive state reset against an already running demo, run
+`./scripts/reset_demo.sh`.
 
-The launcher installs runtime dependencies into `.venv` on the first run and
-reuses them until `requirements.lock` or `pyproject.toml` changes. Set
-`ACI_DEMO_SKIP_INSTALL=1` only when you know the local environment is already
-prepared.
+The launcher installs the minimal local-demo dependency set from
+`requirements-demo.lock` into `.venv` on the first run and reuses it until
+`requirements-demo.lock` or `pyproject.toml` changes. It runs from `src/`
+directly, so the 30-second demo path does not perform an editable package build
+or install cloud/shared-backend clients. Set `ACI_DEMO_REQUIREMENTS_FILE=requirements.lock`
+only when you intentionally want the full production/development dependency
+set, and set `ACI_DEMO_SKIP_INSTALL=1` only when the local environment is
+already prepared.
 
 ## Runtime Profiles
 
@@ -147,6 +176,17 @@ single-process, and pre-seeded.
 
 This path exercises the durable/shared topology. It is the right local profile for validating
 backend wiring rather than for the shortest-path demo.
+
+Validate the shared-backend profile without cloud access:
+
+```bash
+./scripts/smoke_stack.sh
+```
+
+The shared-backend Docker stack uses local Redis, Kafka, and Neo4j containers
+with dummy local credentials by default. Override those values only for a
+dedicated development environment; the 30-second demo path above does not need
+Docker or cloud credentials.
 
 ## Platform Architecture
 
@@ -230,6 +270,7 @@ flowchart LR
 - `POST /v1/trac`
 - `POST /v1/policy/evaluate`
 - `POST /v1/demo/bootstrap` (non-production only)
+- `POST /v1/demo/reset` (non-production only)
 - `POST /v1/demo/mode` (non-production only)
 - `GET /v1/attribution/{workload_id}`
 - `POST /v1/attribution/manual`
@@ -320,7 +361,6 @@ src/aci/
   policy/         Governance policy engine
   trac/           TRAC calculations
   equivalence/    Model equivalence verification
-  benchmark/      Federated benchmarking protocol
   models/         Domain models
 
 frontend/         Investor-facing demo UI

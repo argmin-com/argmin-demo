@@ -1106,6 +1106,18 @@ class FailOpenInterceptor:
         await asyncio.gather(*list(self._background_tasks), return_exceptions=True)
         self._background_tasks.clear()
 
+    def reset_metrics(self) -> None:
+        """Restore deterministic demo/test counters without changing config."""
+        self.total_requests = 0
+        self.total_enriched = 0
+        self.total_fail_open = 0
+        self.total_redirected = 0
+        self.total_cache_misses = 0
+        with self._fail_open_window_lock:
+            self._fail_open_window.clear()
+            self._fail_open_alert_level = "normal"
+        self.circuit_breaker.force_close()
+
     def get_metrics(self) -> dict[str, int | float | str]:
         return {
             "total_requests": self.total_requests,

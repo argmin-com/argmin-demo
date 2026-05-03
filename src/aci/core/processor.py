@@ -11,6 +11,7 @@ critical path. The interceptor reads only from the materialized index.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 import structlog
@@ -21,8 +22,6 @@ from aci.models.events import DomainEvent, EventType
 from aci.models.graph import EdgeProvenance, EdgeType, GraphEdge, GraphNode, NodeType
 
 if TYPE_CHECKING:
-    from datetime import datetime
-
     from aci.confidence.calibration import CalibrationEngine
     from aci.core.event_bus import InMemoryEventBus, KafkaEventBus
     from aci.graph.store import GraphStoreProtocol
@@ -301,6 +300,10 @@ class AttributionProcessor:
         # legitimate multi-owner relationships.
         direct_targets: dict[str, float] = {}
         for lookup_id in self._candidate_graph_node_ids(workload_id):
+            node = self.graph.get_node(lookup_id)
+            if node is not None:
+                self._merge_node_reconciliation_context(ctx, node, event_time)
+
             edges = self.graph.get_edges_from(lookup_id, at_time=event_time)
             for edge in edges:
                 target = self.graph.get_node(edge.to_id)
@@ -309,6 +312,14 @@ class AttributionProcessor:
                         direct_targets.get(target.node_id, 0.0),
                         edge.weight,
                     )
+                    ctx.temporal_events.append(
+                        (edge.valid_from, target.node_id, edge.provenance.source)
+                    )
+                    ctx.historical_attributions.append((target.node_id, edge.confidence))
+
+            incoming_edges = self.graph.get_edges_to(lookup_id, at_time=event_time)
+            for edge in incoming_edges:
+                self._merge_incoming_edge_reconciliation_context(ctx, edge, event_time)
 
         if len(direct_targets) == 1:
             ctx.identity_mappings[workload_id] = next(iter(direct_targets))
@@ -328,6 +339,178 @@ class AttributionProcessor:
                 ctx.naming_patterns[team.node_id] = patterns
 
         return ctx
+
+    def _merge_incoming_edge_reconciliation_context(
+        self,
+        ctx: ReconciliationContext,
+        edge: GraphEdge,
+        event_time: datetime,
+    ) -> None:
+        """Populate probabilistic HRE context from graph edges around a workload."""
+        source = self.graph.get_node(edge.from_id)
+        if source is None:
+            return
+
+        if source.node_type in (NodeType.TEAM, NodeType.PERSON):
+            ctx.temporal_events.append((edge.valid_from, source.node_id, edge.provenance.source))
+            ctx.historical_attributions.append((source.node_id, edge.confidence))
+
+        if edge.edge_type == EdgeType.TRIGGERS and source.node_type == NodeType.DEPLOYMENT:
+            for owner_edge in self.graph.get_edges_to(source.node_id, at_time=event_time):
+                if owner_edge.edge_type != EdgeType.DEPLOYED_BY:
+                    continue
+                owner = self.graph.get_node(owner_edge.from_id)
+                if owner is None or owner.node_type not in (
+                    NodeType.PERSON,
+                    NodeType.SERVICE_ACCOUNT,
+                ):
+                    continue
+                ctx.deployment_owners.append((owner.node_id, owner_edge.valid_from))
+                ctx.temporal_events.append(
+                    (owner_edge.valid_from, owner.node_id, owner_edge.provenance.source)
+                )
+                if owner.node_type == NodeType.PERSON:
+                    ctx.recent_users.append((owner.node_id, owner_edge.valid_from))
+
+    @classmethod
+    def _merge_node_reconciliation_context(
+        cls,
+        ctx: ReconciliationContext,
+        node: GraphNode,
+        event_time: datetime,
+    ) -> None:
+        """Merge explicit reconciliation hints carried on a graph node."""
+        cls._extend_historical_attributions(ctx, node.properties.get("historical_attributions"))
+        cls._extend_temporal_events(ctx, node.properties.get("temporal_events"), event_time)
+        cls._extend_timestamped_entities(
+            ctx.deployment_owners,
+            node.properties.get("deployment_owners"),
+            event_time,
+        )
+        cls._extend_string_entities(ctx.code_owners, node.properties.get("code_owners"))
+        cls._extend_timestamped_entities(
+            ctx.recent_users,
+            node.properties.get("recent_users"),
+            event_time,
+        )
+
+    @classmethod
+    def _extend_historical_attributions(
+        cls,
+        ctx: ReconciliationContext,
+        raw_items: object,
+    ) -> None:
+        if not isinstance(raw_items, list):
+            return
+
+        for item in raw_items:
+            team_id = ""
+            confidence = 0.0
+            if isinstance(item, dict):
+                team_id = str(
+                    item.get("team_id") or item.get("target_entity") or item.get("owner_id") or ""
+                )
+                confidence = cls._coerce_float(item.get("confidence")) or 0.0
+            elif isinstance(item, (list, tuple)) and len(item) >= 2:
+                team_id = str(item[0])
+                confidence = cls._coerce_float(item[1]) or 0.0
+
+            if team_id and confidence > 0.0:
+                ctx.historical_attributions.append((team_id, confidence))
+
+    @classmethod
+    def _extend_temporal_events(
+        cls,
+        ctx: ReconciliationContext,
+        raw_items: object,
+        fallback_time: datetime,
+    ) -> None:
+        if not isinstance(raw_items, list):
+            return
+
+        for item in raw_items:
+            event_time = fallback_time
+            entity_id = ""
+            source = "graph"
+            if isinstance(item, dict):
+                entity_id = str(item.get("entity_id") or item.get("target_entity") or "")
+                source = str(item.get("source") or "graph")
+                event_time = cls._coerce_datetime(item.get("event_time"), fallback_time)
+            elif isinstance(item, (list, tuple)) and len(item) >= 3:
+                event_time = cls._coerce_datetime(item[0], fallback_time)
+                entity_id = str(item[1])
+                source = str(item[2])
+
+            if entity_id:
+                ctx.temporal_events.append((event_time, entity_id, source))
+
+    @classmethod
+    def _extend_timestamped_entities(
+        cls,
+        target: list[tuple[str, datetime]],
+        raw_items: object,
+        fallback_time: datetime,
+    ) -> None:
+        if not isinstance(raw_items, list):
+            return
+
+        for item in raw_items:
+            entity_id = ""
+            observed_at = fallback_time
+            if isinstance(item, str):
+                entity_id = item
+            elif isinstance(item, dict):
+                entity_id = str(
+                    item.get("entity_id") or item.get("owner_id") or item.get("user_id") or ""
+                )
+                observed_at = cls._coerce_datetime(
+                    item.get("observed_at") or item.get("event_time"),
+                    fallback_time,
+                )
+            elif isinstance(item, (list, tuple)) and item:
+                entity_id = str(item[0])
+                if len(item) >= 2:
+                    observed_at = cls._coerce_datetime(item[1], fallback_time)
+
+            if entity_id:
+                target.append((entity_id, observed_at))
+
+    @staticmethod
+    def _extend_string_entities(target: list[str], raw_items: object) -> None:
+        if not isinstance(raw_items, list):
+            return
+
+        for item in raw_items:
+            if isinstance(item, str) and item:
+                target.append(item)
+
+    @staticmethod
+    def _coerce_float(value: object) -> float | None:
+        if isinstance(value, (int, float)):
+            return float(value)
+        if isinstance(value, str):
+            try:
+                return float(value)
+            except ValueError:
+                return None
+        return None
+
+    @staticmethod
+    def _coerce_datetime(value: object, fallback: datetime) -> datetime:
+        if isinstance(value, datetime):
+            if value.tzinfo is None or value.utcoffset() is None:
+                return value.replace(tzinfo=UTC)
+            return value.astimezone(UTC)
+        if isinstance(value, str):
+            normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+            try:
+                parsed = datetime.fromisoformat(normalized)
+            except ValueError:
+                return fallback
+            if parsed.tzinfo is None or parsed.utcoffset() is None:
+                return parsed.replace(tzinfo=UTC)
+            return parsed.astimezone(UTC)
+        return fallback
 
     @staticmethod
     def _candidate_graph_node_ids(workload_id: str) -> list[str]:

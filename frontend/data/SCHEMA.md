@@ -6,7 +6,8 @@
 
 - `meta`: tenant, environment labels, watermark, default mode, and presentation metadata
 - `overview`: executive summary metrics and spend trend points
-- `adoption`: hierarchy and dashboard snapshots for organization, business-unit, and team views
+- `adoption`: hierarchy, dashboard snapshots, and workflow-level adoption maps
+  for organization, business-unit, and team views
 - `teams`: business teams with budgets, spend, trends, and optimization signals
 - `models`: active model families with provider, spend, latency, request volume, and optimization metadata
 - `enterprise_market_signals`: investor-facing market context used on the Models page
@@ -18,6 +19,20 @@
 - `governance`: deployment modes, policy summaries, fail-open matrix, and trust-boundary copy
 - `manual_mapping`: unresolved or operator-corrected ownership mappings
 - `integrations`: connected systems, routes, scenarios, and delivery history
+- `coverage`: pathway-class coverage, capture feasibility, blind spots,
+  degraded states, agent lineage, and local scenario-harness proof
+- `exports`: finance export preview data, including event-time/current-state
+  ownership views, FOCUS-compatible column posture, allocation-only rows, and
+  unknown spend exclusions
+- `energy_efficiency`: advisory model energy transparency data, including
+  star ratings, kWh estimates, carbon estimates, optimization deltas, and
+  explicit `Unrated` / `null` handling for unknown models
+- `admin`: local customer-admin simulation data for RBAC, account lifecycle,
+  read-only integration posture, scoped diagnostics, audited operations, and
+  customer-visible append-only audit events
+- `design_partner_brief`: customer-facing pilot narrative, readiness pillars,
+  buyer-role map, proof moments, success metrics, open questions, and recording
+  talk track used by the Partner Brief page
 - `glossary`: categorized terminology entries
 - `faq`: categorized question-and-answer content
 - `demo_scenarios`: guided demo request payloads and labels
@@ -40,11 +55,20 @@
 - `attribution_requests` should include multiple request examples so Request
   Proof can show both high-confidence and review-required cases, including
   staged replay and evidence-quality summaries.
+- `adoption.workflow_map.workflows[]` should remain broad enough to show
+  workflow, service, capability, insertion point, evidence, and decision owner
+  variation across business units and teams.
 - `manual_mapping` should contain enough evidence and ownership metadata to
   show before/after impact on confidence, budget ownership, intervention
   priority, and forecast reserve.
 - `interventions` should be rich enough to support operational detail cards such
   as baseline cost, savings, effort, evidence, and forecast effect.
+- `coverage.summary.classified_pathways` should reconcile to
+  `coverage.pathways.length` so the pathway truth map does not claim coverage
+  that is not visible in the local UI.
+- `integrations.scenarios[]` should remain runnable without cloud credentials;
+  if the live runtime is unavailable, the frontend simulates a local handoff
+  record from this deterministic dataset.
 
 ## Fields Used Directly By The UI
 
@@ -55,7 +79,13 @@ Examples of high-impact fields that should remain stable:
 - `overview.total_spend_usd`
 - `overview.attribution_coverage_pct`
 - `teams[].optimization_potential_usd`
+- `adoption.workflow_map.summary.*`
+- `adoption.workflow_map.workflows[]`
+- `adoption.workflow_map.capabilities[]`
+- `adoption.workflow_map.services[]`
 - `models[].provider`
+- `models[].energy_status`
+- `models[].kwh_per_1k_requests`
 - `enterprise_market_signals[].label`
 - `enterprise_model_landscape[].provider`
 - `enterprise_ai_platforms[].name`
@@ -63,6 +93,29 @@ Examples of high-impact fields that should remain stable:
 - `interventions[].status`
 - `attribution_requests[].confidence`
 - `integrations.summary.*`
+- `coverage.summary.*`
+- `coverage.pathways[]`
+- `coverage.blind_spots[]`
+- `coverage.agent_lineage`
+- `coverage.scenario_results[]`
+- `exports.summary.*`
+- `exports.rows[]`
+- `exports.allocation_splits[]`
+- `energy_efficiency.summary.*`
+- `energy_efficiency.models[]`
+- `energy_efficiency.recommendations[]`
+- `admin.summary.*`
+- `admin.accounts[]`
+- `admin.operations[]`
+- `admin.audit_log[]`
+- `design_partner_brief.thesis.*`
+- `design_partner_brief.readiness_pillars[]`
+- `design_partner_brief.pilot_stages[]`
+- `design_partner_brief.buyer_roles[]`
+- `design_partner_brief.proof_moments[]`
+- `design_partner_brief.success_metrics[]`
+- `design_partner_brief.open_questions[]`
+- `design_partner_brief.demo_script[]`
 - `prd_traceability.journeys[]`
 - `prd_traceability.requirement_matrix[]`
 - `glossary[].term`

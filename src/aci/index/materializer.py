@@ -12,6 +12,8 @@ Old entries are not overwritten; they are superseded with version metadata.
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
 from collections import OrderedDict
 from datetime import UTC, datetime
@@ -19,11 +21,10 @@ from threading import RLock
 from typing import Any, cast
 
 import structlog
-from redis import Redis
-from redis.exceptions import RedisError
 
 from aci.config import PlatformConfig
 from aci.models.attribution import AttributionIndexEntry, AttributionResult
+from aci.optional_deps import RedisPackageError, load_sync_redis
 
 logger = structlog.get_logger()
 
@@ -40,8 +41,9 @@ class AttributionIndexStore:
         self,
         max_entries: int = 250_000,
         redis_url: str | None = None,
-        redis_prefix: str = "aci:index",
+        redis_prefix: str = "aci:idx",
         redis_ttl_seconds: int = 1800,
+        redis_environment: str = "development",
     ) -> None:
         # Primary index: workload_id -> AttributionIndexEntry.
         self._index: OrderedDict[str, AttributionIndexEntry] = OrderedDict()
@@ -65,8 +67,9 @@ class AttributionIndexStore:
 
         self._redis_prefix = redis_prefix
         self._redis_ttl_seconds = redis_ttl_seconds
+        self._redis_environment = self._normalize_key_component(redis_environment)
         self._schema_version = 1
-        self._redis: Redis | None = None
+        self._redis: Any | None = None
         self._redis_upsert_script = """
         local key = KEYS[1]
         local payload = ARGV[1]
@@ -82,16 +85,11 @@ class AttributionIndexStore:
           return current_version
         end
 
-        redis.call(
-          'HSET',
-          key,
-          'payload',
-          payload,
-          'version',
-          incoming_version,
-          'schema_v',
-          schema_v
-        )
+        local i = 5
+        while i <= #ARGV do
+          redis.call('HSET', key, ARGV[i], ARGV[i + 1] or '')
+          i = i + 2
+        end
         if ttl_ms > 0 then
           redis.call('PEXPIRE', key, ttl_ms)
         end
@@ -99,7 +97,7 @@ class AttributionIndexStore:
         """
         if redis_url:
             try:
-                self._redis = Redis.from_url(
+                self._redis = load_sync_redis("Redis attribution index backend").from_url(
                     redis_url,
                     decode_responses=True,
                     socket_timeout=0.01,
@@ -185,12 +183,17 @@ class AttributionIndexStore:
             return False
         try:
             return bool(self._redis.ping())
-        except RedisError:
+        except RedisPackageError:
             with self._lock:
                 self._durable_errors += 1
             return False
 
-    def materialize(self, entry: AttributionIndexEntry) -> None:
+    def materialize(
+        self,
+        entry: AttributionIndexEntry,
+        *,
+        materialized_at: datetime | None = None,
+    ) -> None:
         """
         Upsert an entry into the index.
 
@@ -204,7 +207,7 @@ class AttributionIndexStore:
             entry_with_version = entry.model_copy(
                 update={
                     "version": new_version,
-                    "materialized_at": datetime.now(UTC),
+                    "materialized_at": materialized_at or datetime.now(UTC),
                 }
             )
 
@@ -233,7 +236,7 @@ class AttributionIndexStore:
         if self._redis is not None:
             try:
                 self._redis.delete(self._redis_key(workload_id))
-            except RedisError:
+            except RedisPackageError:
                 with self._lock:
                     self._durable_errors += 1
 
@@ -251,7 +254,7 @@ class AttributionIndexStore:
                 keys = list(self._redis.scan_iter(match=pattern, count=500))
                 if keys:
                     self._redis.delete(*keys)
-            except RedisError:
+            except RedisPackageError:
                 with self._lock:
                     self._durable_errors += 1
 
@@ -266,7 +269,8 @@ class AttributionIndexStore:
             self._eviction_count += 1
 
     def _redis_key(self, workload_id: str) -> str:
-        return f"{self._redis_prefix}:{workload_id}"
+        resource_hash = self._resource_hash(workload_id)
+        return f"{self._redis_prefix}:v1:{self._redis_environment}:{resource_hash}"
 
     def _load_durable_entry(self, workload_id: str) -> AttributionIndexEntry | None:
         if self._redis is None:
@@ -289,7 +293,7 @@ class AttributionIndexStore:
                 return AttributionIndexEntry.model_validate_json(cast("str", legacy))
 
             return AttributionIndexEntry.model_validate_json(cast("str", raw_payload))
-        except (RedisError, ValueError):
+        except (RedisPackageError, ValueError):
             with self._lock:
                 self._durable_errors += 1
             return None
@@ -299,31 +303,32 @@ class AttributionIndexStore:
             return
         try:
             payload = json.dumps(entry.model_dump(mode="json"))
+            key = self._redis_key(entry.workload_id)
             ttl_ms = max(0, int(self._redis_ttl_seconds * 1000))
+            hash_mapping = self._redis_hash_mapping(entry, payload)
+            hash_args = [
+                value
+                for item in hash_mapping.items()
+                for value in (item[0], item[1])
+            ]
             self._redis.eval(
                 self._redis_upsert_script,
                 1,
-                self._redis_key(entry.workload_id),
+                key,
                 payload,
                 entry.version,
                 self._schema_version,
                 ttl_ms,
+                *hash_args,
             )
             with self._lock:
                 self._durable_writes += 1
-        except (RedisError, AttributeError, TypeError):
+        except (RedisPackageError, AttributeError, TypeError):
             # Conservative fallback path if Lua is unavailable.
             try:
                 key = self._redis_key(entry.workload_id)
                 if hasattr(self._redis, "hset"):
-                    self._redis.hset(
-                        key,
-                        mapping={
-                            "payload": payload,
-                            "version": entry.version,
-                            "schema_v": self._schema_version,
-                        },
-                    )
+                    self._redis.hset(key, mapping=self._redis_hash_mapping(entry, payload))
                     if self._redis_ttl_seconds > 0:
                         self._redis.expire(key, self._redis_ttl_seconds)
                 elif self._redis_ttl_seconds > 0:
@@ -333,10 +338,51 @@ class AttributionIndexStore:
                 with self._lock:
                     self._durable_writes += 1
                 return
-            except RedisError:
+            except RedisPackageError:
                 pass
             with self._lock:
                 self._durable_errors += 1
+
+    def _redis_hash_mapping(
+        self,
+        entry: AttributionIndexEntry,
+        payload: str,
+    ) -> dict[str, str]:
+        constraints = {
+            "model_allowlist": entry.model_allowlist,
+            "approved_alternatives": entry.approved_alternatives,
+            "budget_remaining_usd": entry.budget_remaining_usd,
+            "budget_limit_usd": entry.budget_limit_usd,
+            "cost_ceiling_per_request_usd": entry.cost_ceiling_per_request_usd,
+            "token_budget_input": entry.token_budget_input,
+            "token_budget_output": entry.token_budget_output,
+            "equivalence_class_id": entry.equivalence_class_id,
+        }
+        return {
+            "payload": payload,
+            "version": str(entry.version),
+            "schema_v": str(self._schema_version),
+            "index_version": str(entry.version),
+            "updated_ms": str(int(entry.materialized_at.timestamp() * 1000)),
+            "owner_id": entry.person_id or entry.team_id,
+            "team_id": entry.team_id,
+            "service_id": entry.service_name or entry.workload_id,
+            "conf": f"{entry.confidence:.6f}",
+            "reason": entry.method_used,
+            "explain_id": "",
+            "constraints_json": json.dumps(constraints, sort_keys=True, separators=(",", ":")),
+            "price_snapshot_id": "",
+        }
+
+    @staticmethod
+    def _resource_hash(workload_id: str) -> str:
+        digest = hashlib.sha256(workload_id.encode("utf-8")).digest()
+        return base64.b32encode(digest).decode("ascii").rstrip("=")[:26].lower()
+
+    @staticmethod
+    def _normalize_key_component(value: str) -> str:
+        normalized = "".join(ch.lower() if ch.isalnum() else "-" for ch in value.strip())
+        return normalized.strip("-") or "default"
 
 
 class IndexMaterializer:

@@ -6,18 +6,37 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 VENV_DIR="${ACI_DEMO_VENV_DIR:-${REPO_ROOT}/.venv}"
 DEPS_STAMP="${VENV_DIR}/.argmin-demo-dev-deps.sha256"
 
+require_python312() {
+  local interpreter="$1"
+  "${interpreter}" - <<'PY'
+import sys
+
+if sys.version_info < (3, 12):
+    version = ".".join(str(part) for part in sys.version_info[:3])
+    sys.stderr.write(f"Python 3.12+ is required; found Python {version}.\n")
+    raise SystemExit(1)
+PY
+}
+
 cd "${REPO_ROOT}"
 
 if ! command -v python3 >/dev/null 2>&1; then
   echo "python3 is required to validate the repo." >&2
   exit 1
 fi
+require_python312 python3
 
-if [[ ! -d "${VENV_DIR}" ]]; then
+if [[ ! -f "${VENV_DIR}/bin/activate" ]]; then
+  if [[ -d "${VENV_DIR}" ]] && [[ -n "$(find "${VENV_DIR}" -mindepth 1 -maxdepth 1 -print -quit)" ]]; then
+    echo "ACI_DEMO_VENV_DIR exists but is not a usable Python virtual environment: ${VENV_DIR}" >&2
+    echo "Choose an empty directory, remove the partial directory, or set ACI_DEMO_VENV_DIR to a valid venv." >&2
+    exit 1
+  fi
   python3 -m venv "${VENV_DIR}"
 fi
 
 source "${VENV_DIR}/bin/activate"
+require_python312 python
 
 current_deps_hash="$(
   python - <<'PY'

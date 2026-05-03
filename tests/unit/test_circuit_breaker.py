@@ -145,7 +145,7 @@ class _FakeRedis:
 def test_redis_state_store_serializes_mutations_with_lock() -> None:
     store = RedisCircuitStateStore("redis://example", "aci:test:circuit")
     fake_redis = _FakeRedis()
-    store._redis = fake_redis  # type: ignore[assignment]
+    store._redis = fake_redis
 
     def mutate_to_open(current: CircuitBreakerState) -> None:
         current.state = CircuitState.OPEN.value

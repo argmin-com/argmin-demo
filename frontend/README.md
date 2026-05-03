@@ -57,7 +57,22 @@ Custom port:
 ACI_DEMO_PORT=8010 ./scripts/run_demo.sh
 ```
 
-The launcher uses the dedicated `demo` runtime profile and auto-seeds the backend state.
+The launcher uses the dedicated `demo` runtime profile, installs
+`requirements-demo.lock` instead of the full production lock, runs the API from
+`src/` directly, and auto-seeds the backend state. The seed baseline is fixed to
+a synthetic February 2026 operating period with predictable demo accounts,
+stable workflow scenarios, simulated notifications, and repeatable mock
+responses.
+
+To restore a running demo to that known state:
+
+```bash
+./scripts/reset_demo.sh
+```
+
+To reset both browser session state and backend runtime state in one load, open:
+
+- `http://localhost:8000/platform/?reset=1`
 
 Optional live API auth token:
 
@@ -70,15 +85,19 @@ This is only needed if the local backend is configured to require auth for demo 
 
 1. Open `http://localhost:8000/platform/`
 2. Open **Guided Demo** (top bar, right side)
-3. Click **Start 90-sec Walkthrough**
+3. Click **Start Full Walkthrough**
 4. Review:
    - Overview (financial summary and organizational spend)
    - PRD Proof (source-document requirements, trust states, and proof map)
-   - Employee Adoption (team, business-unit, and organization adoption dashboards)
+   - Coverage (pathway classes, blind spots, degraded states, and agent lineage)
+   - Employee Adoption (organization, business-unit, team, workflow, service, and capability adoption)
    - Request Proof (request-level evidence, decision replay, and evidence quality)
+   - Exports (chargeback-ready, provisional, allocated, and unknown rows)
    - Interventions (stateful lifecycle, methodology, effort, and forecast effect)
+   - Energy (model energy ratings, kWh estimates, carbon estimates, and Unrated states)
    - Forecasting (scenario-based planning views, compare mode, and driver breakdown)
    - Governance (modes, policies, fail-open matrix, and policy simulation)
+   - Admin (RBAC, scoped diagnostics, audited operations, and trust-boundary posture)
 
 Then use the left rail for drill-down surfaces that extend the same story:
 
@@ -97,7 +116,7 @@ The demo also exposes:
   scenario, and mode stay visible while navigating
 - an audience-lens ribbon (`Executive`, `Finance`, `Platform`, `Security`) that
   reframes the same data for different buyer or operator perspectives
-- exportable operating artifacts from Interventions, Forecasting, and Governance
+- exportable operating artifacts from Interventions, Exports, Forecasting, and Governance
 
 ## Demo Guarantees
 

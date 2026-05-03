@@ -21,7 +21,7 @@ import structlog
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from jwt import InvalidTokenError
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
@@ -35,7 +35,7 @@ from aci.api.auth import (
 )
 from aci.api.runtime import AppState, SlidingWindowRateLimiter, ensure_app_state
 from aci.core.event_schema import EventSchemaValidationError, validate_event_attributes
-from aci.demo.seeder import bootstrap_demo_state
+from aci.demo.seeder import DEMO_REFERENCE_TIME, DemoBootstrapResult, bootstrap_demo_state
 from aci.integrations.catalog import default_integration_sources
 from aci.integrations.notifications import NotificationDelivery, NotificationMessage
 from aci.interceptor.gateway import (
@@ -665,6 +665,10 @@ class DemoBootstrapResponse(BaseModel):
     events_published: int
     graph_nodes: int
     graph_edges: int
+    reference_time: str
+    scenario_ids: list[str]
+    demo_accounts: list[dict[str, str]]
+    reset_token: str
     interceptor_mode: str
     environment: str
 
@@ -1260,6 +1264,14 @@ def _is_production_like(environment: str) -> bool:
     return environment.strip().lower() in {"production", "staging"}
 
 
+def _demo_event_id_part(value: str) -> str:
+    normalized = "".join(
+        character.lower() if character.isalnum() else "-"
+        for character in value.strip()
+    ).strip("-")
+    return normalized or "unknown"
+
+
 def _normalize_scopes(raw_scope: object | None) -> set[str]:
     if raw_scope is None:
         return set()
@@ -1412,9 +1424,13 @@ def _gate_error_from_result(result: InterceptionResult) -> JSONResponse | None:
 
 
 @app.get("/", response_model=RootResponse)
-async def root() -> RootResponse:
+async def root(request: Request) -> RootResponse | RedirectResponse:
     """Root metadata and quick links."""
     mockup_url = "/platform/" if frontend_dir.exists() else None
+    accepts_html = "text/html" in request.headers.get("accept", "").lower()
+    if mockup_url is not None and accepts_html:
+        return RedirectResponse(url=mockup_url, status_code=307)
+
     return RootResponse(
         name="Argmin Platform",
         version="0.3.3",
@@ -1600,13 +1616,43 @@ async def bootstrap_demo() -> DemoBootstrapResponse:
         )
 
     result = await bootstrap_demo_state(app_state, reset_existing=True)
+    return _demo_bootstrap_response(result, app_state)
 
+
+@app.post("/v1/demo/reset", response_model=DemoBootstrapResponse)
+async def reset_demo() -> DemoBootstrapResponse:
+    """
+    Restore the local demo to its known baseline state.
+
+    This endpoint is intentionally disabled in production/staging.
+    """
+    app_state = get_state()
+    if _is_production_like(app_state.config.environment):
+        raise HTTPException(
+            status_code=403,
+            detail="demo reset endpoint is disabled in production/staging",
+        )
+
+    result = await bootstrap_demo_state(app_state, reset_existing=True)
+    if app_state.accepts_interception:
+        app_state.interceptor.mode = DeploymentMode.ADVISORY
+    return _demo_bootstrap_response(result, app_state)
+
+
+def _demo_bootstrap_response(
+    result: DemoBootstrapResult,
+    app_state: AppState,
+) -> DemoBootstrapResponse:
     return DemoBootstrapResponse(
         seeded_entries=result.seeded_entries,
         workloads=result.workloads,
         events_published=result.events_published,
         graph_nodes=result.graph_nodes,
         graph_edges=result.graph_edges,
+        reference_time=result.reference_time,
+        scenario_ids=result.scenario_ids,
+        demo_accounts=result.demo_accounts,
+        reset_token="argmin-demo-baseline-v1",
         interceptor_mode=app_state.interceptor.mode.value,
         environment=app_state.config.environment,
     )
@@ -1799,7 +1845,24 @@ async def submit_manual_attribution(
     if current is None:
         raise HTTPException(status_code=404, detail="Workload not found in attribution index")
 
+    if app_state.config.environment.lower() == "demo":
+        event_time = DEMO_REFERENCE_TIME
+        correction_event_id = (
+            "evt-demo-manual-"
+            f"{_demo_event_id_part(req.workload_id)}-"
+            f"{_demo_event_id_part(req.true_team_id)}-"
+            f"{_demo_event_id_part(req.true_cost_center_id)}"
+        )
+        idempotency_key = (
+            f"manual:{req.workload_id}:{req.true_team_id}:{req.true_cost_center_id}"
+        )
+    else:
+        event_time = datetime.now(UTC)
+        correction_event_id = str(uuid4())
+        idempotency_key = f"manual:{req.workload_id}:{uuid4()}"
+
     correction_event = DomainEvent(
+        event_id=correction_event_id,
         event_type=EventType.ATTRIBUTION_CORRECTION,
         subject_id=req.workload_id,
         attributes={
@@ -1814,13 +1877,18 @@ async def submit_manual_attribution(
                 and current.cost_center_id == req.true_cost_center_id
             ),
         },
-        event_time=datetime.now(UTC),
+        event_time=event_time,
+        ingest_time=event_time,
         source="manual_attribution_api",
-        idempotency_key=f"manual:{req.workload_id}:{uuid4()}",
+        idempotency_key=idempotency_key,
         tenant_id=app_state.config.tenant_id,
     )
 
     await app_state.event_bus.publish(correction_event)
+
+    source_event_ids = list(current.source_event_ids)
+    if correction_event.event_id not in source_event_ids:
+        source_event_ids.append(correction_event.event_id)
 
     corrected_entry = current.model_copy(
         update={
@@ -1831,10 +1899,10 @@ async def submit_manual_attribution(
             "confidence": 1.0,
             "confidence_tier": "chargeback_ready",
             "method_used": "MANUAL_CORRECTION",
-            "source_event_ids": [*current.source_event_ids, correction_event.event_id],
+            "source_event_ids": source_event_ids,
         }
     )
-    app_state.index_store.materialize(corrected_entry)
+    app_state.index_store.materialize(corrected_entry, materialized_at=event_time)
 
     return ManualAttributionResponse(
         accepted=True,

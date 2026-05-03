@@ -3,6 +3,7 @@ const NAV_ITEMS = [
     group: "Platform",
     items: [
       { key: "overview", label: "Overview", icon: "<path d='M3 12l9-9 9 9'/><path d='M9 21V9h6v12'/>", badge: null },
+      { key: "partner_brief", label: "Partner Brief", icon: "<path d='M12 2l7 4v5c0 4.7-2.9 8.6-7 10-4.1-1.4-7-5.3-7-10V6l7-4z'/><path d='M8 12h8'/><path d='M8 16h5'/><path d='M9 8h6'/>", badge: null },
       { key: "requirements", label: "PRD Proof", icon: "<path d='M9 11l2 2 4-4'/><path d='M9 17h6'/><path d='M5 3h14v18H5z'/>", badge: null },
       { key: "adoption", label: "Employee Adoption", icon: "<path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M20 8v6'/><path d='M23 11h-6'/>", badge: null },
       { key: "attribution", label: "Request Proof", icon: "<circle cx='12' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><circle cx='18' cy='18' r='3'/><path d='M10 8l-2 7M14 8l2 7M9 18h6'/>", badge: null },
@@ -10,7 +11,10 @@ const NAV_ITEMS = [
       { key: "teams", label: "Teams", icon: "<path d='M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M23 21v-2a4 4 0 00-3-3.87'/><path d='M16 3.13a4 4 0 010 7.75'/>", badge: null },
       { key: "manual_mapping", label: "Manual Mapping", icon: "<path d='M12 20h9'/><path d='M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z'/>", badge: null },
       { key: "interventions", label: "Interventions", icon: "<path d='M13 2L3 14h8l-1 8 10-12h-8l1-8z'/>", badge: "0" },
-      { key: "governance", label: "Governance", icon: "<path d='M12 2l8 4v6c0 5-3.5 9.5-8 10-4.5-.5-8-5-8-10V6l8-4z'/><path d='M9 12l2 2 4-4'/>", badge: null }
+      { key: "governance", label: "Governance", icon: "<path d='M12 2l8 4v6c0 5-3.5 9.5-8 10-4.5-.5-8-5-8-10V6l8-4z'/><path d='M9 12l2 2 4-4'/>", badge: null },
+      { key: "coverage", label: "Coverage", icon: "<path d='M3 12h18'/><path d='M12 3v18'/><circle cx='12' cy='12' r='9'/><path d='M7 12a5 5 0 0 1 10 0'/>", badge: null },
+      { key: "exports", label: "Exports", icon: "<path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><path d='M14 2v6h6'/><path d='M8 13h8M8 17h5'/>", badge: null },
+      { key: "energy", label: "Energy", icon: "<path d='M13 2L4 14h7l-1 8 10-13h-7z'/>", badge: null }
     ]
   },
   {
@@ -18,6 +22,7 @@ const NAV_ITEMS = [
     items: [
       { key: "forecast", label: "Forecasting", icon: "<path d='M3 17l5-5 4 4 8-8'/><path d='M14 8h6v6'/>", badge: null },
       { key: "integrations", label: "Integrations", icon: "<path d='M8 4h8v4H8z'/><path d='M3 10h18v10H3z'/><path d='M12 10v10'/>", badge: null },
+      { key: "admin", label: "Admin", icon: "<path d='M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z'/><path d='M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6V22a2 2 0 0 1-4 0v-2a1.7 1.7 0 0 0-1-.6 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1H2a2 2 0 0 1 0-4h2a1.7 1.7 0 0 0 .6-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6V2a2 2 0 0 1 4 0v2a1.7 1.7 0 0 0 1 .6 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.2.35.4.65.6 1h2a2 2 0 0 1 0 4h-2c-.2.35-.4.65-.6 1z'/>", badge: null },
       { key: "glossary", label: "Glossary", icon: "<path d='M4 19.5A2.5 2.5 0 016.5 17H20'/><path d='M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z'/>", badge: null },
       { key: "faq", label: "FAQ", icon: "<circle cx='12' cy='12' r='10'/><path d='M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3'/><circle cx='12' cy='17' r='1'/>", badge: null }
     ]
@@ -26,6 +31,7 @@ const NAV_ITEMS = [
 
 const PAGE_TITLES = {
   overview: "Overview",
+  partner_brief: "Partner Brief",
   requirements: "PRD Proof",
   adoption: "Employee AI Adoption",
   attribution: "Request Proof",
@@ -34,8 +40,12 @@ const PAGE_TITLES = {
   manual_mapping: "Manual Mapping",
   interventions: "Interventions",
   governance: "Governance",
+  coverage: "Coverage",
+  exports: "Chargeback Exports",
+  energy: "Energy",
   forecast: "Cost Forecasting",
   integrations: "Integrations",
+  admin: "Admin",
   glossary: "Glossary",
   faq: "FAQ"
 };
@@ -104,6 +114,7 @@ const UI_LIMITS = {
   searchDebounceMs: 180,
   toastTimeoutMs: 4000,
   maxLogEntries: 80,
+  maxIntegrationDeliveries: 12,
   runtimeDegradedThreshold: 2
 };
 const BUSINESS_RULES = {
@@ -449,7 +460,8 @@ const FALLBACK_DATASET = {
   },
   adoption: {
     hierarchy: null,
-    dashboards: {}
+    dashboards: {},
+    workflow_map: { summary: {}, capabilities: [], services: [], workflows: [] }
   },
   teams: [],
   models: [],
@@ -458,6 +470,11 @@ const FALLBACK_DATASET = {
   governance: { modes: [], policies: [], fail_open_matrix: [], trust_boundary_summary: [] },
   manual_mapping: [],
   integrations: FALLBACK_INTEGRATION_OVERVIEW,
+  coverage: { summary: {}, pathways: [], blind_spots: [], agent_lineage: null, scenario_results: [] },
+  exports: { summary: {}, controls: [], rows: [], allocation_splits: [] },
+  energy_efficiency: { summary: {}, models: [], recommendations: [] },
+  admin: { summary: {}, accounts: [], operations: [], diagnostics: [] },
+  design_partner_brief: { thesis: {}, readiness_pillars: [], pilot_stages: [], buyer_roles: [], proof_moments: [], success_metrics: [], open_questions: [], demo_script: [] },
   prd_traceability: {
     summary: {
       conclusion: "The local demo is organized as a requirements proof, not a generic dashboard.",
@@ -518,11 +535,13 @@ const state = {
   integrationLoading: false,
   integrationDeliveries: [],
   selectedProofJourney: "money",
+  selectedPartnerStage: "discover",
   glossaryQuery: "",
   faqQuery: "",
   faqOpenKeys: new Set(),
   lastRenderedPage: null,
   pendingDemoAction: "",
+  demoScenarioRunCounts: {},
   guidedDemoProgressLabel: "",
   walkthroughStatus: "idle",
   walkthroughStepIndex: -1,
@@ -536,6 +555,7 @@ const state = {
   governanceSimulationMode: "advisory",
   governanceSimulationBundle: "current",
   governanceSimulationRequestId: null,
+  exportViewMode: "event_time",
   replayStageIndex: 0,
   lastMappingImpactId: null
 };
@@ -565,6 +585,18 @@ const INVESTOR_WALKTHROUGH_STEPS = [
     }
   },
   {
+    key: "partner-brief",
+    page: "partner_brief",
+    anchor: "walkthrough-partner-brief",
+    durationMs: 10000,
+    title: "Partner Brief: credible pilot path",
+    headline: "Turn the demo from a dashboard tour into a concrete enterprise design-partner plan: scope, integrations, success metrics, and executive proof moments.",
+    prepare: async () => {
+      state.selectedPartnerStage = "prove";
+      go("partner_brief");
+    }
+  },
+  {
     key: "requirements-proof",
     page: "requirements",
     anchor: "walkthrough-requirements",
@@ -574,6 +606,17 @@ const INVESTOR_WALKTHROUGH_STEPS = [
     prepare: async () => {
       state.selectedProofJourney = "trust";
       go("requirements");
+    }
+  },
+  {
+    key: "coverage",
+    page: "coverage",
+    anchor: "walkthrough-coverage",
+    durationMs: 9000,
+    title: "Coverage: what the system can and cannot see",
+    headline: "Show honest pathway coverage: fully capturable, partial, indirect, uncapturable, and degraded states all remain explicit.",
+    prepare: async () => {
+      go("coverage");
     }
   },
   {
@@ -603,6 +646,18 @@ const INVESTOR_WALKTHROUGH_STEPS = [
     }
   },
   {
+    key: "exports",
+    page: "exports",
+    anchor: "walkthrough-exports",
+    durationMs: 9000,
+    title: "Exports: chargeback without false precision",
+    headline: "Show finance-ready rows, review-required rows, allocation-only rows, and unknown spend kept out of chargeback.",
+    prepare: async () => {
+      state.exportViewMode = "event_time";
+      go("exports");
+    }
+  },
+  {
     key: "interventions",
     page: "interventions",
     anchor: "walkthrough-interventions",
@@ -613,6 +668,17 @@ const INVESTOR_WALKTHROUGH_STEPS = [
       state.interventionFilter = "recommended";
       go("interventions");
       await runInterceptScenario("soft_stop", { manageLoading: false });
+    }
+  },
+  {
+    key: "energy",
+    page: "energy",
+    anchor: "walkthrough-energy",
+    durationMs: 9000,
+    title: "Energy: footprint as an advisory signal",
+    headline: "Surface model energy, carbon, and Unrated states without letting sustainability claims override cost, quality, or policy.",
+    prepare: async () => {
+      go("energy");
     }
   },
   {
@@ -643,6 +709,17 @@ const INVESTOR_WALKTHROUGH_STEPS = [
     prepare: async () => {
       go("governance");
       await runInterceptScenario("fail_open", { manageLoading: false });
+    }
+  },
+  {
+    key: "admin",
+    page: "admin",
+    anchor: "walkthrough-admin",
+    durationMs: 8000,
+    title: "Admin: operable inside the trust boundary",
+    headline: "Finish with RBAC, read-only integration posture, scoped diagnostics, and auditable administrative actions.",
+    prepare: async () => {
+      go("admin");
     }
   }
 ];
@@ -675,6 +752,10 @@ function fmtUSD(value, digits = 0) {
     }));
   }
   return USD_FORMATTERS.get(digits).format(Number(value || 0));
+}
+
+function fmtNullableUSD(value, digits = 0) {
+  return value === null || value === undefined ? "Unknown" : fmtUSD(value, digits);
 }
 
 function fmtPct(value, digits = 1) {
@@ -729,6 +810,12 @@ function pageLensNarrative(pageKey = state.page, lens = state.roleLens) {
       platform: ["This is the operating baseline for routing, ownership, and intervention prioritization.", "The goal is to see which parts of the stack are expensive, ambiguous, or ripe for optimization."],
       security: ["This is the governance posture of the AI estate before you drill into individual requests.", "The key question is whether usage is broad but still controlled."]
     },
+    partner_brief: {
+      executive: ["This is the design-partner ask in customer language.", "It turns the demo into a pilot plan with decision makers, scope, proof moments, success metrics, and next steps."],
+      finance: ["This is how finance validates value quickly.", "The pilot centers on chargeback-ready spend, savings execution, and planning accuracy without waiting for production billing cycles."],
+      platform: ["This is the technical onboarding path.", "Read-only integrations, synthetic replay, and scoped hot-path proof make the first customer environment concrete and low-risk."],
+      security: ["This is the trust review package.", "The brief separates local proof from production deployment requirements and makes fail-open, read-only, and audit controls explicit."]
+    },
     attribution: {
       executive: ["This is the proof surface behind one financial claim.", "It shows that a specific request can be tied back to an accountable owner with explainable evidence."],
       finance: ["This request-level view is what makes chargeback and audit defensible.", "It answers who pays, why they pay, and how much uncertainty remains in the ownership chain."],
@@ -758,6 +845,30 @@ function pageLensNarrative(pageKey = state.page, lens = state.roleLens) {
       finance: ["Governance matters here because policy drives both financial control and confidence in the spend number.", "This page shows the control posture behind the economics."],
       platform: ["This is the deployment model and policy simulator.", "The important question is how the same request behaves as you change mode or tighten bundle rules."],
       security: ["This is the trust surface: control enforcement, safety validation, and fail-open behavior.", "It shows the platform treats resilience as a first-class requirement."]
+    },
+    coverage: {
+      executive: ["This page shows what the system can and cannot see.", "It preserves trust by making blind spots visible instead of implying complete coverage."],
+      finance: ["Coverage quality determines which spend can support chargeback.", "The important distinction is fully capturable, partial, indirect, and unknown spend."],
+      platform: ["This is the messy-enterprise operating surface.", "It shows provider asymmetry, missing context, agent lineage gaps, and the work needed to raise coverage."],
+      security: ["Coverage is also a control map.", "Uncapturable and degraded pathways are explicitly excluded from unsafe enforcement."]
+    },
+    exports: {
+      executive: ["This is where Argmin becomes finance-operational.", "It shows which outputs are trustworthy enough for monthly reporting and which remain caveated."],
+      finance: ["This page separates ownership truth from allocation truth.", "It proves chargeback exports can be useful without hiding provisional, shared, or unknown states."],
+      platform: ["Export readiness depends on event-time evidence and lineage.", "The surface shows what engineering has to fix before finance can trust a row."],
+      security: ["Exports preserve evidence class and capture feasibility.", "Unsafe rows are excluded or routed to review rather than being flattened into clean totals."]
+    },
+    energy: {
+      executive: ["Energy is a decision dimension, not a veto.", "This page makes environmental footprint visible while preserving the cost and quality context."],
+      finance: ["Energy variance can change total operational cost.", "The useful view is which model shifts reduce both spend and footprint without overstating unknowns."],
+      platform: ["This page keeps energy estimates tied to model, task, and request volume.", "Unknown models remain unrated instead of being treated as zero impact."],
+      security: ["The same honesty rule applies here: unknown means unknown.", "Energy and carbon estimates stay advisory and never bypass approved governance policy."]
+    },
+    admin: {
+      executive: ["This page shows the demo as an operable deployment, not only an analysis surface.", "It makes account control, diagnostic boundaries, and audit posture visible."],
+      finance: ["Admin controls define who can mutate policy, overrides, and exports.", "The key question is whether finance-sensitive actions are role-bound and audited."],
+      platform: ["This is the local approximation of customer deployment operations.", "It shows hot-path dependencies, read-only integrations, and scoped diagnostics."],
+      security: ["This is the trust-boundary operating model.", "Diagnostics run inside the customer boundary, and access is role-scoped, time-limited, and auditable."]
     }
   };
   const selected = copy[pageKey]?.[lens] || copy[pageKey]?.executive || ["", ""];
@@ -1194,6 +1305,12 @@ function activeContextItems() {
     items.push({ label: "Focus", value: "Spend posture and savings levers" });
   }
 
+  if (state.page === "partner_brief") {
+    const stage = selectedPartnerStage();
+    items.push({ label: "Brief", value: "Design partner pilot" });
+    items.push({ label: "Stage", value: stage?.label || "Pilot path" });
+  }
+
   if (state.page === "requirements") {
     const journey = selectedProofJourney();
     items.push({ label: "Source", value: "PRD + Engineering Spec + RAIL" });
@@ -1337,7 +1454,7 @@ function renderWalkthroughBanner() {
     <div class="walkthrough-banner-head">
       <div>
         <div class="walkthrough-banner-meta">${esc(stepLabel)}</div>
-        <div class="walkthrough-banner-title">${esc(state.walkthroughStepTitle || "90-second product walkthrough")}</div>
+        <div class="walkthrough-banner-title">${esc(state.walkthroughStepTitle || "Full product walkthrough")}</div>
         <div class="walkthrough-banner-copy">${esc(state.walkthroughStepHeadline || "The demo is auto-progressing through the product story.")}</div>
       </div>
       ${buttonMarkup}
@@ -1601,8 +1718,7 @@ async function syncAdoptionFromApi(options = {}) {
 function setAdoptionScope(scopeType, scopeId) {
   state.adoptionScopeType = scopeType;
   state.adoptionScopeId = scopeId;
-  const cacheKey = adoptionCacheKey(scopeType, scopeId, state.adoptionWindowDays);
-  if (state.adoptionDashboardCache[cacheKey]) {
+  if (currentAdoptionDashboard()) {
     render();
     return;
   }
@@ -1632,6 +1748,113 @@ function currentIntegrationOverview() {
   return state.integrationOverview || fallbackIntegrationOverview();
 }
 
+function mergeRecordsByKey(primary = [], fallback = [], key) {
+  const merged = new Map();
+  for (const item of fallback || []) {
+    if (item && item[key]) {
+      merged.set(item[key], item);
+    }
+  }
+  for (const item of primary || []) {
+    if (item && item[key]) {
+      merged.set(item[key], item);
+    }
+  }
+  return Array.from(merged.values());
+}
+
+function mergedIntegrationOverview(overview) {
+  const fallback = fallbackIntegrationOverview();
+  if (!overview) {
+    return fallback;
+  }
+  const sources = mergeRecordsByKey(overview.sources, fallback.sources, "integration_id");
+  const routes = mergeRecordsByKey(overview.routes, fallback.routes, "route_id");
+  const scenarios = mergeRecordsByKey(overview.scenarios, fallback.scenarios, "scenario_id");
+  const recentDeliveries = mergeRecordsByKey(
+    overview.recent_deliveries,
+    fallback.recent_deliveries,
+    "delivery_id"
+  ).slice(0, UI_LIMITS.maxIntegrationDeliveries);
+  const summary = {
+    ...(fallback.summary || {}),
+    ...(overview.summary || {}),
+    inbound_source_count: sources.filter((item) => item.direction === "inbound").length,
+    outbound_route_count: routes.length,
+    scenario_count: scenarios.length,
+    configured_destination_count: new Set(
+      routes.flatMap((route) => (route.channels || []).map((channel) => channel.target))
+    ).size,
+    recent_delivery_count: recentDeliveries.length,
+    failed_deliveries: recentDeliveries.filter((item) => item.status === "failed").length,
+    success_rate_pct: recentDeliveries.length
+      ? Number(((recentDeliveries.filter((item) => ["simulated", "sent"].includes(item.status)).length / recentDeliveries.length) * 100).toFixed(1))
+      : 100,
+    live_delivery_mode: overview.summary?.live_delivery_mode || fallback.summary?.live_delivery_mode || "simulated",
+    last_delivery_at: recentDeliveries
+      .map((item) => item.sent_at || "")
+      .filter(Boolean)
+      .sort()
+      .at(-1) || ""
+  };
+  return { ...fallback, ...overview, summary, sources, routes, scenarios, recent_deliveries: recentDeliveries };
+}
+
+function integrationRouteForScenario(scenario) {
+  const overview = currentIntegrationOverview();
+  return (overview?.routes || []).find((item) => item.route_id === scenario?.route_id) || null;
+}
+
+function localIntegrationDeliveryForScenario(scenario) {
+  const route = integrationRouteForScenario(scenario);
+  const primaryChannel = route?.channels?.[0] || {};
+  const existing = state.integrationDeliveries?.length
+    ? state.integrationDeliveries
+    : (currentIntegrationOverview()?.recent_deliveries || []);
+  const newestTimestamp = existing
+    .map((item) => Date.parse(item.sent_at || ""))
+    .filter((timestamp) => Number.isFinite(timestamp))
+    .sort((a, b) => b - a)[0];
+  const sentAt = new Date((newestTimestamp || Date.UTC(2026, 1, 28, 17, 0, 0)) + 60000).toISOString();
+  const sequence = existing.length + 1;
+  return {
+    delivery_id: `local-delivery-${scenario.scenario_id}-${sequence}`,
+    channel: primaryChannel.channel || "local",
+    target: primaryChannel.target || "local://demo-handoff",
+    status: "simulated",
+    message: "delivery simulated from deterministic local demo data",
+    sent_at: sentAt,
+    event_type: scenario.event_type || String(scenario.scenario_id || "integration").replaceAll("-", "_"),
+    severity: scenario.severity || (String(scenario.scenario_id || "").includes("breach") ? "warning" : "info"),
+    route_id: route?.route_id || scenario.route_id || "local-demo-route",
+    route_name: route?.name || scenario.title || "Local Demo Route",
+    workflow_name: route?.workflow_name || "Local Demo Workflow",
+    audience: route?.owner || "Demo owner",
+    business_outcome: route?.business_outcome || scenario.expected_outcome || "Local handoff recorded for the presenter.",
+    scenario_id: scenario.scenario_id
+  };
+}
+
+function applyLocalIntegrationScenario(scenario) {
+  const delivery = localIntegrationDeliveryForScenario(scenario);
+  const overview = currentIntegrationOverview();
+  const existing = state.integrationDeliveries?.length
+    ? state.integrationDeliveries
+    : (overview?.recent_deliveries || []);
+  state.integrationDeliveries = [delivery, ...existing].slice(0, UI_LIMITS.maxIntegrationDeliveries);
+  if (overview?.summary) {
+    overview.summary.recent_delivery_count = state.integrationDeliveries.length;
+    overview.summary.failed_deliveries = state.integrationDeliveries.filter((item) => item.status === "failed").length;
+    const successful = state.integrationDeliveries.filter((item) => ["simulated", "sent"].includes(item.status)).length;
+    overview.summary.success_rate_pct = state.integrationDeliveries.length
+      ? Number(((successful / state.integrationDeliveries.length) * 100).toFixed(1))
+      : 100;
+    overview.summary.last_delivery_at = delivery.sent_at;
+  }
+  state.integrationOverview = overview;
+  return delivery;
+}
+
 async function syncIntegrationsFromApi(options = {}) {
   const force = Boolean(options.force);
   const shouldRender = Boolean(options.render !== false);
@@ -1646,9 +1869,9 @@ async function syncIntegrationsFromApi(options = {}) {
 
   try {
     const overview = await apiRequest("GET", "/v1/integrations/overview?limit=12");
-    state.integrationOverview = overview;
-    state.integrationDeliveries = Array.isArray(overview?.recent_deliveries)
-      ? overview.recent_deliveries
+    state.integrationOverview = mergedIntegrationOverview(overview);
+    state.integrationDeliveries = Array.isArray(state.integrationOverview?.recent_deliveries)
+      ? state.integrationOverview.recent_deliveries
       : [];
   } catch (error) {
     state.integrationOverview = fallbackIntegrationOverview();
@@ -1677,6 +1900,23 @@ async function runIntegrationScenario(scenarioId) {
     return;
   }
 
+  if (state.runtimeStatus !== "online") {
+    const delivery = applyLocalIntegrationScenario(scenario);
+    appendLog(
+      "ok",
+      "Local integration handoff",
+      `${scenario.title} added a ${delivery.channel} handoff from deterministic local demo data.`,
+      null,
+      { hidden: true }
+    );
+    showToast(
+      "Integration Workflow Simulated",
+      `${scenario.title} updated Recent Handoffs using local demo data.`
+    );
+    render();
+    return;
+  }
+
   state.integrationLoading = true;
   render();
   try {
@@ -1698,16 +1938,18 @@ async function runIntegrationScenario(scenarioId) {
       `${response.scenario_title} completed via ${response.route_name}.`
     );
   } catch (error) {
+    void error;
+    const delivery = applyLocalIntegrationScenario(scenario);
     appendLog(
-      "err",
-      "Integration workflow failed",
-      summarizeApiError(error, `${scenario.title} did not complete.`),
+      "ok",
+      "Local integration handoff",
+      `${scenario.title} added a ${delivery.channel} handoff from deterministic local demo data.`,
       null,
       { hidden: true }
     );
     showToast(
-      "Integration Workflow Failed",
-      summarizeApiError(error, "Unable to execute the selected integration workflow.")
+      "Integration Workflow Simulated",
+      `${scenario.title} updated Recent Handoffs using local demo data.`
     );
   } finally {
     state.integrationLoading = false;
@@ -1892,7 +2134,7 @@ function manualMappingImpact(mapping) {
     ? 96
     : status === "reassigned"
       ? 93
-      : Math.max(beforeConfidence, 88);
+      : beforeConfidence;
   const forecastDelta = Math.round(Number(mapping.spend_at_risk_usd || 0) * BUSINESS_RULES.forecastRiskReserveShare);
   const request = (dataset.attribution_requests || []).find((item) => item.id === mapping.request_id) || null;
   const beforeOwner = mapping.current_owner;
@@ -1901,6 +2143,7 @@ function manualMappingImpact(mapping) {
     : (mapping.resolved_team || mapping.suggested_owner || mapping.current_owner);
   const linkedIntervention = getInterventions().find((item) => String(item.team || "").toLowerCase().includes(String(afterOwner || "").split(" ")[0].toLowerCase()));
   return {
+    workloadLabel: mapping.workload_label || mapping.id || "Manual mapping",
     beforeConfidence,
     afterConfidence,
     confidenceLift: afterConfidence - beforeConfidence,
@@ -2315,6 +2558,48 @@ function exportArtifact(kind) {
       "Drivers:",
       ...forecastDriversForScenario().map((driver) => `- ${driver.label}: ${driver.value} | ${driver.detail}`)
     ].join("\n");
+  } else if (kind === "design-partner-brief") {
+    const brief = designPartnerData();
+    const thesis = brief.thesis || {};
+    const stage = selectedPartnerStage();
+    filename = "argmin-design-partner-brief.txt";
+    content += [
+      "Design Partner Brief",
+      thesis.headline || "Enterprise AI cost-governance design partner pilot",
+      thesis.summary || "",
+      "",
+      "Selected pilot stage:",
+      stage ? `${stage.label} | ${stage.duration} | ${stage.goal}` : "No stage selected",
+      "",
+      "Success metrics:",
+      ...(brief.success_metrics || []).map((metric) => `- ${metric.metric}: ${metric.baseline} -> ${metric.target} | Owner: ${metric.owner}`),
+      "",
+      "Proof moments:",
+      ...(brief.proof_moments || []).map((moment) => `- ${moment.audience}: ${moment.moment} | Surface: ${moment.surface_label}`),
+      "",
+      "Open design-partner questions:",
+      ...(brief.open_questions || []).map((question) => `- ${question.owner}: ${question.question}`)
+    ].join("\n");
+  } else if (kind === "chargeback-export") {
+    filename = `aci-chargeback-preview-${state.exportViewMode}.txt`;
+    const rows = exportRowsForMode();
+    content += [
+      "Chargeback Export Preview",
+      `Reporting mode: ${state.exportViewMode === "current_state" ? "Current-state rollup" : "Event-time owner"}`,
+      `Validation: ${dataset.exports?.summary?.validation_status || "PASS"}`,
+      "",
+      "Rows:",
+      ...rows.map((row) => [
+        row.line_id,
+        row.service,
+        row.display_team,
+        row.cost_center,
+        row.truth_basis,
+        row.export_action,
+        fmtNullableUSD(row.reconciled_cost_usd),
+        fmtPct(Number(row.confidence || 0) * 100, 0)
+      ].join(" | "))
+    ].join("\n");
   } else {
     return;
   }
@@ -2671,6 +2956,7 @@ async function clearExecutionLogs() {
   state.lastPayload = null;
   state.lastResponse = null;
   state.demoOutcome = null;
+  state.demoScenarioRunCounts = {};
   state.selectedTeamId = null;
   state.selectedRequestId = null;
   state.selectedModelName = null;
@@ -2708,12 +2994,13 @@ async function clearExecutionLogs() {
   state.integrationDeliveries = Array.isArray(state.integrationOverview?.recent_deliveries)
     ? state.integrationOverview.recent_deliveries
     : [];
+  const backendReset = await resetBackendDemoState({ log: false, toast: false });
   await resetForecastPlanner({
     log: false,
     toast: false,
     statusOverride: "Forecast reset to baseline 12-month view."
   });
-  appendLog("ok", "Demo reset", "The walkthrough, mapping queue, and forecast planner returned to their baseline investor-demo state.", null, {
+  appendLog("ok", "Demo reset", "The walkthrough, mapping queue, forecast planner, and backend runtime returned to their baseline investor-demo state.", backendReset ? state.lastResponse : null, {
     why: "This gives you a clean starting point before presenting the demo again."
   });
   showToast("Demo Reset", "The platform demo is back to its baseline presentation state.");
@@ -2903,7 +3190,7 @@ async function updateInterventionStatus(id, nextStatus) {
   render();
 }
 
-function updateManualMapping(id, status, resolvedTeam) {
+async function updateManualMapping(id, status, resolvedTeam) {
   const mapping = getManualMappings().find((item) => item.id === id);
   if (!mapping) {
     return;
@@ -2917,12 +3204,81 @@ function updateManualMapping(id, status, resolvedTeam) {
   syncContextFromRequest(mapping.request_id || "");
   applyManualMappingToRequest(mapping);
   persistManualMappingState();
+  const correction = await submitManualMappingCorrection(mapping);
   const outcomeMessage = mapping.status === "deferred"
     ? `${mapping.workload_label} remains provisional until stronger evidence is available.`
     : `${mapping.workload_label} now resolves to ${mapping.resolved_team}.`;
   appendLog("ok", "Manual mapping updated", outcomeMessage, null, { hidden: true });
-  showToast("Manual Mapping Updated", outcomeMessage);
+  const correctionSuffix = correction ? " Durable correction event recorded." : "";
+  showToast("Manual Mapping Updated", `${outcomeMessage}${correctionSuffix}`);
   render();
+}
+
+function teamForManualMappingOwner(ownerName) {
+  const normalized = String(ownerName || "").trim().toLowerCase();
+  return (dataset.teams || []).find((team) => String(team.name || "").trim().toLowerCase() === normalized) || null;
+}
+
+function fallbackTeamId(ownerName) {
+  return `team-${String(ownerName || "unknown")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "unknown"}`;
+}
+
+function fallbackCostCenterId(team) {
+  if (!team) {
+    return "CC-MANUAL";
+  }
+  return `CC-${String(team.id || team.name || "manual").toUpperCase().replace(/[^A-Z0-9]+/g, "-")}`;
+}
+
+async function submitManualMappingCorrection(mapping) {
+  const status = normalizeManualMappingStatus(mapping.status);
+  if (status === "deferred") {
+    appendLog(
+      "ok",
+      "Manual mapping deferred",
+      `${mapping.workload_label} remains provisional; no durable correction event was emitted.`,
+      null,
+      { hidden: true }
+    );
+    return null;
+  }
+
+  const resolvedTeamName = mapping.resolved_team || mapping.suggested_owner || mapping.current_owner;
+  const team = teamForManualMappingOwner(resolvedTeamName);
+  const payload = {
+    workload_id: mapping.workload_label,
+    true_team_id: team?.id || fallbackTeamId(resolvedTeamName),
+    true_team_name: resolvedTeamName,
+    true_cost_center_id: team?.cost_center_id || fallbackCostCenterId(team),
+    true_cost_center_name: team?.cost_center || `${resolvedTeamName} Cost Center`,
+    actor: "demo-ui",
+    note: `Manual mapping ${mapping.id} resolved from the local demo UI.`
+  };
+
+  try {
+    const response = await apiRequest("POST", "/v1/attribution/manual", payload);
+    appendLog(
+      "ok",
+      "Manual correction emitted",
+      `${mapping.workload_label} wrote a durable correction event and updated the attribution index.`,
+      response,
+      { hidden: true }
+    );
+    return response;
+  } catch (error) {
+    appendLog(
+      "warn",
+      "Manual correction fallback",
+      summarizeApiError(error, "Live manual correction unavailable; keeping the local review state visible."),
+      null,
+      { hidden: true }
+    );
+    return null;
+  }
 }
 
 function go(pageKey) {
@@ -2943,7 +3299,7 @@ function go(pageKey) {
   if (pageKey === "interventions" && !state.interventionSyncAttempted && !state.interventionLoading) {
     void syncInterventionsFromApi({ render: false });
   }
-  if (pageKey === "integrations" && !state.integrationLoading) {
+  if (pageKey === "integrations" && state.runtimeStatus === "online" && !state.integrationLoading) {
     void syncIntegrationsFromApi({ force: !state.integrationOverview });
   }
   render();
@@ -3043,7 +3399,7 @@ function renderTopbar() {
   if (walkthroughButton instanceof HTMLButtonElement) {
     const running = state.walkthroughStatus === "running";
     walkthroughButton.disabled = running;
-    walkthroughButton.textContent = running ? "Walkthrough Running..." : "Start 90-sec Walkthrough";
+    walkthroughButton.textContent = running ? "Walkthrough Running..." : "Start Full Walkthrough";
     walkthroughButton.setAttribute("aria-expanded", running ? "true" : "false");
   }
   const streamCount = document.getElementById("stream-count");
@@ -3091,7 +3447,7 @@ function renderDrawer() {
             </div>
           `;
         }).join("")
-      : `<div class="hint">No demo activity yet. Start the 90-second walkthrough, or run one live proof action.</div>`;
+      : `<div class="hint">No demo activity yet. Start the full product walkthrough, or run one live proof action.</div>`;
   }
 
   const summaryEl = document.getElementById("drawer-summary");
@@ -3100,7 +3456,7 @@ function renderDrawer() {
       summaryEl.innerHTML = `
         <div class="drawer-summary">
           <div class="drawer-summary-title">Recommended next step</div>
-          <div class="drawer-summary-headline">Start the 90-second walkthrough.</div>
+          <div class="drawer-summary-headline">Start the full product walkthrough.</div>
           <div class="drawer-summary-detail">That is the clearest way to tell the product story. Use the live proof controls only when you want to isolate one specific runtime behavior.</div>
         </div>
       `;
@@ -3120,7 +3476,7 @@ function renderDrawer() {
               <div class="drawer-summary-kpi-value">Unavailable</div>
             </div>
           </div>
-          <div class="drawer-why"><strong>What to do:</strong> Use the 90-second walkthrough for the presentation, and use live proof controls only after the local demo runtime is available.</div>
+          <div class="drawer-why"><strong>What to do:</strong> Use the full product walkthrough for the presentation, and use live proof controls only after the local demo runtime is available.</div>
         </div>
       `;
     } else {
@@ -3282,8 +3638,8 @@ function requirementsView() {
       ${renderSectionNarrative(
         "Requirements proof",
         {
-          conclusion: lensNarrative[0],
-          why: lensNarrative[1]
+          conclusion: lensNarrative.conclusion,
+          why: lensNarrative.why
         },
         "Every source-document claim shown here is tied to an interactive local surface, a deterministic dummy dataset, or an explicit production-only boundary.",
         "Use the journey selector, then jump to the corresponding page to show the working proof."
@@ -3398,6 +3754,272 @@ function requirementsView() {
   `;
 }
 
+function designPartnerData() {
+  return dataset.design_partner_brief || FALLBACK_DATASET.design_partner_brief || {};
+}
+
+function selectedPartnerStage() {
+  const stages = designPartnerData().pilot_stages || [];
+  return stages.find((stage) => stage.stage_id === state.selectedPartnerStage) || stages[0] || null;
+}
+
+function designPartnerStatusClass(status) {
+  const normalized = String(status || "").toLowerCase();
+  if (["green", "ready", "complete", "live"].includes(normalized)) {
+    return "good";
+  }
+  if (["amber", "review", "simulated", "partial"].includes(normalized)) {
+    return "warn";
+  }
+  if (["blue", "planned"].includes(normalized)) {
+    return "info";
+  }
+  return "";
+}
+
+function designPartnerView() {
+  const brief = designPartnerData();
+  const lensNarrative = pageLensNarrative("partner_brief");
+  const thesis = brief.thesis || {};
+  const stages = brief.pilot_stages || [];
+  const selectedStage = selectedPartnerStage();
+  const pillars = brief.readiness_pillars || [];
+  const buyerRoles = brief.buyer_roles || [];
+  const proofMoments = brief.proof_moments || [];
+  const metrics = brief.success_metrics || [];
+  const openQuestions = brief.open_questions || [];
+  const script = brief.demo_script || [];
+
+  const stageButtons = stages.map((stage) => `
+    <button class="partner-stage-btn${stage.stage_id === selectedStage?.stage_id ? " active" : ""}" data-action="set-partner-stage" data-stage-id="${esc(stage.stage_id)}">
+      <span>${esc(stage.label)}</span>
+      <strong>${esc(stage.duration)}</strong>
+    </button>
+  `).join("");
+
+  const selectedSurfaces = (selectedStage?.visible_surfaces || []).map((surface) => `
+    <span class="partner-chip">${esc(surface)}</span>
+  `).join("");
+
+  const selectedRisks = (selectedStage?.risk_controls || []).map((risk) => `
+    <li>${esc(risk)}</li>
+  `).join("");
+
+  const pillarCards = pillars.map((pillar) => `
+    <div class="partner-pillar-card">
+      <div class="partner-card-head">
+        <div>
+          <div class="partner-kicker">${esc(pillar.pillar)}</div>
+          <div class="partner-pillar-score">${esc(pillar.score)}</div>
+        </div>
+        <span class="status-badge ${designPartnerStatusClass(pillar.status)}">${esc(pillar.status)}</span>
+      </div>
+      <p>${esc(pillar.design_partner_value)}</p>
+      <ul>
+        ${(pillar.evidence || []).map((item) => `<li>${esc(item)}</li>`).join("")}
+      </ul>
+    </div>
+  `).join("");
+
+  const buyerCards = buyerRoles.map((role) => `
+    <div class="partner-role-card">
+      <div class="partner-kicker">${esc(role.role)}</div>
+      <div class="partner-role-name">${esc(role.name)}</div>
+      <p>${esc(role.cares_about)}</p>
+      <div class="partner-chip-row">${(role.demo_surfaces || []).map((surface) => `<span class="partner-chip">${esc(surface)}</span>`).join("")}</div>
+    </div>
+  `).join("");
+
+  const proofCards = proofMoments.map((moment) => `
+    <div class="partner-proof-card">
+      <div>
+        <div class="partner-kicker">${esc(moment.audience)}</div>
+        <div class="partner-proof-title">${esc(moment.moment)}</div>
+        <p>${esc(moment.why_it_converts)}</p>
+      </div>
+      <button class="small-btn" data-action="go" data-page="${esc(moment.surface_page || "overview")}">Open ${esc(moment.surface_label || "Surface")}</button>
+    </div>
+  `).join("");
+
+  const metricRows = metrics.map((metric) => `
+    <tr>
+      <td>${esc(metric.metric)}</td>
+      <td>${esc(metric.baseline)}</td>
+      <td>${esc(metric.target)}</td>
+      <td>${esc(metric.owner)}</td>
+      <td>${esc(metric.proof_surface)}</td>
+    </tr>
+  `).join("");
+
+  const questionCards = openQuestions.map((question) => `
+    <div class="partner-question-card">
+      <div class="partner-kicker">${esc(question.owner)}</div>
+      <div class="partner-question-title">${esc(question.question)}</div>
+      <div class="hint">${esc(question.how_demo_handles_it)}</div>
+    </div>
+  `).join("");
+
+  const scriptRows = script.map((step, index) => `
+    <div class="partner-script-step">
+      <div class="partner-script-index">${index + 1}</div>
+      <div>
+        <div class="partner-script-title">${esc(step.title)}</div>
+        <div class="hint">${esc(step.talk_track)}</div>
+      </div>
+      <button class="small-btn" data-action="go" data-page="${esc(step.surface_page || "overview")}">${esc(step.surface_label || "Open")}</button>
+    </div>
+  `).join("");
+
+  return `
+    <div class="partner-page" data-walkthrough-anchor="walkthrough-partner-brief">
+      <section class="partner-hero">
+        <div class="partner-hero-copy">
+          <div class="pill">Design partner briefing room</div>
+          <h1>${esc(thesis.headline || "Turn the local demo into an enterprise pilot.")}</h1>
+          <p>${esc(thesis.summary || "A customer-ready path from screen recording to design partnership.")}</p>
+          <div class="partner-hero-actions">
+            <button class="small-btn primary" data-action="start-walkthrough">Run Buyer Walkthrough</button>
+            <button class="small-btn" data-action="export-artifact" data-artifact="design-partner-brief">Export Partner Brief</button>
+            <button class="small-btn" data-action="go" data-page="requirements">Open PRD Proof</button>
+          </div>
+        </div>
+        <div class="partner-hero-panel">
+          <div class="partner-kicker">Why this should earn a design partner</div>
+          <div class="partner-hero-quote">${esc(thesis.design_partner_claim || "The demo makes the buyer's environment feel already understood.")}</div>
+          <div class="partner-panel-grid">
+            ${(thesis.signals || []).slice(0, 4).map((signal) => `
+              <div>
+                <span>${esc(signal.label)}</span>
+                <strong>${esc(signal.value)}</strong>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </section>
+
+      ${renderSectionNarrative(
+        "Design partner conversion",
+        {
+          conclusion: lensNarrative.conclusion,
+          why: lensNarrative.why
+        },
+        "The page avoids asking a customer to believe a static dashboard. It shows a scoped pilot, decision owners, proof moments, success metrics, and unresolved questions with explicit owners.",
+        "Use this page at the start or end of the recording when the ask is partnership, not just feedback."
+      )}
+
+      <section class="partner-section">
+        <div class="partner-section-head">
+          <div>
+            <div class="section-title">Pilot Path</div>
+            <div class="card-subtitle">Click each stage to show how the customer relationship becomes operational.</div>
+          </div>
+          <button class="small-btn" data-action="go" data-page="integrations">Open Integrations</button>
+        </div>
+        <div class="partner-stage-layout">
+          <div class="partner-stage-list">${stageButtons}</div>
+          <div class="partner-stage-detail">
+            <div class="partner-kicker">${esc(selectedStage?.duration || "Pilot")}</div>
+            <div class="partner-stage-title">${esc(selectedStage?.goal || "Select a pilot stage")}</div>
+            <div class="partner-stage-grid">
+              <div>
+                <span>Customer commitment</span>
+                <strong>${esc(selectedStage?.customer_commitment || "TBD")}</strong>
+              </div>
+              <div>
+                <span>Argmin commitment</span>
+                <strong>${esc(selectedStage?.argmin_commitment || "TBD")}</strong>
+              </div>
+              <div>
+                <span>Success signal</span>
+                <strong>${esc(selectedStage?.success_signal || "TBD")}</strong>
+              </div>
+            </div>
+            <div class="partner-chip-row">${selectedSurfaces}</div>
+            <ul class="partner-risk-list">${selectedRisks}</ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="partner-section">
+        <div class="section-title">Enterprise Readiness Pillars</div>
+        <div class="partner-pillar-grid">${pillarCards}</div>
+      </section>
+
+      <section class="partner-section">
+        <div class="partner-two-col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Buyer Map</div>
+                <div class="card-subtitle">Each role gets a crisp reason to keep engaging after the demo.</div>
+              </div>
+            </div>
+            <div class="partner-role-grid">${buyerCards}</div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Proof Moments</div>
+                <div class="card-subtitle">Specific screens that convert curiosity into a design-partner next step.</div>
+              </div>
+            </div>
+            <div class="partner-proof-list">${proofCards}</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="partner-section">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Pilot Success Metrics</div>
+              <div class="card-subtitle">Measurable checkpoints that keep a design partnership from becoming an open-ended advisory call.</div>
+            </div>
+            <button class="small-btn" data-action="go" data-page="exports">Open Exports</button>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Baseline</th>
+                  <th>Target</th>
+                  <th>Owner</th>
+                  <th>Proof surface</th>
+                </tr>
+              </thead>
+              <tbody>${metricRows}</tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="partner-section">
+        <div class="partner-two-col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Open Questions to Invite Collaboration</div>
+                <div class="card-subtitle">The demo should feel honest about where customer input shapes the product.</div>
+              </div>
+            </div>
+            <div class="partner-question-grid">${questionCards}</div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Recording Talk Track</div>
+                <div class="card-subtitle">A concise sequence for presenting the demo as a partnership opportunity.</div>
+              </div>
+            </div>
+            <div class="partner-script-list">${scriptRows}</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
 function overviewView() {
   const stats = computeOverview();
   const trends = dataset.overview?.spend_trend_k_usd || [];
@@ -3492,6 +4114,7 @@ function overviewView() {
           <div class="hint" style="margin-top:6px">This page answers the first investor question: where AI spend sits today, how much of it is owned, and where the savings levers are.</div>
         </div>
         <div class="mode-banner-right">
+          <button class="small-btn primary" data-action="go" data-page="partner_brief">Open Partner Brief</button>
           <button class="small-btn" data-action="open-drawer">Open Guided Demo</button>
           <button class="small-btn" data-action="go" data-page="faq">Why these numbers are trustworthy</button>
         </div>
@@ -3895,6 +4518,81 @@ function resolveAdoptionBreadcrumbs(hierarchy, dashboard) {
   return items;
 }
 
+function adoptionWorkflowMap() {
+  return dataset.adoption?.workflow_map || FALLBACK_DATASET.adoption.workflow_map;
+}
+
+function adoptionWorkflowRowsForDashboard(dashboard) {
+  const rows = adoptionWorkflowMap().workflows || [];
+  if (!dashboard) {
+    return rows;
+  }
+  if (dashboard.scope_type === "business_unit") {
+    return rows.filter((row) => row.business_unit_id === dashboard.scope_id);
+  }
+  if (dashboard.scope_type === "team") {
+    return rows.filter((row) => row.team_id === dashboard.scope_id);
+  }
+  return rows;
+}
+
+function adoptionDepthClass(depth) {
+  const normalized = String(depth || "").toLowerCase();
+  if (normalized.includes("scaled")) {
+    return "good";
+  }
+  if (normalized.includes("embedded")) {
+    return "info";
+  }
+  if (normalized.includes("emerging")) {
+    return "warn";
+  }
+  return "danger";
+}
+
+function averageWorkflowPct(rows, key) {
+  if (!rows.length) {
+    return 0;
+  }
+  const total = rows.reduce((sum, row) => sum + Number(row[key] || 0), 0);
+  return total / rows.length;
+}
+
+function adoptionCapabilitySummaries(rows) {
+  const groups = new Map();
+  for (const row of rows) {
+    const key = row.capability_class || row.capability || "Unclassified";
+    if (!groups.has(key)) {
+      groups.set(key, {
+        capability: key,
+        workflows: 0,
+        services: new Set(),
+        businessUnits: new Set(),
+        users: 0,
+        requests: 0,
+        governed: []
+      });
+    }
+    const group = groups.get(key);
+    group.workflows += 1;
+    group.services.add(row.service_name || "Unknown service");
+    group.businessUnits.add(row.business_unit_name || "Unknown BU");
+    group.users += Number(row.users_30d || 0);
+    group.requests += Number(row.requests_30d || 0);
+    group.governed.push(Number(row.governed_usage_pct || 0));
+  }
+  return Array.from(groups.values())
+    .map((group) => ({
+      ...group,
+      serviceCount: group.services.size,
+      businessUnitCount: group.businessUnits.size,
+      governedPct: group.governed.length
+        ? group.governed.reduce((sum, value) => sum + value, 0) / group.governed.length
+        : 0
+    }))
+    .sort((a, b) => b.requests - a.requests);
+}
+
 function adoptionView() {
   const hierarchy = state.adoptionHierarchy || fallbackAdoptionHierarchy();
   const dashboard = currentAdoptionDashboard();
@@ -3916,6 +4614,51 @@ function adoptionView() {
   }
 
   const summary = dashboard.summary;
+  const workflowMap = adoptionWorkflowMap();
+  const workflowSummary = workflowMap.summary || {};
+  const workflowRows = adoptionWorkflowRowsForDashboard(dashboard);
+  const sortedWorkflowRows = workflowRows
+    .slice()
+    .sort((a, b) => Number(b.maturity_score || 0) - Number(a.maturity_score || 0));
+  const embeddedWorkflowCount = workflowRows.filter((row) => {
+    const depth = String(row.adoption_depth || "").toLowerCase();
+    return depth.includes("embedded") || depth.includes("scaled");
+  }).length;
+  const serviceCount = new Set(workflowRows.map((row) => row.service_name).filter(Boolean)).size;
+  const capabilityCount = new Set(workflowRows.map((row) => row.capability_class || row.capability).filter(Boolean)).size;
+  const buCount = new Set(workflowRows.map((row) => row.business_unit_id).filter(Boolean)).size;
+  const teamCount = new Set(workflowRows.map((row) => row.team_id).filter(Boolean)).size;
+  const governedWorkflowPct = averageWorkflowPct(workflowRows, "governed_usage_pct");
+  const capabilitySummaries = adoptionCapabilitySummaries(workflowRows);
+  const productLeadCards = [
+    {
+      label: "Mapped Workflows",
+      value: fmtNumber(workflowRows.length || workflowSummary.workflow_count || 0),
+      meta: `${fmtNumber(embeddedWorkflowCount)} embedded or scaled in this scope`
+    },
+    {
+      label: "AI Services Used",
+      value: fmtNumber(serviceCount || workflowSummary.ai_services_used || 0),
+      meta: "Hosted models, SaaS AI, data-platform AI, gateway and policy services"
+    },
+    {
+      label: "Capability Classes",
+      value: fmtNumber(capabilityCount || workflowSummary.capability_classes || 0),
+      meta: "What teams are using AI to do, not just what they spent"
+    },
+    {
+      label: "Governed Workflows",
+      value: fmtPct(governedWorkflowPct || workflowSummary.governed_workflow_pct || 0),
+      meta: `${fmtNumber(buCount || workflowSummary.business_units_with_adoption || 0)} BUs / ${fmtNumber(teamCount || workflowSummary.teams_with_adoption || 0)} teams represented`
+    }
+  ].map((card) => `
+    <div class="adoption-map-stat">
+      <span>${esc(card.label)}</span>
+      <strong>${esc(card.value)}</strong>
+      <p>${esc(card.meta)}</p>
+    </div>
+  `).join("");
+
   const breadcrumbs = resolveAdoptionBreadcrumbs(hierarchy, dashboard);
   const windowLabel = `${dashboard.window_days}d`;
   const windowButtons = ADOPTION_WINDOWS.map((windowDays) => {
@@ -3971,6 +4714,58 @@ function adoptionView() {
       <td>${fmtPct(employee.governed_usage_pct)}</td>
       <td>${esc(employee.top_entry_point)}</td>
       <td>${adoptionStagePill(employee.adoption_stage)}</td>
+    </tr>
+  `).join("");
+  const workflowSpotlightMarkup = sortedWorkflowRows.slice(0, 4).map((workflow) => `
+    <div class="workflow-spotlight-card">
+      <div class="workflow-spotlight-head">
+        <div>
+          <div class="workflow-spotlight-bu">${esc(workflow.business_unit_name)} / ${esc(workflow.team_name)}</div>
+          <div class="workflow-spotlight-title">${esc(workflow.workflow_name)}</div>
+        </div>
+        <span class="status-badge ${adoptionDepthClass(workflow.adoption_depth)}">${esc(workflow.adoption_depth)}</span>
+      </div>
+      <div class="workflow-spotlight-grid">
+        <div><span>AI service</span><strong>${esc(workflow.service_name)}</strong></div>
+        <div><span>Capability</span><strong>${esc(workflow.capability)}</strong></div>
+      </div>
+      <div class="workflow-insertion">
+        <span>Workflow insertion point</span>
+        <strong>${esc(workflow.exact_where)}</strong>
+      </div>
+      <p>${esc(workflow.how_adopted)}</p>
+      <div class="workflow-evidence">${esc(workflow.evidence)}</div>
+    </div>
+  `).join("");
+  const workflowMatrixRows = workflowRows.map((workflow) => `
+    <tr>
+      <td>
+        <div style="font-weight:650;color:var(--text)">${esc(workflow.business_unit_name)}</div>
+        <div class="hint">${esc(workflow.team_name)}</div>
+      </td>
+      <td>
+        <div style="font-weight:650;color:var(--text)">${esc(workflow.workflow_name)}</div>
+        <div class="hint">${esc(workflow.workflow_stage)}</div>
+      </td>
+      <td>${esc(workflow.service_name)}</td>
+      <td>${esc(workflow.capability)}</td>
+      <td>${esc(workflow.entry_point)}</td>
+      <td>${esc(workflow.exact_where)}</td>
+      <td>${fmtNumber(workflow.users_30d)} / ${fmtNumber(workflow.requests_30d)}</td>
+      <td>${fmtPct(workflow.governed_usage_pct)}</td>
+      <td><span class="status-badge ${adoptionDepthClass(workflow.adoption_depth)}">${esc(workflow.adoption_depth)}</span></td>
+    </tr>
+  `).join("");
+  const capabilityRows = capabilitySummaries.map((capability) => `
+    <tr>
+      <td>
+        <div style="font-weight:650;color:var(--text)">${esc(capability.capability)}</div>
+        <div class="hint">${fmtNumber(capability.workflows)} workflow${capability.workflows === 1 ? "" : "s"} across ${fmtNumber(capability.businessUnitCount)} BU${capability.businessUnitCount === 1 ? "" : "s"}</div>
+      </td>
+      <td>${fmtNumber(capability.serviceCount)}</td>
+      <td>${fmtNumber(capability.users)}</td>
+      <td>${fmtNumber(capability.requests)}</td>
+      <td>${fmtPct(capability.governedPct)}</td>
     </tr>
   `).join("");
 
@@ -4033,6 +4828,78 @@ function adoptionView() {
         <div class="adoption-kpi-meta">${windowLabel} spend: ${fmtUSD(summary.spend_30d_usd)} | ${fmtNumber(summary.requests_30d)} requests</div>
       </div>
     </div>
+
+    <section class="card adoption-product-map" style="margin-bottom:12px">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Product Lead Workflow Map</div>
+          <div class="card-subtitle">What each organization, business unit, and team is doing with AI, which services power it, and the exact workflow step where adoption is happening.</div>
+        </div>
+        <button class="small-btn" data-action="go" data-page="integrations">Open Integrations</button>
+      </div>
+      <div class="adoption-map-narrative">
+        <div>
+          <div class="adoption-map-kicker">Adoption pattern</div>
+          <h2>${esc(workflowSummary.primary_adoption_pattern || "AI adoption is mapped to workflows, not only users.")}</h2>
+          <p>${esc(dashboard.scope_type === "organization" ? workflowSummary.highest_maturity_signal || "" : `${dashboard.scope_label} is filtered below so product leaders can see the workflow-level adoption story for this scope.`)}</p>
+        </div>
+        <div class="adoption-map-stat-grid">${productLeadCards}</div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Where AI Is Embedded In The Work</div>
+          <div class="card-subtitle">Highest-maturity workflows in the selected scope, with the service, capability, exact insertion point, and adoption mechanism visible together.</div>
+        </div>
+      </div>
+      <div class="workflow-spotlight-grid-wrap">${workflowSpotlightMarkup || `<div class="adoption-empty">No workflow-level adoption records are available for this scope.</div>`}</div>
+    </section>
+
+    <section class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Workflow Adoption Matrix</div>
+          <div class="card-subtitle">A product-lead operating map of team, workflow, AI service, capability, entry point, insertion point, users, request volume, governance, and maturity.</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table adoption-workflow-table">
+          <thead>
+            <tr>
+              <th>Business Unit / Team</th>
+              <th>Workflow</th>
+              <th>AI Service</th>
+              <th>Capability</th>
+              <th>Entry Point</th>
+              <th>Insertion Point</th>
+              <th>Users / Requests</th>
+              <th>Governed</th>
+              <th>Depth</th>
+            </tr>
+          </thead>
+          <tbody>${workflowMatrixRows || `<tr><td colspan='9' class='muted'>No workflow adoption records captured yet.</td></tr>`}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:12px">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Capability Deployment Map</div>
+          <div class="card-subtitle">Shows what teams are using AI for across the selected scope, independent of provider brand or model family.</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>Capability Class</th><th>Services</th><th>Users</th><th>Requests</th><th>Governed</th></tr>
+          </thead>
+          <tbody>${capabilityRows || `<tr><td colspan='5' class='muted'>No capability records captured yet.</td></tr>`}</tbody>
+        </table>
+      </div>
+    </section>
 
     <div class="card" style="margin-bottom:12px" data-walkthrough-anchor="walkthrough-request-proof">
       <div class="card-title">Executive Lenses</div>
@@ -5216,7 +6083,8 @@ function manualMappingView() {
     .reduce((acc, item) => acc + Number(item.spend_at_risk_usd || 0), 0);
   const reviewed = counts.confirmed + counts.reassigned;
   const uplift = manualMappingCoverageLiftPct(sum(dataset.teams || [], "spend_usd"));
-  const latestImpact = items.find((item) => item.id === state.lastMappingImpactId) || null;
+  const latestMapping = items.find((item) => item.id === state.lastMappingImpactId) || null;
+  const latestImpact = latestMapping ? manualMappingImpact(latestMapping) : null;
   if (!items.length) {
     return `
       ${renderSectionNarrative(
@@ -5282,7 +6150,7 @@ function manualMappingView() {
         <div class="manual-mapping-impact-grid">
           <div class="manual-mapping-impact-card">
             <div class="manual-mapping-kpi-label">Confidence increase</div>
-            <div class="manual-mapping-kpi-value">${impact.beforeConfidence.toFixed(0)}% -> ${impact.afterConfidence.toFixed(0)}%</div>
+            <div class="manual-mapping-kpi-value">${fmtPct(impact.beforeConfidence, 0)} -> ${fmtPct(impact.afterConfidence, 0)}</div>
           </div>
           <div class="manual-mapping-impact-card">
             <div class="manual-mapping-kpi-label">Owner reassignment</div>
@@ -5342,7 +6210,7 @@ function manualMappingView() {
         why: "It closes the gap between directionally useful telemetry and ownership that finance, platform, and governance teams will actually trust."
       },
       latestImpact
-        ? `${latestImpact.workload_label} now shows how one mapping change improves confidence, shifts budget ownership, and changes the forecast reserve.`
+        ? `${latestImpact.workloadLabel} now shows how one mapping decision changes confidence, budget ownership, and the forecast reserve.`
         : "Each mapping card now shows the explicit before-and-after business effect of resolving ambiguous ownership.",
       "Resolve one mapping and then jump into Request Proof, Teams, or Forecasting to show how the result propagates."
     )}
@@ -5369,7 +6237,7 @@ function manualMappingView() {
       <div class="card metric-card">
         <div class="metric-accent" style="background:var(--green)"></div>
         <div class="metric-label">Coverage Lift</div>
-        <div class="metric-value">+${uplift.toFixed(1)} pts</div>
+        <div class="metric-value">+${Number(uplift || 0).toFixed(1)} pts</div>
         <div class="metric-meta">Applied back into the overview coverage view</div>
       </div>
     </div>
@@ -5381,7 +6249,7 @@ function manualMappingView() {
         <div class="grid grid-4" style="margin-top:12px">
           <div class="signal-item">
             <div class="signal-title">Confidence</div>
-            <div class="signal-values"><strong>${latestImpact.beforeConfidence.toFixed(0)}% -> ${latestImpact.afterConfidence.toFixed(0)}%</strong></div>
+            <div class="signal-values"><strong>${fmtPct(latestImpact.beforeConfidence, 0)} -> ${fmtPct(latestImpact.afterConfidence, 0)}</strong></div>
           </div>
           <div class="signal-item">
             <div class="signal-title">Owner shift</div>
@@ -6251,6 +7119,526 @@ function integrationsView() {
   `;
 }
 
+function feasibilityClassName(value) {
+  const normalized = String(value || "").toLowerCase();
+  if (normalized.includes("fully")) {
+    return "good";
+  }
+  if (normalized.includes("partial")) {
+    return "warn";
+  }
+  if (normalized.includes("indirect")) {
+    return "info";
+  }
+  if (normalized.includes("uncapturable") || normalized.includes("unknown")) {
+    return "danger";
+  }
+  return "";
+}
+
+function renderCoverageSummaryCards(summary = {}) {
+  const cards = [
+    {
+      label: "Pathways Classified",
+      value: `${fmtNumber(summary.classified_pathways || 0)} / 20`,
+      meta: "Every pathway is represented before downstream interpretation.",
+      accent: "var(--blue)"
+    },
+    {
+      label: "Capture Coverage",
+      value: fmtPct(summary.capture_coverage_pct || 0),
+      meta: `${fmtUSD(summary.unknown_spend_usd || 0)} remains unknown, indirect, or excluded.`,
+      accent: "var(--green)"
+    },
+    {
+      label: "Identity Resolution",
+      value: fmtPct(summary.identity_resolution_pct || 0),
+      meta: "Linked to canonical identities, teams, or explicit unknown states.",
+      accent: "var(--amber)"
+    },
+    {
+      label: "Agent Lineage",
+      value: fmtPct(summary.agent_lineage_pct || 0),
+      meta: "Root request propagation across descendant calls.",
+      accent: "var(--purple)"
+    }
+  ];
+  return cards.map((card) => `
+    <div class="card metric-card coverage-kpi">
+      <div class="metric-accent" style="background:${card.accent}"></div>
+      <div class="metric-label">${esc(card.label)}</div>
+      <div class="metric-value">${esc(card.value)}</div>
+      <div class="metric-meta">${esc(card.meta)}</div>
+    </div>
+  `).join("");
+}
+
+function coverageView() {
+  const coverage = dataset.coverage || FALLBACK_DATASET.coverage;
+  const summary = coverage.summary || {};
+  const lens = pageLensNarrative("coverage");
+  const pathwayRows = (coverage.pathways || []).map((row) => `
+    <tr>
+      <td>
+        <div class="mono" style="color:var(--text)">${esc(row.category)}</div>
+        <div class="hint">${esc(row.label)}</div>
+      </td>
+      <td><span class="status-badge ${feasibilityClassName(row.feasibility)}">${esc(row.feasibility)}</span></td>
+      <td>${esc(row.capture_method)}</td>
+      <td>${esc(row.usage_truth)}</td>
+      <td>${esc(row.cost_truth)}</td>
+      <td>${esc(row.ownership_truth)}</td>
+      <td>${fmtUSD(row.spend_usd || 0)}</td>
+      <td>${fmtPct(row.coverage_pct || 0)}</td>
+      <td>${esc(row.caveat)}</td>
+    </tr>
+  `).join("");
+
+  const blindSpotCards = (coverage.blind_spots || []).map((item) => `
+    <div class="blindspot-card ${esc(String(item.severity || "").toLowerCase())}">
+      <div class="blindspot-head">
+        <span class="mono">${esc(item.id)}</span>
+        <span class="status-badge ${item.severity === "high" ? "danger" : item.severity === "medium" ? "warn" : "info"}">${esc(item.severity || "medium")}</span>
+      </div>
+      <div class="blindspot-title">${esc(item.title)}</div>
+      <div class="blindspot-meta">${esc(item.pathway)} • ${fmtUSD(item.spend_usd || 0)} exposed</div>
+      <p>${esc(item.cause)}</p>
+      <div class="blindspot-action">${esc(item.operator_action)}</div>
+    </div>
+  `).join("");
+
+  const lineage = coverage.agent_lineage || {};
+  const lineageCalls = (lineage.calls || []).map((call) => `
+    <div class="lineage-step ${call.linked ? "linked" : "missing"}">
+      <div class="lineage-step-index">${fmtNumber(call.step)}</div>
+      <div>
+        <div class="lineage-step-title">${esc(call.purpose)}</div>
+        <div class="hint mono">${esc(call.event_id)}${call.parent_event_id ? ` <- ${esc(call.parent_event_id)}` : " <- missing parent"}</div>
+      </div>
+      <div class="lineage-step-cost">${fmtUSD(call.cost_usd || 0, 2)}</div>
+    </div>
+  `).join("");
+
+  const scenarioRows = (coverage.scenario_results || []).map((scenario) => `
+    <tr>
+      <td><span class="mono">${esc(scenario.id)}</span></td>
+      <td>${esc(scenario.name)}</td>
+      <td>${esc(scenario.surface)}</td>
+      <td>${esc(scenario.evidence)}</td>
+      <td><span class="status-badge good">${esc(scenario.status)}</span></td>
+    </tr>
+  `).join("");
+
+  return `
+    <div class="coverage-page" data-walkthrough-anchor="walkthrough-coverage">
+      <div class="card coverage-hero">
+        <div>
+          <div class="pill">Pathway truth map</div>
+          <h1>Coverage without cosmetic certainty</h1>
+          <p>${esc(lens.conclusion)} ${esc(lens.why)}</p>
+        </div>
+        <div class="coverage-hero-grid">
+          <div><span>Fully capturable</span><strong>${fmtNumber(summary.fully_capturable || 0)}</strong></div>
+          <div><span>Partially capturable</span><strong>${fmtNumber(summary.partially_capturable || 0)}</strong></div>
+          <div><span>Indirect</span><strong>${fmtNumber(summary.indirectly_capturable || 0)}</strong></div>
+          <div><span>Uncapturable</span><strong>${fmtNumber(summary.uncapturable || 0)}</strong></div>
+        </div>
+      </div>
+
+      <div class="grid grid-4" style="margin-bottom:12px">${renderCoverageSummaryCards(summary)}</div>
+
+      <section class="card" style="margin-bottom:12px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Inference Pathway Coverage Matrix</div>
+            <div class="card-subtitle">Every class carries usage, cost, ownership, feasibility, and caveat metadata before it reaches dashboards or exports.</div>
+          </div>
+          <button class="small-btn" data-action="go" data-page="integrations">Open Integrations</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Pathway</th>
+                <th>Feasibility</th>
+                <th>Capture Method</th>
+                <th>Usage Truth</th>
+                <th>Cost Truth</th>
+                <th>Ownership Truth</th>
+                <th>Spend</th>
+                <th>Coverage</th>
+                <th>Caveat</th>
+              </tr>
+            </thead>
+            <tbody>${pathwayRows}</tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="coverage-split" style="margin-bottom:12px">
+        <section class="card">
+          <div class="card-title">Blind Spots and Degraded States</div>
+          <div class="card-subtitle">The product remains useful under partial data by making causes and operator actions explicit.</div>
+          <div class="blindspot-grid">${blindSpotCards}</div>
+        </section>
+        <section class="card">
+          <div class="card-title">Agentic Workflow Lineage</div>
+          <div class="card-subtitle">A local proof of root_request_id / parent_event_id propagation and the way missing child links stay visible.</div>
+          <div class="lineage-summary">
+            <div><span>Workflow</span><strong>${esc(lineage.workflow_id || "N/A")}</strong></div>
+            <div><span>Root request</span><strong>${esc(lineage.root_request_id || "N/A")}</strong></div>
+            <div><span>Linked descendants</span><strong>${fmtNumber(lineage.linked_descendant_calls || 0)} / ${fmtNumber(lineage.total_descendant_calls || 0)}</strong></div>
+            <div><span>Aggregate cost</span><strong>${fmtUSD(lineage.aggregate_cost_usd || 0, 2)}</strong></div>
+          </div>
+          <div class="lineage-timeline">${lineageCalls}</div>
+        </section>
+      </div>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Pathological Scenario Proof</div>
+            <div class="card-subtitle">The local demo maps the highest-risk S-001 to S-020 cases to visible surfaces instead of only claiming backend coverage.</div>
+          </div>
+          <button class="small-btn" data-action="go" data-page="requirements">Open PRD Proof</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr><th>Scenario</th><th>Name</th><th>Surface</th><th>Evidence</th><th>Status</th></tr>
+            </thead>
+            <tbody>${scenarioRows}</tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function exportRowsForMode() {
+  const rows = dataset.exports?.rows || [];
+  if (state.exportViewMode === "current_state") {
+    return rows.map((row) => ({ ...row, display_team: row.team_current_state, display_mode: "Current-state" }));
+  }
+  return rows.map((row) => ({ ...row, display_team: row.team_event_time, display_mode: "Event-time" }));
+}
+
+function exportsView() {
+  const exportsData = dataset.exports || FALLBACK_DATASET.exports;
+  const summary = exportsData.summary || {};
+  const lens = pageLensNarrative("exports");
+  const totalAssignable = Number(summary.exportable_chargeback_usd || 0)
+    + Number(summary.provisional_review_usd || 0)
+    + Number(summary.allocated_shared_usd || 0)
+    + Number(summary.unknown_excluded_usd || 0);
+  const readinessPct = totalAssignable > 0
+    ? (Number(summary.exportable_chargeback_usd || 0) / totalAssignable) * 100
+    : 0;
+
+  const modeButtons = [
+    { key: "event_time", label: "Event-Time Owner" },
+    { key: "current_state", label: "Current-State Rollup" }
+  ].map((item) => `
+    <button class="filter-btn${state.exportViewMode === item.key ? " active" : ""}" data-action="set-export-mode" data-export-mode="${item.key}">
+      ${esc(item.label)}
+    </button>
+  `).join("");
+
+  const controls = (exportsData.controls || []).map((item) => `
+    <div class="export-control-card">
+      <div class="export-control-label">${esc(item.label)}</div>
+      <div class="export-control-value">${esc(item.value)}</div>
+      <p>${esc(item.meaning)}</p>
+    </div>
+  `).join("");
+
+  const rows = exportRowsForMode().map((row) => `
+    <tr>
+      <td><span class="mono">${esc(row.line_id)}</span></td>
+      <td>
+        <div style="font-weight:650;color:var(--text)">${esc(row.service)}</div>
+        <div class="hint">${esc(row.model)}</div>
+      </td>
+      <td>${esc(row.display_team)}</td>
+      <td>${esc(row.cost_center)}</td>
+      <td>${fmtNullableUSD(row.estimated_cost_usd)}</td>
+      <td>${fmtNullableUSD(row.reconciled_cost_usd)}</td>
+      <td>${fmtUSD(row.trac_usd || 0)}</td>
+      <td>${fmtPct(Number(row.confidence || 0) * 100, 0)}</td>
+      <td><span class="status-badge ${feasibilityClassName(row.ownership_state)}">${esc(row.ownership_state)}</span></td>
+      <td>${esc(row.truth_basis)}</td>
+      <td>${esc(row.export_action)}</td>
+    </tr>
+  `).join("");
+
+  const allocations = (exportsData.allocation_splits || []).map((row) => `
+    <div class="allocation-row">
+      <div>
+        <div class="allocation-title">${esc(row.team)}</div>
+        <div class="hint">${esc(row.resource)} • ${esc(row.basis)}</div>
+      </div>
+      <div class="allocation-share">${fmtPct(row.share_pct || 0, 0)}</div>
+      <div class="allocation-cost">${fmtUSD(row.allocated_cost_usd || 0)}</div>
+    </div>
+  `).join("");
+
+  return `
+    <div class="exports-page" data-walkthrough-anchor="walkthrough-exports">
+      <div class="card exports-hero">
+        <div>
+          <div class="pill">Finance close packet</div>
+          <h1>Chargeback without collapsing truth</h1>
+          <p>${esc(lens.conclusion)} ${esc(lens.why)}</p>
+        </div>
+        <div class="export-mode-panel">
+          <div class="card-subtitle">Reporting mode</div>
+          <div class="filter-bar">${modeButtons}</div>
+          <div class="hint">Event-time is finance-safe. Current-state is planning-safe and always labeled.</div>
+        </div>
+      </div>
+
+      <div class="grid grid-4" style="margin-bottom:12px">
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--green)"></div><div class="metric-label">Chargeback Ready</div><div class="metric-value">${fmtUSD(summary.exportable_chargeback_usd || 0)}</div><div class="metric-meta">${fmtPct(readinessPct)} of previewed assignable spend</div></div>
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--amber)"></div><div class="metric-label">Review Required</div><div class="metric-value">${fmtUSD(summary.provisional_review_usd || 0)}</div><div class="metric-meta">Provisional or conflict-bearing ownership</div></div>
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--purple)"></div><div class="metric-label">Allocated Shared</div><div class="metric-value">${fmtUSD(summary.allocated_shared_usd || 0)}</div><div class="metric-meta">Exported separately from ownership truth</div></div>
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--red)"></div><div class="metric-label">Excluded Unknown</div><div class="metric-value">${fmtUSD(summary.unknown_excluded_usd || 0)}</div><div class="metric-meta">Shown with caveat, not hidden</div></div>
+      </div>
+
+      <div class="export-control-grid" style="margin-bottom:12px">${controls}</div>
+
+      <section class="card" style="margin-bottom:12px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Chargeback Export Preview</div>
+            <div class="card-subtitle">FOCUS-compatible posture with ${fmtNumber(summary.focus_columns || 0)} standard columns plus ${fmtNumber(summary.argmin_extension_columns || 0)} Argmin evidence extensions.</div>
+          </div>
+          <button class="small-btn primary" data-action="export-artifact" data-artifact="chargeback-export">Export chargeback preview</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Line</th><th>Service</th><th>Owner</th><th>Cost Center</th><th>Estimated</th><th>Reconciled</th><th>TRAC</th><th>Confidence</th><th>State</th><th>Truth Basis</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-title">Shared Allocation Guard</div>
+        <div class="card-subtitle">Stage C allocation conserves cost but never overwrites the ownership columns used for chargeback readiness.</div>
+        <div class="allocation-list">${allocations}</div>
+      </section>
+    </div>
+  `;
+}
+
+function starRatingMarkup(rating) {
+  if (rating === null || rating === undefined) {
+    return `<span class="energy-unrated">Unrated</span>`;
+  }
+  const stars = Array.from({ length: 5 }, (_, index) => index < Number(rating) ? "★" : "☆").join("");
+  return `<span class="energy-stars" aria-label="${esc(`${rating} of 5 stars`)}">${stars}</span>`;
+}
+
+function energyView() {
+  const energy = dataset.energy_efficiency || FALLBACK_DATASET.energy_efficiency;
+  const summary = energy.summary || {};
+  const lens = pageLensNarrative("energy");
+  const modelCards = (energy.models || []).map((model) => `
+    <div class="energy-model-card ${model.status === "unrated" ? "unrated" : ""}">
+      <div class="energy-model-head">
+        <div>
+          <div class="energy-model-name">${esc(model.model)}</div>
+          <div class="hint">${esc(model.provider)} • ${esc(model.task)}</div>
+        </div>
+        ${starRatingMarkup(model.star_rating)}
+      </div>
+      <div class="energy-model-grid">
+        <div><span>Requests</span><strong>${fmtNumber(model.requests_30d || 0)}</strong></div>
+        <div><span>kWh / 1K</span><strong>${model.kwh_per_1k_requests === null || model.kwh_per_1k_requests === undefined ? "Unknown" : Number(model.kwh_per_1k_requests).toFixed(1)}</strong></div>
+        <div><span>Carbon</span><strong>${model.carbon_kgco2e === null || model.carbon_kgco2e === undefined ? "Unknown" : `${fmtNumber(model.carbon_kgco2e)} kg`}</strong></div>
+      </div>
+      <div class="energy-recommendation">${esc(model.recommendation)}</div>
+    </div>
+  `).join("");
+
+  const recommendationRows = (energy.recommendations || []).map((row) => `
+    <tr>
+      <td>${esc(row.current_model)}</td>
+      <td>${esc(row.candidate_model)}</td>
+      <td>${row.cost_delta_pct === null || row.cost_delta_pct === undefined ? "N/A" : signedPct(row.cost_delta_pct, 0)}</td>
+      <td>${esc(row.quality_delta)}</td>
+      <td>${row.energy_delta_kwh_per_1k === null || row.energy_delta_kwh_per_1k === undefined ? "Unknown" : `${Number(row.energy_delta_kwh_per_1k).toFixed(1)} kWh / 1K`}</td>
+      <td>${row.annual_carbon_delta_kgco2e === null || row.annual_carbon_delta_kgco2e === undefined ? "Unknown" : `${fmtNumber(row.annual_carbon_delta_kgco2e)} kg`}</td>
+      <td>${esc(row.decision)}</td>
+    </tr>
+  `).join("");
+
+  return `
+    <div class="energy-page" data-walkthrough-anchor="walkthrough-energy">
+      <div class="card energy-hero">
+        <div>
+          <div class="pill">Energy transparency</div>
+          <h1>Model footprint without greenwashing</h1>
+          <p>${esc(lens.conclusion)} ${esc(lens.why)}</p>
+        </div>
+        <div class="energy-boundary">
+          <div class="card-title">Decision binding</div>
+          <div class="card-subtitle">${esc(summary.decision_binding || "Advisory only")}</div>
+          <div class="hint">${esc(summary.region || "")}</div>
+        </div>
+      </div>
+
+      <div class="grid grid-4" style="margin-bottom:12px">
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--green)"></div><div class="metric-label">Rated Models</div><div class="metric-value">${fmtNumber(summary.rated_model_count || 0)}</div><div class="metric-meta">${fmtNumber(summary.unrated_model_count || 0)} explicitly unrated</div></div>
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--blue)"></div><div class="metric-label">Known Energy Usage</div><div class="metric-value">${fmtPct(summary.energy_known_request_pct || 0)}</div><div class="metric-meta">Unknowns remain null, not zero</div></div>
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--amber)"></div><div class="metric-label">Monthly Energy</div><div class="metric-value">${fmtNumber(summary.estimated_monthly_kwh || 0)} kWh</div><div class="metric-meta">${Number(summary.estimated_kwh_per_1k_requests || 0).toFixed(1)} kWh per 1K requests</div></div>
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--purple)"></div><div class="metric-label">Estimated Carbon</div><div class="metric-value">${fmtNumber(summary.estimated_carbon_kgco2e || 0)} kg</div><div class="metric-meta">Informational Phase 1 disclosure</div></div>
+      </div>
+
+      <section class="card" style="margin-bottom:12px">
+        <div class="card-title">Observed Model Energy View</div>
+        <div class="card-subtitle">Models without published data are displayed as Unrated and kept in the decision surface.</div>
+        <div class="energy-model-grid-wrap">${modelCards}</div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Energy-Aware Optimization Candidates</div>
+            <div class="card-subtitle">Energy deltas appear beside cost and quality; they never override equivalence or customer policy.</div>
+          </div>
+          <button class="small-btn" data-action="go" data-page="interventions">Open Interventions</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr><th>Current</th><th>Candidate</th><th>Cost Delta</th><th>Quality Basis</th><th>Energy Delta</th><th>Annual Carbon Delta</th><th>Decision</th></tr>
+            </thead>
+            <tbody>${recommendationRows}</tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function adminView() {
+  const admin = dataset.admin || FALLBACK_DATASET.admin;
+  const summary = admin.summary || {};
+  const lens = pageLensNarrative("admin");
+  const accountRows = (admin.accounts || []).map((account) => `
+    <tr>
+      <td>${esc(account.name)}</td>
+      <td>${esc(account.role)}</td>
+      <td><span class="status-badge ${account.status === "active" ? "good" : "warn"}">${esc(account.status)}</span></td>
+      <td>${esc(account.mfa)}</td>
+      <td>${esc(fmtDateTime(account.last_auth || ""))}</td>
+    </tr>
+  `).join("");
+  const operationRows = (admin.operations || []).map((operation) => `
+    <tr>
+      <td>${esc(operation.operation)}</td>
+      <td>${esc(operation.role_required)}</td>
+      <td>${esc(operation.write_target)}</td>
+      <td>${esc(operation.audit)}</td>
+    </tr>
+  `).join("");
+  const auditRows = (admin.audit_log || []).map((event) => `
+    <tr>
+      <td>${esc(fmtDateTime(event.timestamp || ""))}</td>
+      <td>
+        <div style="font-weight:650;color:var(--text)">${esc(event.actor || "Unknown actor")}</div>
+        <div class="hint">${esc(event.role || "Unassigned role")}</div>
+      </td>
+      <td>${esc(event.action || "")}</td>
+      <td>${esc(event.target || "")}</td>
+      <td><span class="status-badge good">${esc(event.outcome || "recorded")}</span></td>
+      <td>${esc(event.basis || "")}</td>
+    </tr>
+  `).join("");
+  const diagnostics = (admin.diagnostics || []).map((item) => `
+    <div class="admin-diagnostic-card">
+      <div class="admin-diagnostic-head">
+        <span>${esc(item.check)}</span>
+        <span class="status-badge ${item.status === "green" ? "good" : "info"}">${esc(item.status)}</span>
+      </div>
+      <p>${esc(item.detail)}</p>
+    </div>
+  `).join("");
+
+  return `
+    <div class="admin-page" data-walkthrough-anchor="walkthrough-admin">
+      <div class="card admin-hero">
+        <div>
+          <div class="pill">Customer deployment operations</div>
+          <h1>Admin controls inside the trust boundary</h1>
+          <p>${esc(lens.conclusion)} ${esc(lens.why)}</p>
+        </div>
+        <div class="admin-summary-grid">
+          <div><span>Mode</span><strong>${esc(summary.deployment_mode || "local demo")}</strong></div>
+          <div><span>RBAC roles</span><strong>${fmtNumber((summary.rbac_roles || []).length)}</strong></div>
+          <div><span>Read-only integrations</span><strong>${fmtNumber(summary.read_only_integrations || 0)}</strong></div>
+          <div><span>Mutation surfaces</span><strong>${fmtNumber(summary.mutation_surfaces || 0)}</strong></div>
+        </div>
+      </div>
+
+      <div class="grid grid-7-5" style="margin-bottom:12px">
+        <section class="card">
+          <div class="card-title">Account Lifecycle and RBAC</div>
+          <div class="card-subtitle">Invitation-gated accounts, role assignment, MFA posture, and deactivation history are visible in the same product shell.</div>
+          <div class="table-wrap" style="margin-top:12px">
+            <table class="table">
+              <thead><tr><th>User</th><th>Role</th><th>Status</th><th>MFA</th><th>Last Auth</th></tr></thead>
+              <tbody>${accountRows}</tbody>
+            </table>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-title">Operational Diagnostics</div>
+          <div class="card-subtitle">Diagnostics stay scoped to the deployment and do not imply external access to customer data.</div>
+          <div class="admin-diagnostic-grid">${diagnostics}</div>
+        </section>
+      </div>
+
+      <section class="card" style="margin-bottom:12px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Customer-Visible Audit Trail</div>
+            <div class="card-subtitle">Every admin-side mutation, export, replay, and exception approval is represented as a local append-only event with actor, target, outcome, and basis.</div>
+          </div>
+          <button class="small-btn" data-action="go" data-page="exports">Open Exports</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th><th>Outcome</th><th>Basis</th></tr></thead>
+            <tbody>${auditRows || `<tr><td colspan='6' class='muted'>No admin audit events are available in the current dataset.</td></tr>`}</tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Audited Admin Operations</div>
+            <div class="card-subtitle">${esc(summary.auth_policy || "")} Last audit event: ${esc(fmtDateTime(summary.last_audit_event || ""))}</div>
+          </div>
+          <button class="small-btn" data-action="go" data-page="governance">Open Governance</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Operation</th><th>Role Required</th><th>Write Target</th><th>Audit</th></tr></thead>
+            <tbody>${operationRows}</tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
 function glossaryResultsMarkup() {
   const query = state.glossaryQuery.trim().toLowerCase();
   const filtered = (dataset.glossary || []).filter((entry) => {
@@ -6443,6 +7831,9 @@ function renderMainView() {
       root.innerHTML = overviewView();
       renderOverviewCharts();
       break;
+    case "partner_brief":
+      root.innerHTML = designPartnerView();
+      break;
     case "requirements":
       root.innerHTML = requirementsView();
       break;
@@ -6470,12 +7861,24 @@ function renderMainView() {
     case "governance":
       root.innerHTML = governanceView();
       break;
+    case "coverage":
+      root.innerHTML = coverageView();
+      break;
+    case "exports":
+      root.innerHTML = exportsView();
+      break;
+    case "energy":
+      root.innerHTML = energyView();
+      break;
     case "forecast":
       root.innerHTML = forecastView();
       renderForecastChart();
       break;
     case "integrations":
       root.innerHTML = integrationsView();
+      break;
+    case "admin":
+      root.innerHTML = adminView();
       break;
     case "glossary":
       root.innerHTML = glossaryView();
@@ -6672,6 +8075,48 @@ async function bootstrapDemoData(options = {}) {
   }
 }
 
+async function resetBackendDemoState(options = {}) {
+  const { log = true, toast = false } = options;
+  try {
+    const result = await apiRequest("POST", "/v1/demo/reset", {});
+    state.lastPayload = { action: "reset" };
+    state.lastResponse = result;
+    state.mode = String(result.interceptor_mode || state.mode).toLowerCase();
+    state.runtimeCapabilities = {
+      ...state.runtimeCapabilities,
+      reference_time: result.reference_time,
+      reset_token: result.reset_token,
+      scenario_count: Array.isArray(result.scenario_ids) ? result.scenario_ids.length : 0,
+      demo_account_count: Array.isArray(result.demo_accounts) ? result.demo_accounts.length : 0
+    };
+    state.adoptionDashboardCache = {};
+    await syncAdoptionFromApi({ preserveSelection: false, force: true, render: false });
+    await syncIntegrationsFromApi({ force: true, render: false });
+    if (log) {
+      appendLog("ok", "Backend demo reset", "Synthetic runtime state was restored from the fixed demo baseline.", result, {
+        why: "This keeps repeated walkthroughs comparable across machines and recording sessions."
+      });
+    }
+    if (toast) {
+      showToast("Backend Reset", "Runtime state is back to the fixed baseline.");
+    }
+    return true;
+  } catch (error) {
+    appendLog("warn", "Backend reset unavailable", summarizeApiError(error, "The backend reset endpoint could not be reached."), null, {
+      hidden: true,
+      why: "The browser will continue using deterministic local dataset state."
+    });
+    return false;
+  }
+}
+
+function nextDemoScenarioRequestId(kind) {
+  const key = String(kind || "scenario");
+  const count = Number(state.demoScenarioRunCounts[key] || 0) + 1;
+  state.demoScenarioRunCounts[key] = count;
+  return `demo-${key}-${String(count).padStart(2, "0")}`;
+}
+
 async function runInterceptScenario(kind, options = {}) {
   const { manageLoading = true } = options;
   const scenario = dataset.demo_scenarios?.[kind];
@@ -6682,8 +8127,8 @@ async function runInterceptScenario(kind, options = {}) {
   const scenarioName = String(scenario.label || kind).replace(/^Scenario [A-Z]:\s*/, "");
 
   const payload = {
-    request_id: `demo-${kind}-${Date.now()}`,
-    ...scenario.payload
+    ...scenario.payload,
+    request_id: scenario.payload?.request_id || nextDemoScenarioRequestId(kind)
   };
 
   state.lastPayload = payload;
@@ -6728,7 +8173,7 @@ async function runInterceptScenario(kind, options = {}) {
         { label: "Scenario", value: scenarioName },
         { label: "Live proof controls", value: "Offline" }
       ],
-      why: "Run the 90-second walkthrough for the presentation flow, or start the local demo runtime to show this proof action live."
+      why: "Run the full product walkthrough for the presentation flow, or start the local demo runtime to show this proof action live."
     });
     appendLog("warn", "Live proof action unavailable", message, null, {
       hidden: true,
@@ -6761,7 +8206,7 @@ async function runFullSequence() {
   state.walkthroughAnchor = "";
   state.walkthroughStepTitle = "Preparing walkthrough";
   state.walkthroughStepHeadline = "Initializing deterministic demo state so the walkthrough stays logically consistent from the customer perspective.";
-  setPendingDemoAction("start-walkthrough", "Preparing 90-second walkthrough...");
+  setPendingDemoAction("start-walkthrough", "Preparing full product walkthrough...");
   render();
 
   const bootstrapped = await bootstrapDemoData({ manageLoading: false, fallbackOkay: true });
@@ -7096,6 +8541,10 @@ function handleAction(actionEl) {
       state.selectedProofJourney = actionEl.dataset.journeyKey || state.selectedProofJourney;
       render();
       return;
+    case "set-partner-stage":
+      state.selectedPartnerStage = actionEl.dataset.stageId || state.selectedPartnerStage;
+      render();
+      return;
     case "set-role-lens":
       state.roleLens = actionEl.dataset.roleLens || "executive";
       render();
@@ -7120,18 +8569,18 @@ function handleAction(actionEl) {
       if (!mapping) {
         return;
       }
-      updateManualMapping(mapping.id, "confirmed", mapping.suggested_owner);
+      void updateManualMapping(mapping.id, "confirmed", mapping.suggested_owner);
       return;
     }
     case "manual-map-assign":
-      updateManualMapping(
+      void updateManualMapping(
         actionEl.dataset.mappingId || "",
         "reassigned",
         actionEl.dataset.team || ""
       );
       return;
     case "manual-map-defer":
-      updateManualMapping(actionEl.dataset.mappingId || "", "deferred");
+      void updateManualMapping(actionEl.dataset.mappingId || "", "deferred");
       return;
     case "manual-map-open-request":
       syncContextFromRequest(actionEl.dataset.requestId || "");
@@ -7190,8 +8639,9 @@ function handleAction(actionEl) {
       void syncAdoptionFromApi({ preserveSelection: true, force: true });
       return;
     case "adoption-reset":
-      applyAdoptionHierarchy(state.adoptionHierarchy || fallbackAdoptionHierarchy());
-      void syncAdoptionFromApi({ preserveSelection: false, force: true });
+      state.adoptionDashboardCache = {};
+      applyAdoptionHierarchy(fallbackAdoptionHierarchy(), { preserveSelection: false });
+      render();
       return;
     case "forecast-set-scenario":
       state.forecastScenarioKey = actionEl.dataset.scenarioKey || DEFAULT_FORECAST_SCENARIO;
@@ -7249,6 +8699,10 @@ function handleAction(actionEl) {
     case "governance-set-request":
       state.governanceSimulationRequestId = actionEl.dataset.requestId || "";
       syncContextFromRequest(state.governanceSimulationRequestId);
+      render();
+      return;
+    case "set-export-mode":
+      state.exportViewMode = actionEl.dataset.exportMode || "event_time";
       render();
       return;
     case "export-artifact":
@@ -7439,7 +8893,18 @@ function onKeyDown(event) {
 
 async function initialize() {
   try {
+    const params = new URLSearchParams(window.location.search);
+    const resetOnLoad = params.get("reset") === "1";
     await loadDataset();
+    if (resetOnLoad) {
+      safeSessionRemove(INTERVENTION_STORAGE_KEY);
+      safeSessionRemove(MANUAL_MAPPING_STORAGE_KEY);
+      state.logs = [];
+      state.lastPayload = null;
+      state.lastResponse = null;
+      state.demoOutcome = null;
+      state.demoScenarioRunCounts = {};
+    }
     hydrateInterventionStatuses();
     hydrateManualMappingState();
     applyDatasetMetadata();
@@ -7448,8 +8913,19 @@ async function initialize() {
     state.integrationDeliveries = Array.isArray(state.integrationOverview?.recent_deliveries)
       ? state.integrationOverview.recent_deliveries
       : [];
+    if (resetOnLoad) {
+      await resetBackendDemoState({ log: false, toast: false });
+    }
     await resetForecastPlanner();
-    appendLog("ok", "Demo initialized", "Frontend dataset loaded and runtime controls ready.", null, { hidden: true });
+    appendLog(
+      "ok",
+      "Demo initialized",
+      resetOnLoad
+        ? "Frontend and backend demo state reset from the fixed baseline."
+        : "Frontend dataset loaded and runtime controls ready.",
+      null,
+      { hidden: true }
+    );
   } catch (error) {
     appendLog("err", "Initialization fallback", summarizeApiError(error, "The demo UI could not finish its startup routine."), null, {
       hidden: true

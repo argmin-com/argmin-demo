@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import calendar
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import TYPE_CHECKING
 
 from aci.models.attribution import AttributionIndexEntry
@@ -15,6 +15,58 @@ if TYPE_CHECKING:
     from aci.api.runtime import AppState
 
 
+DEMO_REFERENCE_TIME = datetime(2026, 2, 28, 17, 0, tzinfo=UTC)
+DEMO_REFERENCE_DAY = DEMO_REFERENCE_TIME.date()
+DEMO_SCENARIO_IDS = (
+    "policy-breach",
+    "intervention-approved",
+    "pricing-drift",
+    "executive-digest",
+    "manual-mapping-dispute",
+    "security-exception",
+    "service-owner-scorecard",
+    "energy-review",
+)
+DEMO_USER_ACCOUNTS = (
+    {
+        "name": "Maya Patel",
+        "email": "maya.patel@novatech.example",
+        "role": "Admin",
+        "status": "Active",
+    },
+    {
+        "name": "Ethan Chen",
+        "email": "ethan.chen@novatech.example",
+        "role": "FinOps",
+        "status": "Active",
+    },
+    {
+        "name": "Rina Alvarez",
+        "email": "rina.alvarez@novatech.example",
+        "role": "Engineer",
+        "status": "Active",
+    },
+    {
+        "name": "Devon Ross",
+        "email": "devon.ross@novatech.example",
+        "role": "Platform Engineering Viewer",
+        "status": "Active",
+    },
+    {
+        "name": "Priya Shah",
+        "email": "priya.shah@novatech.example",
+        "role": "Security Reviewer",
+        "status": "Active",
+    },
+    {
+        "name": "Former Ops User",
+        "email": "former.ops@novatech.example",
+        "role": "Engineer",
+        "status": "Deactivated",
+    },
+)
+
+
 @dataclass(frozen=True)
 class DemoBootstrapResult:
     seeded_entries: int
@@ -22,6 +74,9 @@ class DemoBootstrapResult:
     events_published: int
     graph_nodes: int
     graph_edges: int
+    reference_time: str
+    scenario_ids: list[str]
+    demo_accounts: list[dict[str, str]]
 
 
 def demo_seed_entries() -> list[AttributionIndexEntry]:
@@ -74,7 +129,107 @@ def demo_seed_entries() -> list[AttributionIndexEntry]:
             token_budget_input=3500,
             cost_ceiling_per_request_usd=0.03,
         ),
+        AttributionIndexEntry(
+            workload_id="support-bot-staging",
+            team_id="team-customer-engineering",
+            team_name="Customer Engineering",
+            cost_center_id="CC-CUST-ENG",
+            cost_center_name="Customer Engineering",
+            confidence=0.72,
+            confidence_tier="provisional",
+            method_used="R5",
+            budget_remaining_usd=4100.0,
+            budget_limit_usd=90000.0,
+            model_allowlist=["gpt-4o-mini", "gpt-4o"],
+            token_budget_output=900,
+            token_budget_input=2500,
+            cost_ceiling_per_request_usd=0.02,
+        ),
+        AttributionIndexEntry(
+            workload_id="ml-evals-sandbox",
+            team_id="team-research",
+            team_name="Research",
+            cost_center_id="CC-RESEARCH",
+            cost_center_name="Research",
+            confidence=0.68,
+            confidence_tier="provisional",
+            method_used="R6",
+            budget_remaining_usd=3700.0,
+            budget_limit_usd=60000.0,
+            model_allowlist=["gpt-4o-mini", "claude-3.5-sonnet", "gemini-1.5-flash"],
+            token_budget_output=1600,
+            token_budget_input=4500,
+            cost_ceiling_per_request_usd=0.04,
+        ),
+        AttributionIndexEntry(
+            workload_id="product-roadmap-agent-prod",
+            team_id="team-product",
+            team_name="Product",
+            cost_center_id="CC-PRODUCT",
+            cost_center_name="Product",
+            confidence=0.84,
+            confidence_tier="chargeback_ready",
+            method_used="R3",
+            budget_remaining_usd=15800.0,
+            budget_limit_usd=150000.0,
+            model_allowlist=["gpt-4o-mini", "gpt-4o"],
+            token_budget_output=1200,
+            token_budget_input=4000,
+            cost_ceiling_per_request_usd=0.025,
+        ),
+        AttributionIndexEntry(
+            workload_id="shadow-ai-provider-card",
+            team_id="team-unknown",
+            team_name="UNKNOWN",
+            cost_center_id="CC-UNKNOWN",
+            cost_center_name="Unknown",
+            confidence=0.37,
+            confidence_tier="unresolved",
+            method_used="R6",
+            budget_remaining_usd=0.0,
+            budget_limit_usd=0.0,
+            model_allowlist=[],
+            token_budget_output=500,
+            token_budget_input=1500,
+            cost_ceiling_per_request_usd=0.01,
+        ),
+        AttributionIndexEntry(
+            workload_id="campaign-copilot-seat-activity",
+            team_id="team-marketing",
+            team_name="Marketing",
+            cost_center_id="CC-MARKETING",
+            cost_center_name="Marketing",
+            confidence=0.69,
+            confidence_tier="provisional",
+            method_used="R5",
+            budget_remaining_usd=9400.0,
+            budget_limit_usd=45000.0,
+            model_allowlist=["gpt-4o-mini"],
+            token_budget_output=700,
+            token_budget_input=1800,
+            cost_ceiling_per_request_usd=0.012,
+        ),
+        AttributionIndexEntry(
+            workload_id="analytics-batch-nightly",
+            team_id="team-data-science",
+            team_name="Data Science",
+            cost_center_id="CC-5100",
+            cost_center_name="Data Science",
+            confidence=0.86,
+            confidence_tier="chargeback_ready",
+            method_used="R2",
+            budget_remaining_usd=7200.0,
+            budget_limit_usd=120000.0,
+            model_allowlist=["gpt-4o-mini", "gemini-1.5-flash"],
+            token_budget_output=1200,
+            token_budget_input=3000,
+            cost_ceiling_per_request_usd=0.008,
+        ),
     ]
+
+
+def _demo_accounts() -> list[dict[str, str]]:
+    return [dict(account) for account in DEMO_USER_ACCOUNTS]
 
 
 async def bootstrap_demo_state(
@@ -100,27 +255,43 @@ async def bootstrap_demo_state(
             events_published=0,
             graph_nodes=graph_stats["total_nodes"],
             graph_edges=graph_stats["total_edges"],
+            reference_time=DEMO_REFERENCE_TIME.isoformat(),
+            scenario_ids=list(DEMO_SCENARIO_IDS),
+            demo_accounts=_demo_accounts(),
         )
 
     if reset_existing:
         app_state.index_store.clear()
         app_state.adoption.clear()
         app_state.notification_hub.clear()
+        app_state.reconciliation.clear()
+        app_state.pricing.reset_to_default_rules()
+        app_state.intervention_registry.reset_to_seed_data()
+        reset_metrics = getattr(app_state.interceptor, "reset_metrics", None)
+        if callable(reset_metrics):
+            reset_metrics()
+        clear_event_bus = getattr(app_state.event_bus, "clear", None)
+        if callable(clear_event_bus):
+            clear_event_bus()
         if app_state.graph is not None:
             app_state.graph.clear()
 
     if app_state.graph is not None:
         _seed_graph(app_state)
+    app_state.adoption.set_reference_time(DEMO_REFERENCE_TIME)
     _seed_adoption(app_state)
 
     events_published = 0
     if app_state.accepts_ingestion and app_state.config.event_bus_backend.lower() == "memory":
-        result = await app_state.event_bus.publish_batch(_demo_events(app_state))
+        result = await app_state.event_bus.publish_batch(
+            _demo_events(app_state),
+            dispatch=False,
+        )
         events_published = result["published"]
 
     entries = demo_seed_entries()
     for entry in entries:
-        app_state.index_store.materialize(entry)
+        app_state.index_store.materialize(entry, materialized_at=DEMO_REFERENCE_TIME)
 
     if reset_existing or not app_state.notification_hub.list_deliveries(limit=1):
         await _seed_integrations(app_state)
@@ -139,18 +310,19 @@ async def bootstrap_demo_state(
         events_published=events_published,
         graph_nodes=graph_stats["total_nodes"],
         graph_edges=graph_stats["total_edges"],
+        reference_time=DEMO_REFERENCE_TIME.isoformat(),
+        scenario_ids=list(DEMO_SCENARIO_IDS),
+        demo_accounts=_demo_accounts(),
     )
 
 
 async def _seed_integrations(app_state: AppState) -> None:
-    for scenario_id in (
-        "policy-breach",
-        "intervention-approved",
-        "pricing-drift",
-        "executive-digest",
-    ):
+    for index, scenario_id in enumerate(DEMO_SCENARIO_IDS):
         try:
-            await app_state.notification_hub.dispatch_scenario(scenario_id)
+            await app_state.notification_hub.dispatch_scenario(
+                scenario_id,
+                sent_at=DEMO_REFERENCE_TIME + timedelta(minutes=index),
+            )
         except KeyError:
             continue
 
@@ -159,7 +331,7 @@ def _seed_graph(app_state: AppState) -> None:
     if app_state.graph is None:
         return
 
-    seeded_at = datetime.now(UTC)
+    seeded_at = DEMO_REFERENCE_TIME
     nodes = [
         GraphNode(
             node_id="team:team-cs-platform",
@@ -307,10 +479,11 @@ def _seed_graph(app_state: AppState) -> None:
 
 
 def _demo_events(app_state: AppState) -> list[DomainEvent]:
-    timestamp = datetime.now(UTC)
+    timestamp = DEMO_REFERENCE_TIME
     tenant_id = app_state.config.tenant_id
     return [
         DomainEvent(
+            event_id="evt-demo-org-change-alice",
             event_type=EventType.ORG_CHANGE,
             subject_id="person:alice.ng",
             attributes={
@@ -330,11 +503,13 @@ def _demo_events(app_state: AppState) -> list[DomainEvent]:
                 "source_system": "demo-seeder",
             },
             event_time=timestamp,
+            ingest_time=timestamp,
             source="demo-seeder",
             idempotency_key="demo-org-change-alice",
             tenant_id=tenant_id,
         ),
         DomainEvent(
+            event_id="evt-demo-deployment-code-intel",
             event_type=EventType.DEPLOYMENT,
             subject_id="deploy:code-intel-prod",
             attributes={
@@ -349,11 +524,13 @@ def _demo_events(app_state: AppState) -> list[DomainEvent]:
                 "timestamp": timestamp,
             },
             event_time=timestamp,
+            ingest_time=timestamp,
             source="demo-seeder",
             idempotency_key="demo-deployment-code-intel",
             tenant_id=tenant_id,
         ),
         DomainEvent(
+            event_id="evt-demo-billing-analytics-batch",
             event_type=EventType.BILLING_LINE_ITEM,
             subject_id="billing:analytics-batch",
             attributes={
@@ -368,11 +545,13 @@ def _demo_events(app_state: AppState) -> list[DomainEvent]:
                 "tags": {"team": "team-data-science"},
             },
             event_time=timestamp,
+            ingest_time=timestamp,
             source="demo-seeder",
             idempotency_key="demo-billing-analytics-batch",
             tenant_id=tenant_id,
         ),
         DomainEvent(
+            event_id="evt-demo-inference-customer-support-bot",
             event_type=EventType.INFERENCE_REQUEST,
             subject_id="req-customer-support-bot",
             attributes={
@@ -398,11 +577,13 @@ def _demo_events(app_state: AppState) -> list[DomainEvent]:
                 "cost_usd": 0.0032,
             },
             event_time=timestamp,
+            ingest_time=timestamp,
             source="demo-seeder",
             idempotency_key="demo-inference-customer-support-bot",
             tenant_id=tenant_id,
         ),
         DomainEvent(
+            event_id="evt-demo-inference-analytics-batch",
             event_type=EventType.INFERENCE_REQUEST,
             subject_id="req-analytics-batch",
             attributes={
@@ -429,11 +610,13 @@ def _demo_events(app_state: AppState) -> list[DomainEvent]:
                 "cost_usd": 0.014,
             },
             event_time=timestamp,
+            ingest_time=timestamp,
             source="demo-seeder",
             idempotency_key="demo-inference-analytics-batch",
             tenant_id=tenant_id,
         ),
         DomainEvent(
+            event_id="evt-demo-inference-code-intel-prod",
             event_type=EventType.INFERENCE_REQUEST,
             subject_id="req-code-intel-prod",
             attributes={
@@ -459,6 +642,7 @@ def _demo_events(app_state: AppState) -> list[DomainEvent]:
                 "cost_usd": 0.009,
             },
             event_time=timestamp,
+            ingest_time=timestamp,
             source="demo-seeder",
             idempotency_key="demo-inference-code-intel-prod",
             tenant_id=tenant_id,
@@ -589,7 +773,7 @@ def _seed_adoption(app_state: AppState) -> None:
             "business_unit_name": "Finance and Operations",
         },
     ]
-    reference_day = datetime.now(UTC).date()
+    reference_day = DEMO_REFERENCE_DAY
     month_multipliers = [0.72, 0.8, 0.88, 0.95, 1.02, 1.11]
     for employee in employees:
         app_state.adoption.upsert_employee(

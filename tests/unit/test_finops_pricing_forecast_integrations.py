@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 import asyncio
+from typing import TYPE_CHECKING
 
 import httpx
 from fastapi.testclient import TestClient
 
+import aci.integrations.notifications as notifications_module
 from aci.api.app import app, get_state
-from aci.integrations.notifications import NotificationHub
+from aci.integrations.notifications import NotificationHub, NotificationMessage
 from aci.pricing.catalog import PricingUsage
+
+if TYPE_CHECKING:
+    import pytest
 
 
 def test_pricing_catalog_estimate_with_cached_tokens() -> None:
@@ -231,6 +236,30 @@ def test_notifications_endpoint_records_unsupported_channel_failure() -> None:
     assert payload[0]["message"] == "unsupported notification channel 'pagerduty'"
 
 
+def test_notifications_endpoint_simulates_ticketing_channels() -> None:
+    app_state = get_state()
+    app_state.notification_hub.clear()
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/v1/integrations/notify",
+            json={
+                "event_type": "ownership_dispute",
+                "title": "Manual mapping review required",
+                "detail": "Shared service account needs owner confirmation.",
+                "severity": "warning",
+                "channels": ["jira", "servicenow"],
+            },
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert {item["channel"] for item in payload} == {"jira", "servicenow"}
+    assert all(item["status"] == "simulated" for item in payload)
+    assert any(item["target"] == "jira://simulated" for item in payload)
+    assert any(item["target"] == "servicenow://simulated" for item in payload)
+
+
 class _FakeAsyncHTTPClient:
     def __init__(self) -> None:
         self.calls: list[tuple[str, dict[str, object]]] = []
@@ -289,10 +318,79 @@ def test_notifications_endpoints_support_live_async_delivery() -> None:
             deliveries = send.json()
             assert len(deliveries) == 2
             assert all(item["status"] == "sent" for item in deliveries)
+            assert all("SECRET" not in item["target"] for item in deliveries)
+            assert any(
+                item["target"] == "https://hooks.slack.com/redacted"
+                for item in deliveries
+            )
             assert len(fake_client.calls) == 2
+            assert any(
+                call[0] == "https://hooks.slack.com/services/T000/B000/SECRET"
+                for call in fake_client.calls
+            )
     finally:
         asyncio.run(app_state.notification_hub.aclose())
         app_state.notification_hub = original_hub
+
+
+def test_notifications_endpoint_redacts_simulated_webhook_targets() -> None:
+    app_state = get_state()
+    app_state.notification_hub.clear()
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/v1/integrations/notify",
+            json={
+                "event_type": "safety_check",
+                "title": "Safety check",
+                "detail": "Simulated delivery must not retain pasted webhook secrets.",
+                "severity": "info",
+                "channels": ["slack", "webhook"],
+                "slack_webhook_url": "https://hooks.slack.com/services/T000/B000/SECRET",
+                "webhook_url": "https://notify.example.com/aci/customer-secret",
+            },
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert {item["channel"] for item in payload} == {"slack", "webhook"}
+    assert all(item["status"] == "simulated" for item in payload)
+    assert all("SECRET" not in item["target"] for item in payload)
+    assert all("customer-secret" not in item["target"] for item in payload)
+    assert {
+        "https://hooks.slack.com/redacted",
+        "https://notify.example.com/redacted",
+    } == {item["target"] for item in payload}
+
+
+def test_notification_hub_simulated_delivery_does_not_load_httpx(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def blocked_load_httpx(_feature: str) -> object:
+        raise AssertionError("simulated local demo delivery must not load httpx")
+
+    monkeypatch.setattr(notifications_module, "load_httpx", blocked_load_httpx)
+    hub = NotificationHub(live_network=False)
+
+    deliveries = asyncio.run(
+        hub.send(
+            message=NotificationMessage(
+                event_type="local_demo",
+                title="Local demo",
+                detail="Simulated deliveries should stay dependency-light.",
+            ),
+            channels=["slack", "webhook"],
+            slack_webhook_url="https://hooks.slack.com/services/T000/B000/SECRET",
+            webhook_url="https://notify.example.com/aci/customer-secret",
+        )
+    )
+
+    assert len(deliveries) == 2
+    assert all(delivery.status == "simulated" for delivery in deliveries)
+    assert {delivery.target for delivery in deliveries} == {
+        "https://hooks.slack.com/redacted",
+        "https://notify.example.com/redacted",
+    }
 
 
 def test_integrations_overview_and_scenario_dispatch_endpoints() -> None:
@@ -314,16 +412,42 @@ def test_integrations_overview_and_scenario_dispatch_endpoints() -> None:
         overview = client.get("/v1/integrations/overview?limit=10")
         assert overview.status_code == 200
         payload = overview.json()
-        assert payload["summary"]["inbound_source_count"] >= 4
-        assert payload["summary"]["outbound_route_count"] >= 4
+        assert payload["summary"]["inbound_source_count"] >= 9
+        assert payload["summary"]["outbound_route_count"] >= 8
+        assert payload["summary"]["scenario_count"] >= 8
         assert payload["summary"]["recent_delivery_count"] >= 1
+        assert any(item["integration_id"] == "azure-openai" for item in payload["sources"])
+        assert any(item["integration_id"] == "servicenow" for item in payload["sources"])
         assert any(item["integration_id"] == "github-sdlc" for item in payload["sources"])
         assert any(item["route_id"] == "executive-adoption-digest" for item in payload["routes"])
+        assert any(item["route_id"] == "manual-mapping-review" for item in payload["routes"])
         assert any(item["scenario_id"] == "pricing-drift" for item in payload["scenarios"])
+        assert any(
+            item["scenario_id"] == "manual-mapping-dispute" for item in payload["scenarios"]
+        )
         assert any(
             item["route_id"] == "policy-breach-escalation"
             for item in payload["recent_deliveries"]
         )
+
+
+def test_integrations_dispatch_ticketing_scenarios_are_simulated_handoffs() -> None:
+    app_state = get_state()
+    app_state.notification_hub.clear()
+
+    with TestClient(app) as client:
+        dispatch = client.post("/v1/integrations/scenarios/manual-mapping-dispute/dispatch")
+
+    assert dispatch.status_code == 200
+    payload = dispatch.json()
+    assert payload["scenario_id"] == "manual-mapping-dispute"
+    assert payload["route_id"] == "manual-mapping-review"
+    assert {item["channel"] for item in payload["deliveries"]} == {"email", "jira"}
+    assert any(
+        item["target"] == "jira://finops-attribution"
+        and item["status"] == "simulated"
+        for item in payload["deliveries"]
+    )
 
 
 def test_integrations_dispatch_unknown_scenario_returns_not_found() -> None:

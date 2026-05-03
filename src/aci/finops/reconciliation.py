@@ -9,8 +9,8 @@ from threading import Lock
 from typing import Protocol, cast
 
 import structlog
-from redis import Redis as SyncRedis
-from redis.exceptions import RedisError
+
+from aci.optional_deps import RedisPackageError, load_sync_redis
 
 logger = structlog.get_logger()
 RedisMembers = set[str] | set[bytes]
@@ -90,8 +90,12 @@ class ReconciliationLedger:
             redis_client
             if redis_client is not None
             else (
-                cast_supports_redis(
-                    SyncRedis.from_url(redis_url, decode_responses=True),
+                cast(
+                    "SupportsRedisLedger",
+                    load_sync_redis("Redis reconciliation backend").from_url(
+                        redis_url,
+                        decode_responses=True,
+                    ),
                 )
                 if redis_url
                 else None
@@ -252,7 +256,7 @@ class ReconciliationLedger:
             return True
         try:
             return bool(self._redis.ping())
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("reconciliation.redis_unavailable", error=str(exc))
             return False
 
@@ -276,14 +280,14 @@ class ReconciliationLedger:
                 json.dumps(payload, sort_keys=True),
             )
             self._redis.sadd(self._records_index_key(), record.request_id)
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("reconciliation.redis_persist_failed", error=str(exc))
 
     def _load_record(self, request_id: str) -> CostRecord | None:
         assert self._redis is not None
         try:
             raw = self._redis.get(self._record_key(request_id))
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("reconciliation.redis_load_failed", error=str(exc))
             return None
         if raw is None:
@@ -294,7 +298,7 @@ class ReconciliationLedger:
         assert self._redis is not None
         try:
             ids = sorted(_decode(item) for item in self._redis.smembers(self._records_index_key()))
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("reconciliation.redis_load_failed", error=str(exc))
             return list(self._records.values())
 
@@ -317,7 +321,7 @@ class ReconciliationLedger:
             if keys:
                 self._redis.delete(*keys)
             self._redis.delete(self._records_index_key())
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("reconciliation.redis_clear_failed", error=str(exc))
 
 
@@ -367,7 +371,3 @@ def _decode(value: str | bytes) -> str:
 
 def _payload_float(value: object) -> float:
     return float(str(value))
-
-
-def cast_supports_redis(client: SyncRedis) -> SupportsRedisLedger:
-    return cast("SupportsRedisLedger", client)

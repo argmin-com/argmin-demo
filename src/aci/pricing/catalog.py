@@ -10,11 +10,12 @@ from threading import Lock
 from typing import Protocol, cast
 
 import structlog
-from redis import Redis as SyncRedis
-from redis.exceptions import RedisError
+
+from aci.optional_deps import RedisPackageError, load_sync_redis
 
 logger = structlog.get_logger()
 RedisMembers = set[str] | set[bytes]
+DEFAULT_PRICING_EFFECTIVE_FROM = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 class SupportsRedisPricing(Protocol):
@@ -87,8 +88,12 @@ class PricingCatalog:
             redis_client
             if redis_client is not None
             else (
-                cast_supports_redis(
-                    SyncRedis.from_url(redis_url, decode_responses=True),
+                cast(
+                    "SupportsRedisPricing",
+                    load_sync_redis("Redis pricing backend").from_url(
+                        redis_url,
+                        decode_responses=True,
+                    ),
                 )
                 if redis_url
                 else None
@@ -257,8 +262,34 @@ class PricingCatalog:
         )
         if catalog.list_rules():
             return catalog
-        anchor = datetime(2026, 1, 1, tzinfo=UTC)
-        catalog.register_rule(
+        catalog.reset_to_default_rules()
+        return catalog
+
+    def reset_to_default_rules(self) -> None:
+        """Restore deterministic local/demo pricing rules."""
+        self.clear()
+        for rule in self._default_rules():
+            self.register_rule(rule)
+
+    def clear(self) -> None:
+        """Clear pricing rules, including any durable Redis-backed copies."""
+        with self._lock:
+            self._rules.clear()
+        if self._redis is None:
+            return
+        try:
+            keys = sorted(_decode(value) for value in self._redis.smembers(self._rules_index_key()))
+            stale = [key for key in keys if key]
+            if stale:
+                self._redis.delete(*stale)
+            self._redis.delete(self._rules_index_key())
+        except RedisPackageError as exc:
+            logger.warning("pricing.redis_clear_failed", error=str(exc))
+
+    @staticmethod
+    def _default_rules() -> list[PricingRule]:
+        anchor = DEFAULT_PRICING_EFFECTIVE_FROM
+        return [
             PricingRule(
                 provider="openai",
                 model="gpt-4o",
@@ -267,9 +298,7 @@ class PricingCatalog:
                 output_usd_per_1k_tokens=0.0150,
                 source="seeded-defaults",
                 provenance_ref="provider-benchmark-2026-01",
-            )
-        )
-        catalog.register_rule(
+            ),
             PricingRule(
                 provider="openai",
                 model="gpt-4o-mini",
@@ -278,9 +307,7 @@ class PricingCatalog:
                 output_usd_per_1k_tokens=0.00060,
                 source="seeded-defaults",
                 provenance_ref="provider-benchmark-2026-01",
-            )
-        )
-        catalog.register_rule(
+            ),
             PricingRule(
                 provider="google",
                 model="gemini-2.0-flash",
@@ -290,9 +317,7 @@ class PricingCatalog:
                 cached_input_usd_per_1k_tokens=0.00030,
                 source="seeded-defaults",
                 provenance_ref="provider-benchmark-2026-01",
-            )
-        )
-        catalog.register_rule(
+            ),
             PricingRule(
                 provider="google",
                 model="gemini-1.5-flash",
@@ -302,9 +327,7 @@ class PricingCatalog:
                 cached_input_usd_per_1k_tokens=0.00003,
                 source="seeded-defaults",
                 provenance_ref="provider-benchmark-2026-01",
-            )
-        )
-        catalog.register_rule(
+            ),
             PricingRule(
                 provider="aws-bedrock",
                 model="amazon.nova-pro-v1:0",
@@ -313,16 +336,15 @@ class PricingCatalog:
                 output_usd_per_1k_tokens=0.0150,
                 source="seeded-defaults",
                 provenance_ref="provider-benchmark-2026-01",
-            )
-        )
-        return catalog
+            ),
+        ]
 
     def durable_backend_healthy(self) -> bool:
         if self._redis is None:
             return True
         try:
             return bool(self._redis.ping())
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("pricing.redis_unavailable", error=str(exc))
             return False
 
@@ -364,14 +386,14 @@ class PricingCatalog:
             self._redis.delete(self._rules_index_key())
             if current_keys:
                 self._redis.sadd(self._rules_index_key(), *sorted(current_keys))
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("pricing.redis_persist_failed", error=str(exc))
 
     def _load_rules_from_redis(self) -> None:
         assert self._redis is not None
         try:
             keys = sorted(_decode(value) for value in self._redis.smembers(self._rules_index_key()))
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("pricing.redis_load_failed", error=str(exc))
             return
 
@@ -381,7 +403,7 @@ class PricingCatalog:
                 continue
             try:
                 raw = self._redis.get(key)
-            except RedisError as exc:
+            except RedisPackageError as exc:
                 logger.warning("pricing.redis_load_failed", error=str(exc))
                 return
             if raw is None:
@@ -434,7 +456,3 @@ def _decode(value: str | bytes) -> str:
 
 def _payload_float(value: object) -> float:
     return float(str(value))
-
-
-def cast_supports_redis(client: SyncRedis) -> SupportsRedisPricing:
-    return cast("SupportsRedisPricing", client)

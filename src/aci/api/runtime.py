@@ -11,8 +11,6 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING, Protocol, cast
 
 import structlog
-from redis.asyncio import Redis as AsyncRedis
-from redis.exceptions import RedisError
 
 from aci.adoption.analytics import AdoptionAnalytics
 from aci.confidence.calibration import CalibrationEngine
@@ -37,6 +35,7 @@ from aci.interceptor.gateway import DeploymentMode, FailOpenInterceptor
 from aci.interventions.registry import InterventionRegistry
 from aci.interventions.simulator import CostSimulationEngine
 from aci.models.events import EventType
+from aci.optional_deps import RedisPackageError, load_async_redis
 from aci.policy.engine import PolicyEngine
 from aci.pricing.catalog import PricingCatalog
 from aci.trac.calculator import TRACCalculator
@@ -158,7 +157,7 @@ return {allowed, tokens}
     ) -> None:
         self._redis: SupportsRedisTokenBucket = redis_client or cast(
             "SupportsRedisTokenBucket",
-            AsyncRedis.from_url(redis_url, decode_responses=True),
+            load_async_redis("Redis rate limiting").from_url(redis_url, decode_responses=True),
         )
         self._capacity = float(limit)
         self._refill_rate_per_second = float(limit) / window_seconds
@@ -179,7 +178,7 @@ return {allowed, tokens}
                 str(self._ttl_seconds),
             )
             return bool(int(allowed))
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("rate_limiter.redis_unavailable", error=str(exc))
             return True
 
@@ -201,7 +200,13 @@ class DisabledEventBus:
     async def publish(self, *_args: object, **_kwargs: object) -> bool:
         return False
 
-    async def publish_batch(self, _events: Sequence[object]) -> dict[str, int]:
+    async def publish_batch(
+        self,
+        _events: Sequence[object],
+        *,
+        dispatch: bool = True,
+    ) -> dict[str, int]:
+        del dispatch
         return {"published": 0, "deduplicated": 0}
 
     def subscribe(self, _topic: str, _handler: object) -> None:
@@ -282,6 +287,7 @@ class AppState:
             redis_url=self.config.redis_url if self.config.index_backend == "redis" else None,
             redis_prefix=self.config.index_redis_prefix,
             redis_ttl_seconds=self.config.index_redis_ttl_s,
+            redis_environment=self.config.environment,
         )
         self.pricing = PricingCatalog.with_default_rules(
             redis_url=self.config.redis_url if self.config.pricing_backend == "redis" else None,

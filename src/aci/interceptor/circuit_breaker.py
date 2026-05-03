@@ -21,8 +21,8 @@ from typing import TYPE_CHECKING, Protocol, cast
 from uuid import uuid4
 
 import structlog
-from redis import Redis
-from redis.exceptions import RedisError, WatchError
+
+from aci.optional_deps import RedisPackageError, RedisWatchPackageError, load_sync_redis
 
 logger = structlog.get_logger()
 
@@ -90,7 +90,7 @@ class RedisCircuitStateStore:
         lock_timeout_s: float = 0.02,
         lock_ttl_s: float = 1.0,
     ) -> None:
-        self._redis = Redis.from_url(
+        self._redis = load_sync_redis("Redis circuit-state backend").from_url(
             redis_url,
             decode_responses=True,
             socket_timeout=socket_timeout_s,
@@ -116,7 +116,7 @@ class RedisCircuitStateStore:
             with self._redis.pipeline() as pipe:
                 while True:
                     try:
-                        pipe.watch(self._key)  # type: ignore[no-untyped-call]
+                        pipe.watch(self._key)
                         raw = pipe.get(self._key)
                         state = self._parse_state(raw)
                         mutator(state)
@@ -124,7 +124,7 @@ class RedisCircuitStateStore:
                         pipe.set(self._key, json.dumps(asdict(state)))
                         pipe.execute()
                         return CircuitBreakerState(**asdict(state))
-                    except WatchError:
+                    except RedisWatchPackageError:
                         continue
                     finally:
                         pipe.reset()
@@ -151,7 +151,7 @@ class RedisCircuitStateStore:
             if acquired:
                 return True
             time.sleep(0.001)
-        raise RedisError("timed out acquiring circuit breaker mutation lock")
+        raise RedisPackageError("timed out acquiring circuit breaker mutation lock")
 
     def _release_lock(self) -> None:
         self._redis.eval(
@@ -355,7 +355,7 @@ class CircuitBreaker:
             with self._fallback_lock:
                 self._fallback_state = CircuitBreakerState(**asdict(state))
             return state
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("circuit_breaker.state_mutation_failed", error=str(exc))
             with self._fallback_lock:
                 degraded_state = CircuitBreakerState(**asdict(self._fallback_state))

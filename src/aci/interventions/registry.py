@@ -9,11 +9,12 @@ from threading import Lock
 from typing import Literal, Protocol, cast
 
 import structlog
-from redis import Redis as SyncRedis
-from redis.exceptions import RedisError
+
+from aci.optional_deps import RedisPackageError, load_sync_redis
 
 logger = structlog.get_logger()
 RedisMembers = set[str] | set[bytes]
+SEEDED_INTERVENTION_UPDATED_AT = datetime(2026, 2, 28, 17, 0, tzinfo=UTC)
 
 
 class SupportsRedisInterventions(Protocol):
@@ -117,8 +118,12 @@ class InterventionRegistry:
             redis_client
             if redis_client is not None
             else (
-                cast_supports_redis(
-                    SyncRedis.from_url(redis_url, decode_responses=True),
+                cast(
+                    "SupportsRedisInterventions",
+                    load_sync_redis("Redis interventions backend").from_url(
+                        redis_url,
+                        decode_responses=True,
+                    ),
                 )
                 if redis_url
                 else None
@@ -143,7 +148,18 @@ class InterventionRegistry:
         registry = cls(redis_url=redis_url, redis_prefix=redis_prefix, redis_client=redis_client)
         if registry.list_records():
             return registry
-        seeded = [
+        registry.reset_to_seed_data()
+        return registry
+
+    def reset_to_seed_data(self) -> None:
+        """Restore the deterministic local/demo intervention baseline."""
+        self.clear()
+        for record in self._seed_records():
+            self._add_or_replace(record, persist=True)
+
+    @staticmethod
+    def _seed_records() -> list[InterventionRecord]:
+        return [
             InterventionRecord(
                 intervention_id="INT-401",
                 title="Route fallback traffic from gpt-4o to gpt-4o-mini",
@@ -162,6 +178,7 @@ class InterventionRegistry:
                 threshold_condition="2.1M monthly fallback requests and 72% cost differential",
                 rule_condition="Cost differential > 50% and equivalence confidence >= 0.93",
                 status="recommended",
+                updated_at=SEEDED_INTERVENTION_UPDATED_AT,
             ),
             InterventionRecord(
                 intervention_id="INT-402",
@@ -181,6 +198,7 @@ class InterventionRegistry:
                 threshold_condition="p95 input tokens exceed floor by >20%",
                 rule_condition="Recommend compaction when p95 > 4K",
                 status="review",
+                updated_at=SEEDED_INTERVENTION_UPDATED_AT,
             ),
             InterventionRecord(
                 intervention_id="INT-403",
@@ -197,6 +215,7 @@ class InterventionRegistry:
                 threshold_condition="Semantic duplicate ratio > 30%",
                 rule_condition="Enable cache when duplicate ratio >= 0.30",
                 status="implemented",
+                updated_at=SEEDED_INTERVENTION_UPDATED_AT,
             ),
             InterventionRecord(
                 intervention_id="INT-404",
@@ -213,11 +232,9 @@ class InterventionRegistry:
                 threshold_condition=">25% staging requests use frontier-tier models",
                 rule_condition="Apply staging allowlist when non-prod frontier usage > 20%",
                 status="recommended",
+                updated_at=SEEDED_INTERVENTION_UPDATED_AT,
             ),
         ]
-        for record in seeded:
-            registry._add_or_replace(record, persist=True)
-        return registry
 
     def list_records(self, status: str | None = None) -> list[InterventionRecord]:
         """Return records sorted by monthly savings descending."""
@@ -348,7 +365,7 @@ class InterventionRegistry:
             return True
         try:
             return bool(self._redis.ping())
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("interventions.redis_unavailable", error=str(exc))
             return False
 
@@ -378,14 +395,14 @@ class InterventionRegistry:
                 json.dumps(payload, sort_keys=True),
             )
             self._redis.sadd(self._ids_key(), record.intervention_id)
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("interventions.redis_persist_failed", error=str(exc))
 
     def _load_record(self, intervention_id: str) -> InterventionRecord | None:
         assert self._redis is not None
         try:
             raw = self._redis.get(self._record_key(intervention_id))
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("interventions.redis_load_failed", error=str(exc))
             return None
         if raw is None:
@@ -396,7 +413,7 @@ class InterventionRegistry:
         assert self._redis is not None
         try:
             ids = sorted(_decode(item) for item in self._redis.smembers(self._ids_key()))
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("interventions.redis_load_failed", error=str(exc))
             return list(self._records.values())
 
@@ -421,7 +438,7 @@ class InterventionRegistry:
             if keys:
                 self._redis.delete(*keys)
             self._redis.delete(self._ids_key())
-        except RedisError as exc:
+        except RedisPackageError as exc:
             logger.warning("interventions.redis_clear_failed", error=str(exc))
 
 
@@ -496,7 +513,3 @@ def _decode(value: str | bytes) -> str:
 
 def _payload_float(value: object) -> float:
     return float(str(value))
-
-
-def cast_supports_redis(client: SyncRedis) -> SupportsRedisInterventions:
-    return cast("SupportsRedisInterventions", client)

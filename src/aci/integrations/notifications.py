@@ -10,7 +10,6 @@ from threading import Lock
 from typing import Protocol
 from urllib.parse import urlparse
 
-import httpx
 import structlog
 from prometheus_client import Counter
 
@@ -20,6 +19,7 @@ from aci.integrations.catalog import (
     default_integration_routes,
     default_integration_scenarios,
 )
+from aci.optional_deps import load_httpx
 
 logger = structlog.get_logger()
 
@@ -28,7 +28,7 @@ NOTIFICATION_DELIVERY_TOTAL = Counter(
     "Notification delivery attempts by channel and status.",
     ["channel", "status"],
 )
-SUPPORTED_CHANNELS = {"email", "slack", "webhook"}
+SUPPORTED_CHANNELS = {"email", "slack", "jira", "servicenow", "webhook"}
 
 
 class SupportsAsyncHTTPClient(Protocol):
@@ -40,9 +40,13 @@ class SupportsAsyncHTTPClient(Protocol):
         headers: dict[str, str],
         timeout: float,
         follow_redirects: bool,
-    ) -> httpx.Response: ...
+    ) -> SupportsHTTPResponse: ...
 
     async def aclose(self) -> None: ...
+
+
+class SupportsHTTPResponse(Protocol):
+    status_code: int
 
 
 @dataclass(frozen=True)
@@ -129,12 +133,24 @@ class NotificationHub:
         audience: str = "",
         business_outcome: str = "",
         scenario_id: str = "",
+        channel_targets: dict[str, str] | None = None,
+        sent_at: datetime | None = None,
     ) -> list[NotificationDelivery]:
         """Dispatch one message across the selected channels."""
         dispatched: list[NotificationDelivery] = []
         email_targets = email_to or []
+        channel_target_map = channel_targets or {}
         normalized_channels = [channel.strip().lower() for channel in channels if channel.strip()]
-        timestamp = datetime.now(UTC)
+        timestamp = sent_at or datetime.now(UTC)
+        message_context = self._message_context(
+            message=message,
+            route_id=route_id,
+            route_name=route_name,
+            workflow_name=workflow_name,
+            audience=audience,
+            business_outcome=business_outcome,
+            scenario_id=scenario_id,
+        )
 
         async_tasks: list[asyncio.Task[NotificationDelivery]] = []
 
@@ -146,21 +162,18 @@ class NotificationHub:
                     status="failed",
                     message="at least one notification channel is required",
                     timestamp=timestamp,
-                    event_type=message.event_type,
-                    severity=message.severity,
-                    route_id=route_id,
-                    route_name=route_name,
-                    workflow_name=workflow_name,
-                    audience=audience,
-                    business_outcome=business_outcome,
-                    scenario_id=scenario_id,
+                    **message_context,
                 )
             )
             return dispatched
 
         for channel in normalized_channels:
             if channel == "slack":
-                target = slack_webhook_url.strip() or "slack://simulated"
+                target = (
+                    slack_webhook_url.strip()
+                    or channel_target_map.get(channel, "").strip()
+                    or "slack://simulated"
+                )
                 async_tasks.append(
                     asyncio.create_task(
                         self._deliver_async(
@@ -168,21 +181,16 @@ class NotificationHub:
                             target=target,
                             body=self._slack_body(message),
                             timestamp=timestamp,
-                            message_context={
-                                "event_type": message.event_type,
-                                "severity": message.severity,
-                                "route_id": route_id,
-                                "route_name": route_name,
-                                "workflow_name": workflow_name,
-                                "audience": audience,
-                                "business_outcome": business_outcome,
-                                "scenario_id": scenario_id,
-                            },
+                            message_context=message_context,
                         )
                     )
                 )
             elif channel == "webhook":
-                target = webhook_url.strip() or "webhook://simulated"
+                target = (
+                    webhook_url.strip()
+                    or channel_target_map.get(channel, "").strip()
+                    or "webhook://simulated"
+                )
                 async_tasks.append(
                     asyncio.create_task(
                         self._deliver_async(
@@ -190,17 +198,23 @@ class NotificationHub:
                             target=target,
                             body=self._webhook_body(message),
                             timestamp=timestamp,
-                            message_context={
-                                "event_type": message.event_type,
-                                "severity": message.severity,
-                                "route_id": route_id,
-                                "route_name": route_name,
-                                "workflow_name": workflow_name,
-                                "audience": audience,
-                                "business_outcome": business_outcome,
-                                "scenario_id": scenario_id,
-                            },
+                            message_context=message_context,
                         )
+                    )
+                )
+            elif channel in {"jira", "servicenow"}:
+                target = channel_target_map.get(channel, "").strip() or f"{channel}://simulated"
+                dispatched.append(
+                    self._record(
+                        channel=channel,
+                        target=target,
+                        status="simulated",
+                        message=(
+                            f"{channel} handoff simulated; live delivery for this channel "
+                            "is represented by the customer's connector runtime"
+                        ),
+                        timestamp=timestamp,
+                        **message_context,
                     )
                 )
             elif channel == "email":
@@ -212,14 +226,7 @@ class NotificationHub:
                             status="failed",
                             message="email_to must contain at least one recipient",
                             timestamp=timestamp,
-                            event_type=message.event_type,
-                            severity=message.severity,
-                            route_id=route_id,
-                            route_name=route_name,
-                            workflow_name=workflow_name,
-                            audience=audience,
-                            business_outcome=business_outcome,
-                            scenario_id=scenario_id,
+                            **message_context,
                         )
                     )
                     continue
@@ -234,14 +241,7 @@ class NotificationHub:
                                 f"{message.title}: {message.detail}"
                             ),
                             timestamp=timestamp,
-                            event_type=message.event_type,
-                            severity=message.severity,
-                            route_id=route_id,
-                            route_name=route_name,
-                            workflow_name=workflow_name,
-                            audience=audience,
-                            business_outcome=business_outcome,
-                            scenario_id=scenario_id,
+                            **message_context,
                         )
                     )
             elif channel not in SUPPORTED_CHANNELS:
@@ -252,14 +252,7 @@ class NotificationHub:
                         status="failed",
                         message=f"unsupported notification channel '{channel}'",
                         timestamp=timestamp,
-                        event_type=message.event_type,
-                        severity=message.severity,
-                        route_id=route_id,
-                        route_name=route_name,
-                        workflow_name=workflow_name,
-                        audience=audience,
-                        business_outcome=business_outcome,
-                        scenario_id=scenario_id,
+                        **message_context,
                     )
                 )
 
@@ -316,6 +309,8 @@ class NotificationHub:
     async def dispatch_scenario(
         self,
         scenario_id: str,
+        *,
+        sent_at: datetime | None = None,
     ) -> tuple[IntegrationScenario, IntegrationRoute, list[NotificationDelivery]]:
         """Execute a named business workflow scenario."""
         scenario = self._scenarios.get(scenario_id)
@@ -357,6 +352,10 @@ class NotificationHub:
             audience=route.owner,
             business_outcome=route.business_outcome,
             scenario_id=scenario.scenario_id,
+            channel_targets={
+                channel.channel: channel.target for channel in route.channels
+            },
+            sent_at=sent_at,
         )
         return scenario, route, deliveries
 
@@ -364,6 +363,28 @@ class NotificationHub:
         """Close any owned HTTP client."""
         if self._http_client is not None:
             await self._http_client.aclose()
+
+    @staticmethod
+    def _message_context(
+        *,
+        message: NotificationMessage,
+        route_id: str,
+        route_name: str,
+        workflow_name: str,
+        audience: str,
+        business_outcome: str,
+        scenario_id: str,
+    ) -> dict[str, str]:
+        return {
+            "event_type": message.event_type,
+            "severity": message.severity,
+            "route_id": route_id,
+            "route_name": route_name,
+            "workflow_name": workflow_name,
+            "audience": audience,
+            "business_outcome": business_outcome,
+            "scenario_id": scenario_id,
+        }
 
     async def _deliver_async(
         self,
@@ -397,9 +418,13 @@ class NotificationHub:
 
         owns_client = False
         client = self._http_client
+        httpx_module = None
         if client is None:
-            client = httpx.AsyncClient()
+            httpx_module = load_httpx("live notification delivery")
+            client = httpx_module.AsyncClient()
             owns_client = True
+        else:
+            httpx_module = load_httpx("live notification delivery")
 
         try:
             for attempt in range(1, self.retry_attempts + 1):
@@ -415,7 +440,7 @@ class NotificationHub:
                         logger.info(
                             "notifications.sent",
                             channel=channel,
-                            target=target,
+                            target=self._redact_target(target),
                             status_code=response.status_code,
                         )
                         return self._record(
@@ -446,11 +471,11 @@ class NotificationHub:
                         timestamp=timestamp,
                         **message_context,
                     )
-                except httpx.HTTPError as exc:
+                except httpx_module.HTTPError as exc:
                     logger.warning(
                         "notifications.delivery_failed",
                         channel=channel,
-                        target=target,
+                        target=self._redact_target(target),
                         attempt=attempt,
                         error=str(exc),
                     )
@@ -503,7 +528,7 @@ class NotificationHub:
             delivery = NotificationDelivery(
                 delivery_id=delivery_id,
                 channel=channel,
-                target=target,
+                target=self._redact_target(target),
                 status=status,
                 message=message,
                 sent_at=timestamp,
@@ -562,6 +587,17 @@ class NotificationHub:
                 return "webhook hostname is not in the configured allowlist"
 
         return None
+
+    @staticmethod
+    def _redact_target(target: str) -> str:
+        parsed = urlparse(target)
+        if parsed.scheme.lower() not in {"http", "https"} or not parsed.hostname:
+            return target
+
+        host = parsed.hostname.lower()
+        if parsed.port is not None:
+            host = f"{host}:{parsed.port}"
+        return f"{parsed.scheme.lower()}://{host}/redacted"
 
     @staticmethod
     def _slack_body(message: NotificationMessage) -> dict[str, object]:

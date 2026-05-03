@@ -29,13 +29,13 @@ services:
       ACI_REDIS_URL: ${ACI_REDIS_URL:-redis://redis:6379/0}
       ACI_NEO4J_URI: ${ACI_NEO4J_URI:-bolt://neo4j:7687}
       ACI_NEO4J_USER: ${ACI_NEO4J_USER:-neo4j}
-      ACI_NEO4J_PASSWORD: ${ACI_NEO4J_PASSWORD:?set ACI_NEO4J_PASSWORD in .env}
+      ACI_NEO4J_PASSWORD: ${ACI_NEO4J_PASSWORD:-argmin-local-neo4j-password}
       ACI_AUTH_ENABLED: ${ACI_AUTH_ENABLED:-true}
       ACI_AUTH_ALLOW_DEV_BYPASS: ${ACI_AUTH_ALLOW_DEV_BYPASS:-true}
       ACI_AUTH_JWT_ALGORITHM: ${ACI_AUTH_JWT_ALGORITHM:-HS256}
       ACI_AUTH_JWT_ISSUER: ${ACI_AUTH_JWT_ISSUER:-aci-control-plane}
       ACI_AUTH_JWT_AUDIENCE: ${ACI_AUTH_JWT_AUDIENCE:-aci-api}
-      ACI_AUTH_JWT_HS256_SECRET: ${ACI_AUTH_JWT_HS256_SECRET:-dev-only-secret}
+      ACI_AUTH_JWT_HS256_SECRET: ${ACI_AUTH_JWT_HS256_SECRET:-argmin-local-jwt-secret}
       ACI_INTERCEPTOR_TIMEOUT_MS: "20"
       ACI_CONFIDENCE_CAP: "0.95"
     depends_on:
@@ -93,14 +93,14 @@ services:
       - "7474:7474"   # Browser.
       - "7687:7687"   # Bolt.
     environment:
-      ACI_NEO4J_PASSWORD: ${ACI_NEO4J_PASSWORD:?set ACI_NEO4J_PASSWORD in .env}
-      NEO4J_AUTH: neo4j/${ACI_NEO4J_PASSWORD:?set ACI_NEO4J_PASSWORD in .env}
+      ACI_NEO4J_PASSWORD: ${ACI_NEO4J_PASSWORD:-argmin-local-neo4j-password}
+      NEO4J_AUTH: neo4j/${ACI_NEO4J_PASSWORD:-argmin-local-neo4j-password}
       NEO4J_PLUGINS: '["apoc"]'
       NEO4J_server_memory_heap_max__size: 512M
     volumes:
       - neo4j-data:/data
     healthcheck:
-      test: ["CMD-SHELL", "cypher-shell -u neo4j -p \"$ACI_NEO4J_PASSWORD\" 'RETURN 1'"]
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p \"$$ACI_NEO4J_PASSWORD\" 'RETURN 1'"]
       interval: 10s
       timeout: 10s
       retries: 5

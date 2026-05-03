@@ -106,6 +106,27 @@ async def test_publish_batch_reports_counts() -> None:
 
 
 @pytest.mark.asyncio
+async def test_publish_batch_can_append_without_dispatching_subscribers() -> None:
+    bus = InMemoryEventBus(max_events=16)
+    seen: list[str] = []
+
+    def handler(event: DomainEvent) -> None:
+        seen.append(event.event_id)
+
+    bus.subscribe(EventType.INFERENCE_REQUEST.value, handler)
+
+    result = await bus.publish_batch(
+        [make_event("evt-seed", "seed-key")],
+        dispatch=False,
+    )
+
+    assert result == {"published": 1, "deduplicated": 0}
+    assert seen == []
+    assert cast("int", bus.stats["published"]) == 1
+    assert bus.replay()[0].event_id == "evt-seed"
+
+
+@pytest.mark.asyncio
 async def test_deduplication_is_scoped_by_tenant() -> None:
     bus = InMemoryEventBus(max_events=16)
 

@@ -4,6 +4,8 @@
 .pytest_cache
 .ruff_cache
 .venv
+.benchmarks
+.playwright-cli
 __pycache__/
 *.pyc
 *.pyo
@@ -11,6 +13,9 @@ __pycache__/
 *.log
 *.sqlite3
 .DS_Store
+dist/
+results/
+tmp/pdfs/
 
 docs/
 tests/

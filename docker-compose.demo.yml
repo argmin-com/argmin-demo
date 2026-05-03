@@ -19,7 +19,9 @@ services:
       ACI_AUTH_JWT_ALGORITHM: HS256
       ACI_AUTH_JWT_ISSUER: aci-control-plane
       ACI_AUTH_JWT_AUDIENCE: aci-api
-      ACI_AUTH_JWT_HS256_SECRET: dev-only-secret
+      ACI_AUTH_JWT_HS256_SECRET: argmin-local-demo-secret
+      ACI_NOTIFICATION_LIVE_NETWORK: "false"
+      ACI_NOTIFICATION_ALLOW_PRIVATE_TARGETS: "false"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health > /dev/null"]
       interval: 10s

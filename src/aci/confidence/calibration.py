@@ -17,11 +17,9 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
+from typing import Any
 
-import numpy as np
 import structlog
-from scipy.stats import ks_2samp
-from sklearn.isotonic import IsotonicRegression
 
 from aci.config import ConfidenceConfig
 from aci.models.confidence import (
@@ -29,6 +27,7 @@ from aci.models.confidence import (
     ConfidenceTier,
     GroundTruthLabel,
 )
+from aci.optional_deps import load_calibration_math
 
 logger = structlog.get_logger()
 
@@ -62,7 +61,7 @@ class CalibrationEngine:
         self.config = config or ConfidenceConfig()
         self.curves: dict[str, CalibrationCurve] = {}
         self.ground_truth: dict[str, list[GroundTruthLabel]] = defaultdict(list)
-        self._iso_models: dict[str, IsotonicRegression] = {}
+        self._iso_models: dict[str, Any] = {}
 
         # Initialize warm-start curves.
         for method, points in WARM_START_CURVES.items():
@@ -131,17 +130,22 @@ class CalibrationEngine:
         Isotonic regression is simple and well-understood (Section 5.2).
         It requires sufficient tail coverage for stable curves.
         """
+        np_module, ks_2samp_fn, isotonic_cls = load_calibration_math()
         labels = self.ground_truth[method]
-        raw_scores = np.array([label.predicted_confidence for label in labels])
-        outcomes = np.array([1.0 if label.was_correct else 0.0 for label in labels])
-        raw_scores, outcomes, weights = self._with_tail_anchors(raw_scores, outcomes)
+        raw_scores = np_module.array([label.predicted_confidence for label in labels])
+        outcomes = np_module.array([1.0 if label.was_correct else 0.0 for label in labels])
+        raw_scores, outcomes, weights = self._with_tail_anchors(
+            np_module,
+            raw_scores,
+            outcomes,
+        )
 
-        iso = IsotonicRegression(y_min=0.0, y_max=self.config.cap, out_of_bounds="clip")
+        iso = isotonic_cls(y_min=0.0, y_max=self.config.cap, out_of_bounds="clip")
         iso.fit(raw_scores, outcomes, sample_weight=weights)
         self._iso_models[method] = iso
 
         # Generate curve points for storage and visualization.
-        test_points = np.linspace(0.0, 1.0, 50)
+        test_points = np_module.linspace(0.0, 1.0, 50)
         calibrated_points = iso.predict(test_points)
 
         customer_curve = CalibrationCurve(
@@ -154,7 +158,7 @@ class CalibrationEngine:
 
         # Check KS statistic against warm-start for transition logging.
         if method in WARM_START_CURVES:
-            warm_calibrated = np.array(
+            warm_calibrated = np_module.array(
                 [
                     self._interpolate(
                         [p[0] for p in WARM_START_CURVES[method]],
@@ -164,7 +168,7 @@ class CalibrationEngine:
                     for x in test_points
                 ]
             )
-            ks_stat, _ = ks_2samp(calibrated_points, warm_calibrated)
+            ks_stat, _ = ks_2samp_fn(calibrated_points, warm_calibrated)
             customer_curve.ks_statistic = float(ks_stat)
 
             if ks_stat > self.config.warmstart_ks_threshold:
@@ -182,23 +186,25 @@ class CalibrationEngine:
         Provide provisional calibration with bootstrap confidence intervals
         when sample count is between 50 and 200 (Section 5.2).
         """
+        np_module, _ks_2samp_fn, isotonic_cls = load_calibration_math()
         labels = self.ground_truth[method]
-        raw_scores = np.array([label.predicted_confidence for label in labels])
-        outcomes = np.array([1.0 if label.was_correct else 0.0 for label in labels])
+        raw_scores = np_module.array([label.predicted_confidence for label in labels])
+        outcomes = np_module.array([1.0 if label.was_correct else 0.0 for label in labels])
         anchored_scores, anchored_outcomes, anchored_weights = self._with_tail_anchors(
+            np_module,
             raw_scores,
             outcomes,
         )
 
         # Bootstrap: resample 100 times, fit isotonic each time.
         n_bootstrap = 100
-        test_points = np.linspace(0.0, 1.0, 20)
-        bootstrap_curves = np.zeros((n_bootstrap, len(test_points)))
+        test_points = np_module.linspace(0.0, 1.0, 20)
+        bootstrap_curves = np_module.zeros((n_bootstrap, len(test_points)))
 
-        rng = np.random.default_rng(42)
+        rng = np_module.random.default_rng(42)
         for b in range(n_bootstrap):
             indices = rng.choice(len(anchored_scores), size=len(anchored_scores), replace=True)
-            iso = IsotonicRegression(y_min=0.0, y_max=self.config.cap, out_of_bounds="clip")
+            iso = isotonic_cls(y_min=0.0, y_max=self.config.cap, out_of_bounds="clip")
             iso.fit(
                 anchored_scores[indices],
                 anchored_outcomes[indices],
@@ -206,9 +212,9 @@ class CalibrationEngine:
             )
             bootstrap_curves[b] = iso.predict(test_points)
 
-        median_curve = np.median(bootstrap_curves, axis=0)
-        lower = np.percentile(bootstrap_curves, 2.5, axis=0)
-        upper = np.percentile(bootstrap_curves, 97.5, axis=0)
+        median_curve = np_module.median(bootstrap_curves, axis=0)
+        lower = np_module.percentile(bootstrap_curves, 2.5, axis=0)
+        upper = np_module.percentile(bootstrap_curves, 97.5, axis=0)
 
         self.curves[method] = CalibrationCurve(
             method=method,
@@ -216,7 +222,7 @@ class CalibrationEngine:
             calibrated_scores=median_curve.tolist(),
             sample_count=len(labels),
             is_warm_start=True,  # Still provisional.
-            uncertainty_band=(float(np.mean(lower)), float(np.mean(upper))),
+            uncertainty_band=(float(np_module.mean(lower)), float(np_module.mean(upper))),
         )
 
     @staticmethod
@@ -249,19 +255,20 @@ class CalibrationEngine:
 
     @staticmethod
     def _with_tail_anchors(
-        raw_scores: np.ndarray,
-        outcomes: np.ndarray,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        np_module: Any,  # noqa: ANN401
+        raw_scores: Any,  # noqa: ANN401
+        outcomes: Any,  # noqa: ANN401
+    ) -> tuple[Any, Any, Any]:  # noqa: ANN401
         """Inject low-weight tail anchors so isotonic fits preserve slope across [0, 1]."""
-        anchor_scores = np.array([0.0, 1.0])
-        anchor_outcomes = np.array([0.0, 1.0])
-        anchor_weights = np.array([0.05, 0.05])
-        sample_weights = np.ones_like(raw_scores)
+        anchor_scores = np_module.array([0.0, 1.0])
+        anchor_outcomes = np_module.array([0.0, 1.0])
+        anchor_weights = np_module.array([0.05, 0.05])
+        sample_weights = np_module.ones_like(raw_scores)
 
         return (
-            np.concatenate([raw_scores, anchor_scores]),
-            np.concatenate([outcomes, anchor_outcomes]),
-            np.concatenate([sample_weights, anchor_weights]),
+            np_module.concatenate([raw_scores, anchor_scores]),
+            np_module.concatenate([outcomes, anchor_outcomes]),
+            np_module.concatenate([sample_weights, anchor_weights]),
         )
 
     def get_confidence_tier(self, confidence: float) -> ConfidenceTier:

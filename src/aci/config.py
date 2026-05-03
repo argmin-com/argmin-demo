@@ -478,7 +478,7 @@ class PlatformConfig(BaseSettings):
         description="Authoritative graph backend (memory|neo4j)",
     )
     index_redis_prefix: str = Field(
-        default="aci:index",
+        default="aci:idx",
         description="Redis key prefix for durable index entries",
     )
     index_redis_ttl_s: int = Field(
@@ -579,11 +579,11 @@ class PlatformConfig(BaseSettings):
             )
 
         production_like = self.environment.lower() in {"production", "staging"}
+        env_name = self.environment.lower()
         if production_like and not _secret_value(self.neo4j_password):
             raise ValueError("neo4j_password must be configured in production/staging")
 
         non_production_envs = {"development", "dev", "test", "testing", "local", "demo"}
-        env_name = self.environment.lower()
         if production_like and not self.auth.enabled:
             raise ValueError("auth.enabled must be true in production/staging")
         if self.auth.allow_dev_bypass and env_name not in non_production_envs:
@@ -648,12 +648,63 @@ class PlatformConfig(BaseSettings):
                     "auth.jwt_public_key_pem is required for asymmetric JWT algorithms"
                 )
 
-        if production_like and algorithm.startswith("HS"):
-            weak_defaults = {"", "dev-only-secret"}
-            if _secret_value(self.auth.jwt_hs256_secret) in weak_defaults:
+        weak_secret_placeholders = {
+            "",
+            "change-me",
+            "dev-only-secret",
+            "replace-with-strong-secret",
+            "argmin-local-demo-secret",
+            "argmin-local-jwt-secret",
+            "argmin-local-neo4j-password",
+        }
+
+        if (
+            production_like
+            and algorithm.startswith("HS")
+            and _secret_value(self.auth.jwt_hs256_secret) in weak_secret_placeholders
+        ):
+            raise ValueError(
+                "auth.jwt_hs256_secret must be set to a strong non-default "
+                "value in production/staging"
+            )
+
+        if production_like and _secret_value(self.neo4j_password) in weak_secret_placeholders:
+            raise ValueError(
+                "neo4j_password must be set to a strong non-default value in "
+                "production/staging"
+            )
+
+        if env_name == "demo":
+            demo_local_backends = {
+                "graph_backend": self.graph_backend,
+                "event_bus_backend": self.event_bus_backend,
+                "index_backend": self.index_backend,
+                "pricing_backend": self.pricing_backend,
+                "reconciliation_backend": self.reconciliation_backend,
+                "interventions_backend": self.interventions_backend,
+                "adoption.backend": self.adoption.backend,
+            }
+            non_local = {
+                key: value
+                for key, value in demo_local_backends.items()
+                if value != "memory"
+            }
+            if non_local:
                 raise ValueError(
-                    "auth.jwt_hs256_secret must be set to a strong non-default "
-                    "value in production/staging"
+                    "demo environment must use local memory backends; got "
+                    f"{non_local}"
+                )
+            if self.interceptor.circuit_state_backend != "local":
+                raise ValueError(
+                    "demo environment must use local circuit breaker state"
+                )
+            if self.notifications.live_network:
+                raise ValueError(
+                    "demo environment cannot enable live outbound notifications"
+                )
+            if self.notifications.allow_private_targets:
+                raise ValueError(
+                    "demo environment cannot enable private notification targets"
                 )
 
         if self.event_bus_backend == "kafka" and not self.kafka_bootstrap:

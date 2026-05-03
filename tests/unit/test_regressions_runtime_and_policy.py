@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import UTC, datetime
 from typing import Any, cast
 
@@ -117,6 +118,121 @@ def test_build_context_preserves_fractional_direct_targets() -> None:
         "team:alpha": pytest.approx(0.7),
         "team:beta": pytest.approx(0.3),
     }
+
+
+def test_build_context_feeds_probabilistic_hre_context_from_graph_properties() -> None:
+    graph = GraphStore()
+    event_bus = InMemoryEventBus()
+    processor = AttributionProcessor(
+        event_bus=event_bus,
+        graph_store=graph,
+        hre=HeuristicReconciliationEngine(),
+        calibration=CalibrationEngine(),
+        materializer=IndexMaterializer(AttributionIndexStore()),
+        policy_engine=PolicyEngine(),
+    )
+    observed_at = datetime.now(UTC)
+    graph.upsert_node(
+        GraphNode(
+            node_id="resource:ambiguous-service",
+            node_type=NodeType.INFERENCE_ENDPOINT,
+            label="ambiguous-service",
+            properties={
+                "historical_attributions": [
+                    {"team_id": "team:platform", "confidence": 0.61},
+                    {"team_id": "team:platform", "confidence": 0.64},
+                    {"team_id": "team:data", "confidence": 0.41},
+                ],
+                "temporal_events": [
+                    {
+                        "event_time": observed_at.isoformat(),
+                        "entity_id": "team:platform",
+                        "source": "deployment-fixture",
+                    }
+                ],
+                "deployment_owners": [
+                    {"entity_id": "person:alice", "observed_at": observed_at.isoformat()}
+                ],
+                "code_owners": ["team:platform"],
+                "recent_users": [
+                    {"entity_id": "person:alice", "observed_at": observed_at.isoformat()}
+                ],
+            },
+        )
+    )
+
+    ctx = processor._build_context(
+        workload_id="ambiguous-service",
+        event_time=observed_at,
+        tenant_id="tenant-a",
+    )
+
+    assert ("team:platform", 0.61) in ctx.historical_attributions
+    assert ctx.temporal_events == [(observed_at, "team:platform", "deployment-fixture")]
+    assert ctx.deployment_owners == [("person:alice", observed_at)]
+    assert ctx.code_owners == ["team:platform"]
+    assert ctx.recent_users == [("person:alice", observed_at)]
+
+
+def test_build_context_derives_deployment_owner_from_incoming_graph_edges() -> None:
+    graph = GraphStore()
+    event_bus = InMemoryEventBus()
+    processor = AttributionProcessor(
+        event_bus=event_bus,
+        graph_store=graph,
+        hre=HeuristicReconciliationEngine(),
+        calibration=CalibrationEngine(),
+        materializer=IndexMaterializer(AttributionIndexStore()),
+        policy_engine=PolicyEngine(),
+    )
+    observed_at = datetime.now(UTC)
+    graph.upsert_node(
+        GraphNode(
+            node_id="resource:runtime-service",
+            node_type=NodeType.INFERENCE_ENDPOINT,
+            label="runtime-service",
+        )
+    )
+    graph.upsert_node(
+        GraphNode(
+            node_id="deploy:runtime-service-42",
+            node_type=NodeType.DEPLOYMENT,
+            label="runtime-service-42",
+        )
+    )
+    graph.upsert_node(GraphNode(node_id="person:bob", node_type=NodeType.PERSON, label="Bob"))
+    graph.add_edge(
+        GraphEdge(
+            edge_type=EdgeType.TRIGGERS,
+            from_id="deploy:runtime-service-42",
+            to_id="resource:runtime-service",
+            confidence=0.95,
+            weight=1.0,
+            valid_from=observed_at,
+            provenance=EdgeProvenance(source="github-actions", method="R2"),
+        )
+    )
+    graph.add_edge(
+        GraphEdge(
+            edge_type=EdgeType.DEPLOYED_BY,
+            from_id="person:bob",
+            to_id="deploy:runtime-service-42",
+            confidence=0.92,
+            weight=1.0,
+            valid_from=observed_at,
+            provenance=EdgeProvenance(source="github-actions", method="R5"),
+        )
+    )
+
+    ctx = processor._build_context(
+        workload_id="runtime-service",
+        event_time=observed_at,
+        tenant_id="tenant-a",
+    )
+
+    assert ctx.deployment_owners == [("person:bob", observed_at)]
+    assert ctx.recent_users == [("person:bob", observed_at)]
+    assert (observed_at, "person:bob", "github-actions") in ctx.temporal_events
 
 
 def test_policy_engine_applies_team_specific_over_global() -> None:
@@ -438,6 +554,65 @@ def test_platform_config_allows_demo_profile_with_memory_backends() -> None:
     assert config.graph_backend == "memory"
 
 
+def test_platform_config_rejects_non_local_backends_in_demo() -> None:
+    with pytest.raises(ValueError, match="demo environment must use local memory backends"):
+        PlatformConfig(
+            environment="demo",
+            graph_backend="neo4j",
+            neo4j_password="argmin-local-neo4j-password",
+            auth=AuthConfig(
+                enabled=True,
+                allow_dev_bypass=True,
+                jwt_algorithm="HS256",
+                jwt_hs256_secret="argmin-local-demo-secret",
+            ),
+        )
+
+
+def test_platform_config_rejects_live_notifications_in_demo() -> None:
+    with pytest.raises(ValueError, match="demo environment cannot enable live outbound"):
+        PlatformConfig(
+            environment="demo",
+            notifications={"live_network": True},
+            auth=AuthConfig(
+                enabled=True,
+                allow_dev_bypass=True,
+                jwt_algorithm="HS256",
+                jwt_hs256_secret="argmin-local-demo-secret",
+            ),
+        )
+
+
+def test_platform_config_rejects_dummy_secrets_in_production() -> None:
+    with pytest.raises(ValueError, match="auth.jwt_hs256_secret"):
+        PlatformConfig(
+            environment="production",
+            runtime_role="processor",
+            graph_backend="neo4j",
+            neo4j_password="strong-secret",
+            auth=AuthConfig(
+                enabled=True,
+                allow_dev_bypass=False,
+                jwt_algorithm="HS256",
+                jwt_hs256_secret="replace-with-strong-secret",
+            ),
+        )
+
+    with pytest.raises(ValueError, match="neo4j_password"):
+        PlatformConfig(
+            environment="production",
+            runtime_role="processor",
+            graph_backend="neo4j",
+            neo4j_password="argmin-local-neo4j-password",
+            auth=AuthConfig(
+                enabled=True,
+                allow_dev_bypass=False,
+                jwt_algorithm="HS256",
+                jwt_hs256_secret="really-strong-secret",
+            ),
+        )
+
+
 def test_graph_store_factory_selects_configured_backend() -> None:
     memory_config = PlatformConfig(environment="demo", graph_backend="memory")
     neo4j_config = PlatformConfig(
@@ -708,3 +883,66 @@ def test_index_store_writes_redis_ttl_when_enabled() -> None:
 
     store._write_durable_entry(entry)
     assert fake.calls and fake.calls[0]["ex"] == 123
+
+
+def test_index_store_uses_versioned_environment_scoped_redis_keys() -> None:
+    store = AttributionIndexStore(redis_environment="Demo Env")
+    key = store._redis_key("customer-support-bot")
+
+    assert key.startswith("aci:idx:v1:demo-env:")
+    assert "customer-support-bot" not in key
+    assert len(key.rsplit(":", 1)[-1]) == 26
+
+
+def test_index_store_writes_hot_path_hash_fields_through_version_guard() -> None:
+    class _FakeRedis:
+        def __init__(self) -> None:
+            self.script = ""
+            self.args: tuple[object, ...] = ()
+            self.keys: list[str] = []
+
+        def eval(
+            self,
+            _script: str,
+            _numkeys: int,
+            key: str,
+            *_args: object,
+        ) -> int:
+            self.script = _script
+            self.args = _args
+            self.keys.append(key)
+            return 1
+
+    store = AttributionIndexStore(redis_environment="demo")
+    fake = _FakeRedis()
+    store._redis = cast("Any", fake)
+    entry = AttributionIndexEntry(
+        workload_id="svc-index-contract",
+        team_id="team-contract",
+        team_name="Contract Team",
+        cost_center_id="CC-contract",
+        confidence=0.91,
+        confidence_tier="chargeback_ready",
+        method_used="R2+R5",
+        service_name="svc-index-contract",
+        person_id="person-owner",
+        model_allowlist=["gpt-4o-mini"],
+        token_budget_input=1200,
+    )
+
+    store._write_durable_entry(entry)
+
+    assert fake.keys[0].startswith("aci:idx:v1:demo:")
+    assert "incoming_version < current_version" in fake.script
+    assert "while i <= #ARGV do" in fake.script
+    hash_args = [str(arg) for arg in fake.args[4:]]
+    mapping: dict[str, str] = dict(zip(hash_args[0::2], hash_args[1::2], strict=True))
+    assert mapping["index_version"] == str(entry.version)
+    assert mapping["owner_id"] == "person-owner"
+    assert mapping["team_id"] == "team-contract"
+    assert mapping["service_id"] == "svc-index-contract"
+    assert mapping["conf"] == "0.910000"
+    assert mapping["reason"] == "R2+R5"
+    constraints = json.loads(mapping["constraints_json"])
+    assert constraints["model_allowlist"] == ["gpt-4o-mini"]
+    assert constraints["token_budget_input"] == 1200

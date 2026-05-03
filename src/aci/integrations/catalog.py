@@ -199,6 +199,96 @@ def default_integration_sources() -> list[IntegrationSource]:
                 "Workflow automation",
             ),
         ),
+        IntegrationSource(
+            integration_id="azure-openai",
+            name="Azure OpenAI",
+            category="Request telemetry",
+            direction="inbound",
+            status="active",
+            system="Azure Monitor / APIM",
+            owner="Platform Engineering",
+            business_value=(
+                "Captures private-endpoint deployments, APIM route metadata, "
+                "and Azure billing for GPT workloads."
+            ),
+            primary_signals=("deployment", "token usage", "AAD app"),
+            downstream_consumers=("HRE", "Exports", "Policy simulation"),
+        ),
+        IntegrationSource(
+            integration_id="gcp-vertex",
+            name="Google Vertex AI",
+            category="Request telemetry",
+            direction="inbound",
+            status="active",
+            system="Vertex AI audit logs",
+            owner="Data Platform",
+            business_value=(
+                "Connects Gemini usage to projects, service accounts, and "
+                "model-router decisions."
+            ),
+            primary_signals=("project", "served model", "usage export"),
+            downstream_consumers=("Coverage", "Energy", "Forecasting"),
+        ),
+        IntegrationSource(
+            integration_id="snowflake-cortex",
+            name="Snowflake Cortex",
+            category="Data-platform AI",
+            direction="inbound",
+            status="active",
+            system="Snowflake account usage",
+            owner="Data Science",
+            business_value=(
+                "Shows warehouse-AI invocation, workspace ownership, and "
+                "allocation caveats for finance review."
+            ),
+            primary_signals=("query tag", "warehouse cost", "user"),
+            downstream_consumers=("Exports", "Adoption analytics", "Manual mapping"),
+        ),
+        IntegrationSource(
+            integration_id="salesforce-einstein",
+            name="Salesforce Einstein",
+            category="Embedded SaaS AI",
+            direction="inbound",
+            status="active",
+            system="Salesforce admin export",
+            owner="Customer Operations",
+            business_value=(
+                "Provides case-workflow adoption signals and customer-operation "
+                "AI coverage."
+            ),
+            primary_signals=("case ID", "agent activity", "license assignment"),
+            downstream_consumers=("Adoption analytics", "Coverage", "Customer reports"),
+        ),
+        IntegrationSource(
+            integration_id="servicenow",
+            name="ServiceNow",
+            category="Operational handoff",
+            direction="outbound",
+            status="active",
+            system="ServiceNow Change",
+            owner="Platform Operations",
+            business_value=(
+                "Turns approved optimization and governance actions into owned "
+                "change records."
+            ),
+            primary_signals=("change request", "approval state", "owner"),
+            downstream_consumers=("Change management", "Platform ops", "Audit"),
+        ),
+        IntegrationSource(
+            integration_id="jira",
+            name="Jira",
+            category="Operational handoff",
+            direction="outbound",
+            status="active",
+            system="Jira Cloud",
+            owner="Engineering Operations",
+            business_value=(
+                "Routes implementation tasks and product gaps into delivery "
+                "backlogs."
+            ),
+            primary_signals=("ticket", "assignee", "status"),
+            downstream_consumers=("Engineering teams", "Product leads", "Delivery reporting"),
+        ),
     ]
 
 
@@ -317,6 +407,117 @@ def default_integration_routes() -> list[IntegrationRoute]:
                     channel="slack",
                     target="slack://executive-ai-briefing",
                     purpose="Executive discussion thread",
+                    fallback=True,
+                ),
+            ),
+        ),
+        IntegrationRoute(
+            route_id="manual-mapping-review",
+            name="Manual Mapping Review",
+            workflow_name="Ownership Dispute Resolution",
+            owner="FinOps attribution owner",
+            trigger="Confidence below chargeback threshold or same-tier ownership conflict",
+            expected_action="Confirm, reassign, or defer ownership with evidence.",
+            business_outcome=(
+                "Ambiguous spend becomes a tracked decision instead of a hidden "
+                "dashboard assumption."
+            ),
+            sla_target="2 business days",
+            channels=(
+                IntegrationRouteChannel(
+                    channel="jira",
+                    target="jira://finops-attribution",
+                    purpose="Create mapping review task",
+                ),
+                IntegrationRouteChannel(
+                    channel="email",
+                    target="finops-attribution@novatech.example",
+                    purpose="Review digest and audit record",
+                    fallback=True,
+                ),
+            ),
+        ),
+        IntegrationRoute(
+            route_id="security-exception-review",
+            name="Security Exception Review",
+            workflow_name="Trust Boundary Review",
+            owner="Security review delegate",
+            trigger="Policy simulation returns exception-required state",
+            expected_action=(
+                "Approve, deny, or request additional evidence for the AI workflow."
+            ),
+            business_outcome=(
+                "Policy exceptions stay auditable and inside customer-controlled review."
+            ),
+            sla_target="4 hours",
+            channels=(
+                IntegrationRouteChannel(
+                    channel="slack",
+                    target="slack://security-ai-review",
+                    purpose="Reviewer triage thread",
+                ),
+                IntegrationRouteChannel(
+                    channel="servicenow",
+                    target="servicenow://change/ai-exceptions",
+                    purpose="Exception record",
+                    fallback=True,
+                ),
+            ),
+        ),
+        IntegrationRoute(
+            route_id="service-owner-scorecard",
+            name="Service Owner Scorecard",
+            workflow_name="Team Operating Review",
+            owner="Service owner",
+            trigger="Weekly team-level adoption, cost, and governance summary",
+            expected_action=(
+                "Review spend, adoption, exceptions, and recommended optimizations."
+            ),
+            business_outcome=(
+                "Teams see the exact workflows where AI is adopted and what "
+                "actions are pending."
+            ),
+            sla_target="Weekly",
+            channels=(
+                IntegrationRouteChannel(
+                    channel="email",
+                    target="service-owners@novatech.example",
+                    purpose="Team scorecard delivery",
+                ),
+                IntegrationRouteChannel(
+                    channel="slack",
+                    target="slack://service-owner-ai-scorecards",
+                    purpose="Discussion thread",
+                    fallback=True,
+                ),
+            ),
+        ),
+        IntegrationRoute(
+            route_id="energy-efficiency-review",
+            name="Energy Efficiency Review",
+            workflow_name="Sustainability Advisory",
+            owner="Platform sustainability lead",
+            trigger=(
+                "Energy-aware recommendation has cost and quality equivalence evidence"
+            ),
+            expected_action=(
+                "Review advisory energy delta beside cost and quality before "
+                "approving a route change."
+            ),
+            business_outcome=(
+                "Energy is visible without overriding product quality, policy, or cost truth."
+            ),
+            sla_target="Monthly",
+            channels=(
+                IntegrationRouteChannel(
+                    channel="email",
+                    target="platform-sustainability@novatech.example",
+                    purpose="Advisory review packet",
+                ),
+                IntegrationRouteChannel(
+                    channel="jira",
+                    target="jira://platform-economics/energy",
+                    purpose="Follow-up task for telemetry gaps",
                     fallback=True,
                 ),
             ),
@@ -442,6 +643,117 @@ def default_integration_scenarios() -> list[IntegrationScenario]:
                 "scope": "organization",
                 "window_days": "30",
                 "digest_type": "adoption_and_governance",
+            },
+        ),
+        IntegrationScenario(
+            scenario_id="manual-mapping-dispute",
+            title="Ownership Dispute Review",
+            description=(
+                "Shows how a provisional or conflicting owner becomes a tracked "
+                "FinOps review task."
+            ),
+            route_id="manual-mapping-review",
+            business_question=(
+                "What happens when attribution is useful but not trustworthy "
+                "enough for chargeback?"
+            ),
+            expected_outcome=(
+                "FinOps receives a review task with confidence, candidates, and evidence."
+            ),
+            event_type="ownership_dispute",
+            severity="warning",
+            message_title="Manual mapping review required",
+            message_detail=(
+                "A shared service account has multiple plausible owners and "
+                "requires human confirmation before chargeback."
+            ),
+            metadata={
+                "mapping_id": "mm_001",
+                "confidence_pct": "72",
+                "candidate_count": "3",
+            },
+        ),
+        IntegrationScenario(
+            scenario_id="security-exception",
+            title="Security Exception Review",
+            description=(
+                "Shows how a policy exception stays inside the customer trust boundary."
+            ),
+            route_id="security-exception-review",
+            business_question=(
+                "Can the product support governance without silently blocking "
+                "production workflows?"
+            ),
+            expected_outcome=(
+                "Security receives an auditable exception packet and the request "
+                "remains labeled."
+            ),
+            event_type="security_exception",
+            severity="warning",
+            message_title="AI policy exception requires review",
+            message_detail=(
+                "A request is outside the standard policy bundle and requires "
+                "security review before active enforcement."
+            ),
+            metadata={
+                "policy_id": "POL-817",
+                "trust_boundary": "customer-vpc",
+                "request_id": "req_security_exception_204",
+            },
+        ),
+        IntegrationScenario(
+            scenario_id="service-owner-scorecard",
+            title="Service Owner Scorecard",
+            description=(
+                "Shows a team-level operating packet with adoption, cost, "
+                "governance, and recommendations."
+            ),
+            route_id="service-owner-scorecard",
+            business_question=(
+                "What exactly does a service owner receive about AI usage in "
+                "their workflows?"
+            ),
+            expected_outcome=(
+                "Owners receive a concise scorecard tied to workflows and pending actions."
+            ),
+            event_type="service_owner_scorecard",
+            severity="info",
+            message_title="Weekly service owner AI scorecard is ready",
+            message_detail=(
+                "Platform Engineering has three high-adoption workflows, two "
+                "open interventions, and one provisional ownership item."
+            ),
+            metadata={
+                "team": "Platform Engineering",
+                "window_days": "30",
+                "open_actions": "3",
+            },
+        ),
+        IntegrationScenario(
+            scenario_id="energy-review",
+            title="Energy Advisory Review",
+            description=(
+                "Shows how an energy-aware recommendation is routed without greenwashing."
+            ),
+            route_id="energy-efficiency-review",
+            business_question=(
+                "How does energy data influence decisions when some model "
+                "footprints are unknown?"
+            ),
+            expected_outcome=(
+                "Platform economics sees advisory deltas and explicit Unrated/null fields."
+            ),
+            event_type="energy_efficiency_review",
+            severity="info",
+            message_title="Energy advisory review packet is ready",
+            message_detail=(
+                "A lower-energy candidate is available with equivalent quality, "
+                "while unrated models remain explicitly marked as unknown."
+            ),
+            metadata={
+                "decision_binding": "advisory",
+                "unknowns": "preserved_as_null",
+                "candidate_model": "gemini-1.5-flash",
             },
         ),
     ]

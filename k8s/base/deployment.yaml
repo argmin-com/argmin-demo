@@ -17,7 +17,7 @@ data:
   ACI_ENVIRONMENT: "production"
   ACI_GRAPH_BACKEND: "neo4j"
   ACI_INDEX_BACKEND: "redis"
-  ACI_INDEX_REDIS_PREFIX: "aci:index"
+  ACI_INDEX_REDIS_PREFIX: "aci:idx"
   ACI_INDEX_REDIS_TTL_S: "1800"
   ACI_KAFKA_BOOTSTRAP: "kafka:9092"
   ACI_REDIS_URL: "rediss://replace-with-managed-redis:6379/0"
@@ -113,7 +113,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: aci-platform
-          image: aci-platform:0.2.0
+          image: aci-platform:0.3.3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -204,7 +204,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: aci-platform
-          image: aci-platform:0.2.0
+          image: aci-platform:0.3.3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

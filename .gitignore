@@ -17,7 +17,9 @@ htmlcov/
 !.env.example
 .venv/
 venv/
+.playwright-cli/
 *.log
 uv.lock
 results/
 .benchmarks/
+tmp/pdfs/

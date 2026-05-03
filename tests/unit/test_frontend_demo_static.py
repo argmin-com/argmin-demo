@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -9,9 +10,97 @@ FRONTEND_SCHEMA = REPO_ROOT / "frontend" / "data" / "SCHEMA.md"
 VENDORED_CHART = REPO_ROOT / "frontend" / "vendor" / "chart.umd.min.js"
 FRONTEND_FONT_DIR = REPO_ROOT / "frontend" / "assets" / "fonts"
 LEGACY_V3_MOCKUP = REPO_ROOT / "frontend" / "platform-mockup-v3.html"
+DEMO_USER_FACING_PATHS = [
+    REPO_ROOT / "README.md",
+    REPO_ROOT / "docs" / "demo-guide.md",
+    REPO_ROOT / "docs" / "demo-feature-matrix.md",
+    FRONTEND_INDEX,
+    FRONTEND_APP_JS,
+    FRONTEND_SCHEMA,
+    REPO_ROOT / "frontend" / "data" / "demo_dataset.json",
+]
+
 
 def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
+
+
+def test_demo_energy_copy_preserves_uncertainty_instead_of_false_precision() -> None:
+    js = _read(FRONTEND_APP_JS)
+    schema = _read(FRONTEND_SCHEMA)
+    dataset = _read(REPO_ROOT / "frontend" / "data" / "demo_dataset.json")
+
+    assert "Energy transparency" in js
+    assert "Unknowns remain null, not zero" in js
+    assert "Unrated" in js
+    assert "advisory" in js.lower()
+    assert "energy_efficiency" in schema
+    assert "explicit `Unrated` / `null` handling" in schema
+    assert '"status": "unrated"' in dataset
+    assert '"kwh_per_1k_requests": null' in dataset
+
+
+def test_demo_copy_no_longer_advertises_obsolete_short_walkthrough() -> None:
+    for path in DEMO_USER_FACING_PATHS:
+        content = _read(path)
+        assert "Start 90-sec Walkthrough" not in content
+        assert "90-second walkthrough" not in content
+        assert "90 second walkthrough" not in content
+
+
+def test_confidential_source_document_exports_are_not_committed() -> None:
+    tmp_pdf_dir = REPO_ROOT / "tmp" / "pdfs"
+    committed_exports = []
+    if tmp_pdf_dir.exists():
+        committed_exports = [
+            path
+            for path in tmp_pdf_dir.iterdir()
+            if path.is_file() and path.suffix in {".txt", ".pdf"}
+        ]
+
+    assert committed_exports == []
+    assert "tmp/pdfs/" in _read(REPO_ROOT / ".gitignore")
+
+
+def test_frontend_dataset_integrations_match_schema_contract() -> None:
+    dataset = json.loads(
+        (REPO_ROOT / "frontend" / "data" / "demo_dataset.json").read_text()
+    )
+    integrations = dataset["integrations"]
+    summary = integrations["summary"]
+    sources = integrations["sources"]
+    routes = integrations["routes"]
+    scenarios = integrations["scenarios"]
+    deliveries = integrations["recent_deliveries"]
+
+    assert summary["inbound_source_count"] == sum(
+        1 for source in sources if source["direction"] == "inbound"
+    )
+    assert summary["outbound_route_count"] == len(routes)
+    assert summary["scenario_count"] == len(scenarios)
+    assert summary["recent_delivery_count"] == len(deliveries)
+    assert summary["live_delivery_mode"] == "simulated"
+    assert {scenario["route_id"] for scenario in scenarios} <= {
+        route["route_id"] for route in routes
+    }
+
+
+def test_frontend_dataset_references_existing_models_and_teams() -> None:
+    dataset = json.loads(
+        (REPO_ROOT / "frontend" / "data" / "demo_dataset.json").read_text()
+    )
+    team_names = {team["name"] for team in dataset["teams"]}
+    model_names = {model["name"] for model in dataset["models"]}
+
+    for request in dataset["attribution_requests"]:
+        assert request["model"] in model_names
+
+    for intervention in dataset["interventions"]:
+        assert intervention["team"] in team_names
+        linked_model = intervention.get("linked_model")
+        if linked_model:
+            assert linked_model in model_names
+
 
 def test_frontend_uses_vendored_chart_and_no_cdn_fonts() -> None:
     html = _read(FRONTEND_INDEX)
@@ -29,6 +118,7 @@ def test_frontend_uses_vendored_chart_and_no_cdn_fonts() -> None:
     assert FRONTEND_APP_CSS.exists()
     assert FRONTEND_APP_JS.exists()
     assert FRONTEND_FONT_DIR.exists()
+
 
 def test_frontend_csp_and_accessibility_scaffolding_present() -> None:
     html = _read(FRONTEND_INDEX)
@@ -48,6 +138,7 @@ def test_frontend_csp_and_accessibility_scaffolding_present() -> None:
     assert 'id="drawer-summary" role="status" aria-live="polite"' in html
     assert 'id="log-stream" role="log" aria-live="polite"' in html
     assert 'aria-label="Close navigation menu">&times;' in html
+    assert "</body>" in html
     assert "focus-visible" in css
 
 def test_frontend_overview_avoids_confusing_data_freshness_panel() -> None:
@@ -133,7 +224,7 @@ def test_guided_demo_drawer_uses_presenter_facing_copy() -> None:
     assert "Presentation mode" in js
     assert "The walkthrough is available from local demo data." in js
     assert (
-        "No demo activity yet. Start the 90-second walkthrough, or run one live proof action."
+        "No demo activity yet. Start the full product walkthrough, or run one live proof action."
         in js
     )
 
@@ -186,6 +277,44 @@ def test_frontend_starts_local_first_instead_of_eager_live_sync() -> None:
     assert "await syncIntegrationsFromApi" not in reset_demo_block
     assert "await runForecastDemo({" not in reset_block
     assert "seedForecastPlanner({" in reset_block
+
+
+def test_frontend_demo_reset_and_scenarios_are_deterministic() -> None:
+    js = _read(FRONTEND_APP_JS)
+    scenario_block = js.split(
+        "async function runInterceptScenario(kind, options = {}) {", 1
+    )[1].split("}\n\nfunction scenarioNarrative(", 1)[0]
+    reset_block = js.split(
+        "async function clearExecutionLogs() {", 1
+    )[1].split("}\n\nfunction setMobileNav(", 1)[0]
+    initialize_block = js.split(
+        "async function initialize() {", 1
+    )[1].split("}\n\nwindow.addEventListener", 1)[0]
+
+    assert "demoScenarioRunCounts: {}" in js
+    assert "async function resetBackendDemoState(options = {})" in js
+    assert 'apiRequest("POST", "/v1/demo/reset", {})' in js
+    assert "function nextDemoScenarioRequestId(kind)" in js
+    assert "Date.now()" not in scenario_block
+    assert "nextDemoScenarioRequestId(kind)" in scenario_block
+    assert "state.demoScenarioRunCounts = {};" in reset_block
+    assert "resetBackendDemoState({ log: false, toast: false })" in reset_block
+    assert 'params.get("reset") === "1"' in initialize_block
+
+
+def test_manual_mapping_view_handles_session_state_without_numeric_crashes() -> None:
+    js = _read(FRONTEND_APP_JS)
+    manual_mapping_block = js.split("function manualMappingView() {", 1)[1].split(
+        "}\n\nfunction governanceView()",
+        1,
+    )[0]
+
+    assert "impact.beforeConfidence.toFixed" not in manual_mapping_block
+    assert "impact.afterConfidence.toFixed" not in manual_mapping_block
+    assert "latestImpact.beforeConfidence.toFixed" not in manual_mapping_block
+    assert "latestImpact.afterConfidence.toFixed" not in manual_mapping_block
+    assert "fmtPct(impact.beforeConfidence, 0)" in manual_mapping_block
+    assert "fmtPct(latestImpact.beforeConfidence, 0)" in manual_mapping_block
 
 
 def test_frontend_intervention_sync_can_clear_with_empty_live_payload() -> None:
@@ -242,25 +371,29 @@ def test_frontend_investor_walkthrough_is_defined() -> None:
     assert "const INVESTOR_WALKTHROUGH_STEPS" in js
     assert "Overview: where the money is" in js
     assert "PRD Proof: every claim tied to a visible surface" in js
+    assert "Coverage: what the system can and cannot see" in js
     assert "Employee Adoption: who is actually using AI" in js
     assert "Request Proof: why one request belongs to one owner" in js
+    assert "Exports: chargeback without false precision" in js
     assert "Interventions: what to do next" in js
+    assert "Energy: footprint as an advisory signal" in js
     assert "Forecasting: what happens if you act" in js
     assert "Governance: why this is safe to deploy" in js
+    assert "Admin: operable inside the trust boundary" in js
     assert "function renderWalkthroughBanner()" in js
     assert 'data-action="start-walkthrough"' in _read(FRONTEND_INDEX)
     assert "const INVESTOR_WALKTHROUGH_TOTAL_MS" in js
     assert "durationMs: 12000" in js
     assert "durationMs: 10000" in js
+    assert "durationMs: 9000" in js
     assert "durationMs: 11000" in js
     assert "durationMs: 15000" in js
     assert "durationMs: 13000" in js
     assert "durationMs: 14000" in js
+    assert "durationMs: 8000" in js
 
 
 def test_frontend_demo_includes_prd_traceability_proof_surface() -> None:
-    import json
-
     js = _read(FRONTEND_APP_JS)
     css = _read(FRONTEND_APP_CSS)
     readme = _read(FRONTEND_README)
@@ -297,6 +430,310 @@ def test_frontend_demo_includes_prd_traceability_proof_surface() -> None:
         "dispute",
     }
 
+
+def test_frontend_demo_includes_local_prd_gap_surfaces() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+    readme = _read(FRONTEND_README)
+    schema = _read(FRONTEND_SCHEMA)
+    feature_matrix = _read(REPO_ROOT / "docs" / "demo-feature-matrix.md")
+
+    for label in ("Coverage", "Exports", "Energy", "Admin"):
+        assert label in js
+        assert f"| `{label}` |" in feature_matrix
+        assert label in readme
+
+    assert "coverageView" in js
+    assert "exportsView" in js
+    assert "energyView" in js
+    assert "adminView" in js
+    assert 'data-walkthrough-anchor="walkthrough-coverage"' in js
+    assert 'data-walkthrough-anchor="walkthrough-exports"' in js
+    assert 'data-walkthrough-anchor="walkthrough-energy"' in js
+    assert 'data-walkthrough-anchor="walkthrough-admin"' in js
+    assert 'data-action="set-export-mode"' in js
+    assert 'data-artifact="chargeback-export"' in js
+    assert "starRatingMarkup" in js
+    assert ".coverage-page" in css
+    assert ".exports-page" in css
+    assert ".energy-page" in css
+    assert ".admin-page" in css
+    assert "coverage" in schema
+    assert "exports" in schema
+    assert "energy_efficiency" in schema
+    assert "admin" in schema
+
+
+def test_frontend_adoption_answers_product_lead_workflow_story() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+    schema = _read(FRONTEND_SCHEMA)
+    feature_matrix = _read(REPO_ROOT / "docs" / "demo-feature-matrix.md")
+    readme = _read(FRONTEND_README)
+    dataset_path = REPO_ROOT / "frontend" / "data" / "demo_dataset.json"
+    dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
+
+    assert "Product Lead Workflow Map" in js
+    assert "Workflow Adoption Matrix" in js
+    assert "Capability Deployment Map" in js
+    assert "Workflow insertion point" in js
+    assert "adoptionWorkflowRowsForDashboard" in js
+    assert ".workflow-spotlight-card" in css
+    assert "adoption.workflow_map.workflows[]" in schema
+    assert "workflow insertion points" in feature_matrix
+    assert "workflow, service, and capability adoption" in readme
+    reset_block = js.split('case "adoption-reset":', 1)[1].split(
+        'case "forecast-set-scenario":',
+        1,
+    )[0]
+    scope_block = js.split("function setAdoptionScope", 1)[1].split(
+        "function setAdoptionWindow",
+        1,
+    )[0]
+    assert "currentAdoptionDashboard()" in scope_block
+    assert "fallbackAdoptionHierarchy" in reset_block
+    assert "syncAdoptionFromApi" not in reset_block
+
+    workflow_map = dataset["adoption"]["workflow_map"]
+    workflows = workflow_map["workflows"]
+    assert workflow_map["summary"]["workflow_count"] == len(workflows)
+    assert workflow_map["summary"]["ai_services_used"] == len(
+        {row["service_name"] for row in workflows}
+    )
+    assert workflow_map["summary"]["capability_classes"] == len(
+        {row["capability_class"] for row in workflows}
+    )
+    assert len(workflow_map["capabilities"]) == len(
+        {row["capability"] for row in workflows}
+    )
+    assert len(workflow_map["services"]) == workflow_map["summary"]["ai_services_used"]
+    assert len(workflows) >= 20
+    assert {row["business_unit_name"] for row in workflows} >= {
+        "Product and Platform",
+        "Customer Operations",
+        "Risk and Trust",
+        "Finance and Operations",
+    }
+    assert len({row["service_name"] for row in workflows}) >= 16
+    assert len({row["capability_class"] for row in workflows}) >= 16
+    assert {row["adoption_depth"] for row in workflows} >= {
+        "Scaled",
+        "Embedded",
+        "Emerging",
+        "Pilot",
+    }
+    required_fields = {
+        "workflow_name",
+        "service_name",
+        "capability",
+        "entry_point",
+        "exact_where",
+        "how_adopted",
+        "evidence",
+        "decision_owner",
+    }
+    for workflow in workflows:
+        assert required_fields <= workflow.keys()
+        assert all(str(workflow[field]).strip() for field in required_fields)
+        assert workflow["users_30d"] > 0
+        assert workflow["requests_30d"] > 0
+        assert workflow["governed_usage_pct"] > 0
+
+
+def test_frontend_dataset_supports_local_prd_requirement_surfaces() -> None:
+    dataset_path = REPO_ROOT / "frontend" / "data" / "demo_dataset.json"
+    dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
+
+    coverage = dataset["coverage"]
+    coverage_summary = coverage["summary"]
+    assert coverage_summary["classified_pathways"] == 20
+    assert len(coverage["pathways"]) == coverage_summary["classified_pathways"]
+    assert {row["feasibility"] for row in coverage["pathways"]} >= {
+        "FULLY_CAPTURABLE",
+        "PARTIALLY_CAPTURABLE",
+        "INDIRECTLY_CAPTURABLE",
+        "UNCAPTURABLE",
+    }
+    assert len(coverage["blind_spots"]) >= 5
+    lineage = coverage["agent_lineage"]
+    assert lineage["linked_descendant_calls"] <= lineage["total_descendant_calls"]
+    assert any(not call["linked"] for call in lineage["calls"])
+    assert len(coverage["scenario_results"]) >= 20
+    assert {row["id"] for row in coverage["scenario_results"]} >= {"S-001", "S-020"}
+
+    exports = dataset["exports"]
+    assert exports["summary"]["rows_previewed"] == len(exports["rows"])
+    assert len(exports["rows"]) >= 14
+    assert {row["ownership_state"] for row in exports["rows"]} >= {
+        "CHARGEBACK_READY_SINGLE_CANDIDATE",
+        "PROVISIONAL_SINGLE_CANDIDATE",
+        "SHARED",
+        "UNKNOWN",
+        "UNRESOLVED_CONFLICT",
+    }
+    assert sum(row["share_pct"] for row in exports["allocation_splits"]) == 100
+    assert exports["summary"]["unknown_excluded_usd"] > 0
+
+    energy = dataset["energy_efficiency"]
+    assert len(energy["models"]) >= 12
+    assert {row["status"] for row in energy["models"]} >= {"rated", "unrated"}
+    assert any(row["star_rating"] is None for row in energy["models"])
+    assert any(row["kwh_per_1k_requests"] is None for row in energy["models"])
+    assert len(energy["recommendations"]) >= 3
+    assert all("decision" in row for row in energy["recommendations"])
+
+    admin = dataset["admin"]
+    assert len(admin["accounts"]) >= 8
+    assert len(admin["operations"]) >= 8
+    assert len(admin["diagnostics"]) >= 8
+    assert len(admin["audit_log"]) >= 8
+    assert {row["status"] for row in admin["accounts"]} >= {"active", "deactivated"}
+    assert admin["summary"]["read_only_integrations"] > 0
+    assert admin["summary"]["mutation_surfaces"] == sum(
+        1 for row in admin["operations"] if row["write_target"] != "none"
+    )
+    assert all(
+        "Argmin " in row["write_target"] or row["write_target"] == "none"
+        for row in admin["operations"]
+    )
+    assert all(row["audit"] == "required" for row in admin["operations"])
+
+
+def test_frontend_dataset_has_rich_clickthrough_variants() -> None:
+    dataset_path = REPO_ROOT / "frontend" / "data" / "demo_dataset.json"
+    dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
+    team_names = {team["name"] for team in dataset["teams"]}
+    model_names = {model["name"] for model in dataset["models"]}
+
+    requests = dataset["attribution_requests"]
+    assert len(requests) >= 14
+    assert {request["model"] for request in requests} <= model_names
+    assert any(request["confidence"] >= 0.9 for request in requests)
+    assert any(0.8 <= request["confidence"] < 0.9 for request in requests)
+    assert any(request["confidence"] < 0.8 for request in requests)
+    assert any(
+        "R6:" in node["method"]
+        for request in requests
+        for node in request["chain"]
+    )
+    assert any(
+        node["value"] == "UNKNOWN"
+        for request in requests
+        for node in request["chain"]
+        if node["layer"] == "Org Hierarchy"
+    )
+
+    mappings = dataset["manual_mapping"]
+    assert len(mappings) >= 8
+    assert {row["status"] for row in mappings} >= {
+        "needs_review",
+        "confirmed",
+        "reassigned",
+        "deferred",
+    }
+    for mapping in mappings:
+        assert set(mapping["candidate_teams"]) <= (team_names | {"UNKNOWN"})
+
+    interventions = dataset["interventions"]
+    assert len(interventions) >= 14
+    assert {row["status"] for row in interventions} >= {
+        "recommended",
+        "review",
+        "approved",
+        "implemented",
+    }
+    assert len({row["type"] for row in interventions}) >= 10
+    assert all(row["team"] in team_names for row in interventions)
+
+    integrations = dataset["integrations"]
+    assert len(integrations["sources"]) >= 12
+    assert len(integrations["routes"]) >= 8
+    assert len(integrations["scenarios"]) >= 8
+    assert len(integrations["recent_deliveries"]) >= 10
+    assert integrations["summary"]["inbound_source_count"] == sum(
+        1 for source in integrations["sources"] if source["direction"] == "inbound"
+    )
+    assert integrations["summary"]["failed_deliveries"] >= 1
+
+
+def test_frontend_integrations_and_admin_have_local_demo_actions() -> None:
+    js = _read(FRONTEND_APP_JS)
+    schema = _read(FRONTEND_SCHEMA)
+
+    assert "function localIntegrationDeliveryForScenario" in js
+    assert "function mergedIntegrationOverview" in js
+    assert "mergeRecordsByKey" in js
+    assert "applyLocalIntegrationScenario" in js
+    assert 'state.runtimeStatus !== "online"' in js
+    assert 'pageKey === "integrations" && state.runtimeStatus === "online"' in js
+    assert "Integration Workflow Simulated" in js
+    assert "Local integration handoff" in js
+    assert "Integration Workflow Failed" not in js
+    assert "Customer-Visible Audit Trail" in js
+    assert "admin.audit_log[]" in schema
+
+
+def test_frontend_has_customer_design_partner_briefing_surface() -> None:
+    dataset = json.loads(
+        (REPO_ROOT / "frontend" / "data" / "demo_dataset.json").read_text()
+    )
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+    schema = _read(FRONTEND_SCHEMA)
+
+    brief = dataset["design_partner_brief"]
+    assert "partner_brief" in js
+    assert "Partner Brief" in js
+    assert "design-partner-brief" in js
+    assert "function designPartnerView" in js
+    assert "set-partner-stage" in js
+    assert "lensNarrative.conclusion" in js
+    assert "lensNarrative[0]" not in js
+    assert ".partner-hero" in css
+    assert "design_partner_brief.pilot_stages[]" in schema
+    assert len(brief["readiness_pillars"]) >= 5
+    assert len(brief["pilot_stages"]) == 4
+    assert len(brief["buyer_roles"]) >= 4
+    assert len(brief["proof_moments"]) == 8
+    assert len(brief["success_metrics"]) >= 6
+    assert brief["thesis"]["signals"] == [
+        {"label": "Pilot motion", "value": f'{len(brief["pilot_stages"])} stages'},
+        {
+            "label": "Modeled integrations",
+            "value": f'{len(dataset["integrations"]["sources"])} systems',
+        },
+        {
+            "label": "Proof surfaces",
+            "value": f'{len(brief["proof_moments"])} buyer moments',
+        },
+        {
+            "label": "Success metrics",
+            "value": f'{len(brief["success_metrics"])} measurable checkpoints',
+        },
+    ]
+    assert {stage["stage_id"] for stage in brief["pilot_stages"]} == {
+        "discover",
+        "connect",
+        "prove",
+        "pilot",
+    }
+    surface_pages = {moment["surface_page"] for moment in brief["proof_moments"]}
+    expected_pages = {
+        "overview",
+        "adoption",
+        "attribution",
+        "exports",
+        "forecast",
+        "energy",
+        "admin",
+        "integrations",
+    }
+    assert expected_pages <= surface_pages
+    assert {step["surface_page"] for step in brief["demo_script"]} <= (
+        expected_pages | {"partner_brief"}
+    )
+
+
 def test_frontend_support_docs_cover_schema_and_local_assets() -> None:
     readme = _read(FRONTEND_README)
     schema = _read(FRONTEND_SCHEMA)
@@ -309,8 +746,6 @@ def test_frontend_support_docs_cover_schema_and_local_assets() -> None:
 
 
 def test_frontend_dataset_totals_are_internally_consistent() -> None:
-    import json
-
     dataset_path = REPO_ROOT / "frontend" / "data" / "demo_dataset.json"
     dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
     team_total = sum(item["spend_usd"] for item in dataset["teams"])
@@ -332,8 +767,6 @@ def test_frontend_dataset_totals_are_internally_consistent() -> None:
 
 
 def test_frontend_dataset_includes_enterprise_model_landscape_content() -> None:
-    import json
-
     dataset_path = REPO_ROOT / "frontend" / "data" / "demo_dataset.json"
     dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
     glossary_terms = {entry["term"] for entry in dataset["glossary"]}
@@ -421,6 +854,11 @@ def test_frontend_demo_surfaces_manual_mapping_replay_forecast_and_governance_ex
     assert "Simulated decision" in js
     assert "Export monthly planning pack" in js
     assert "Export governance exception log" in js
+    assert "async function submitManualMappingCorrection" in js
+    assert "await apiRequest(\"POST\", \"/v1/attribution/manual\", payload)" in js
+    assert "const latestMapping =" in js
+    assert "const latestImpact = latestMapping ? manualMappingImpact(latestMapping) : null;" in js
+    assert ": beforeConfidence;" in js
     assert ".decision-replay-card" in css
     assert ".manual-mapping-impact-grid" in css
     assert ".simulation-result-card" in css
@@ -455,6 +893,6 @@ def test_repo_demo_docs_match_current_frontend_behavior() -> None:
     demo_guide = _read(REPO_ROOT / "docs" / "demo-guide.md")
     feature_matrix = _read(REPO_ROOT / "docs" / "demo-feature-matrix.md")
 
-    assert "Start 90-sec Walkthrough" in repo_readme
+    assert "Start Full Walkthrough" in repo_readme
     assert "local directional estimate" in demo_guide
     assert "continues on deterministic local demo data" in feature_matrix
