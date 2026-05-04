@@ -283,7 +283,7 @@ const VALID_INTERVENTION_TRANSITIONS = {
   implemented: new Set(["review"]),
   dismissed: new Set(["review"])
 };
-const DATASET_VERSION = "20260309aj";
+const DATASET_VERSION = "20260309as";
 const DATASET_URL = new URL(`data/demo_dataset.json?v=${DATASET_VERSION}`, window.location.href).toString();
 const TYPOGRAPHY_ROLE_SELECTORS = Object.freeze({
   heading: [
@@ -385,6 +385,37 @@ const CHART_FRAME_CLASS_BY_HEIGHT = new Map([
   ["300px", "chart-frame-xl"],
   ["320px", "chart-frame-xxl"]
 ]);
+const PIXEL_ALIGNMENT_SELECTORS = Object.freeze([
+  ".topbar",
+  ".topbar-left",
+  ".topbar-right",
+  ".context-ribbon",
+  ".context-chip",
+  ".role-ribbon",
+  ".view-root",
+  ".brand",
+  ".brand-logo",
+  ".demo-path-nav",
+  ".demo-path-step",
+  ".demo-path-number",
+  ".demo-path-copy",
+  ".tenant-card",
+  ".runtime-chip",
+  ".screen-secondary-content",
+  ".screen-priority",
+  ".entry-home",
+  ".entry-home-main",
+  ".entry-home-action",
+  ".card",
+  ".card-header",
+  ".metric-card",
+  ".table-toolbar",
+  ".table-pagination",
+  ".state-panel",
+  ".small-btn",
+  ".top-btn",
+  ".nav-item"
+].join(", "));
 
 const FALLBACK_FORECAST_SCENARIOS = {
   baseline: {
@@ -1869,6 +1900,85 @@ function normalizeLayoutContracts(root = document) {
   }
 }
 
+function normalizePixelAlignmentContracts(root = document) {
+  const scope = root || document;
+  for (const element of scope.querySelectorAll(PIXEL_ALIGNMENT_SELECTORS)) {
+    if (!(element instanceof HTMLElement)) {
+      continue;
+    }
+    element.dataset.alignment = "pixel-grid";
+  }
+}
+
+function normalizeDataVisualContracts(root = document) {
+  const scope = root || document;
+
+  for (const canvas of scope.querySelectorAll("canvas")) {
+    const frame = canvas.parentElement;
+    if (!(frame instanceof HTMLElement)) {
+      continue;
+    }
+    frame.classList.add("data-chart-frame");
+    frame.dataset.visual = "chart";
+    frame.dataset.visualDensity = "clean";
+    canvas.dataset.visual = "chart-canvas";
+  }
+
+  for (const note of scope.querySelectorAll(".chart-axis-note")) {
+    if (!(note instanceof HTMLElement)) {
+      continue;
+    }
+    note.classList.add("data-visual-caption");
+    note.dataset.visual = "chart-caption";
+  }
+
+  const metricSelector = [
+    ".metric-card",
+    ".adoption-kpi-card",
+    ".forecast-metric",
+    ".forecast-estimate-card",
+    ".drawer-summary-kpi",
+    ".manual-mapping-kpi",
+    ".adoption-lens-card",
+    ".coverage-kpi"
+  ].join(",");
+  const metricGroups = new Map();
+  for (const metric of scope.querySelectorAll(metricSelector)) {
+    if (!(metric instanceof HTMLElement)) {
+      continue;
+    }
+    metric.dataset.visual = "metric";
+    metric.dataset.visualDensity = "clean";
+    const parent = metric.parentElement;
+    if (!parent) {
+      metric.dataset.visualPriority = metric.dataset.visualPriority || "secondary";
+      continue;
+    }
+    if (!metricGroups.has(parent)) {
+      metricGroups.set(parent, []);
+    }
+    metricGroups.get(parent).push(metric);
+  }
+  for (const metrics of metricGroups.values()) {
+    metrics.forEach((metric, index) => {
+      metric.dataset.visualPriority = index === 0 ? "primary" : "secondary";
+    });
+  }
+
+  for (const wrap of scope.querySelectorAll(".table-wrap, .scannable-table-wrap")) {
+    if (!(wrap instanceof HTMLElement)) {
+      continue;
+    }
+    wrap.dataset.visual = "table";
+    wrap.dataset.visualDensity = "scan";
+  }
+
+  for (const table of scope.querySelectorAll("table.table")) {
+    table.dataset.visual = "table";
+    table.dataset.visualDensity = "scan";
+  }
+}
+
 function normalizePrimaryActionContracts(root = document) {
   const scope = root || document;
   const actionGroups = scope.querySelectorAll(
@@ -1959,6 +2069,8 @@ function normalizeInteractionContracts(root = document) {
   normalizeTypographyContracts(scope);
   normalizeLayoutContracts(scope);
   normalizeScannableTables(scope);
+  normalizePixelAlignmentContracts(scope);
+  normalizeDataVisualContracts(scope);
   normalizeContextualHelp(scope);
   normalizePrimaryActionContracts(scope);
   for (const button of scope.querySelectorAll("button[data-action]")) {
@@ -2692,6 +2804,20 @@ function chartColors() {
   ];
 }
 
+const CLEAN_CHART_COLOR_SEQUENCE = Object.freeze([
+  "rgba(79, 142, 248, 0.62)",
+  "rgba(42, 196, 135, 0.52)",
+  "rgba(237, 168, 46, 0.5)",
+  "rgba(120, 137, 168, 0.42)"
+]);
+
+const CLEAN_CHART_STROKE_SEQUENCE = Object.freeze([
+  PALETTE.brand,
+  PALETTE.success,
+  PALETTE.warning,
+  PALETTE.neutral
+]);
+
 function paletteChartColor(value, fallback = PALETTE.brand) {
   const normalized = String(value || "").trim().toLowerCase();
   const mapped = {
@@ -3403,21 +3529,174 @@ async function waitForWalkthroughStep(durationMs, runId, stepIndex) {
   });
 }
 
+function cleanChartColor(index, alpha = 0.62) {
+  const color = CLEAN_CHART_COLOR_SEQUENCE[index % CLEAN_CHART_COLOR_SEQUENCE.length];
+  if (alpha === 0.62) {
+    return color;
+  }
+  return color.replace(/0\.\d+\)$/, `${alpha})`);
+}
+
+function cleanChartStroke(index) {
+  return CLEAN_CHART_STROKE_SEQUENCE[index % CLEAN_CHART_STROKE_SEQUENCE.length];
+}
+
+function cleanChartScale(scale = {}) {
+  const grid = scale.grid || {};
+  const ticks = scale.ticks || {};
+  return {
+    ...scale,
+    border: {
+      ...(scale.border || {}),
+      display: false
+    },
+    grid: {
+      ...grid,
+      display: grid.display === false ? false : true,
+      color: grid.display === false ? "transparent" : "rgba(120, 137, 168, 0.12)",
+      drawTicks: false,
+      lineWidth: 1
+    },
+    title: {
+      ...(scale.title || {}),
+      display: false
+    },
+    ticks: {
+      ...ticks,
+      color: "#96a7c2",
+      maxTicksLimit: ticks.maxTicksLimit || 6,
+      padding: ticks.padding || 8,
+      font: {
+        ...(ticks.font || {}),
+        size: 10,
+        weight: 500
+      }
+    }
+  };
+}
+
+function cleanChartDataset(dataset = {}, index = 0, chartType = "bar", datasetCount = 1) {
+  const type = dataset.type || chartType;
+  if (type === "line") {
+    const stroke = cleanChartStroke(index);
+    return {
+      ...dataset,
+      borderColor: dataset.borderColor || stroke,
+      backgroundColor: dataset.fill ? cleanChartColor(index, 0.1) : "rgba(0, 0, 0, 0)",
+      borderWidth: Math.min(Number(dataset.borderWidth || 2.5), 3),
+      pointRadius: Math.min(Number(dataset.pointRadius ?? 1.5), 2),
+      pointHoverRadius: 4,
+      tension: Number.isFinite(Number(dataset.tension)) ? Number(dataset.tension) : 0.28
+    };
+  }
+  return {
+    ...dataset,
+    backgroundColor: cleanChartColor(index, datasetCount === 1 ? 0.58 : 0.48),
+    borderColor: dataset.borderColor || cleanChartStroke(index),
+    borderWidth: Math.min(Number(dataset.borderWidth || 1), 1),
+    borderSkipped: false,
+    borderRadius: Math.min(Number(dataset.borderRadius || 6), 8),
+    barPercentage: Math.min(Number(dataset.barPercentage || 0.66), 0.7),
+    categoryPercentage: Math.min(Number(dataset.categoryPercentage || 0.72), 0.78)
+  };
+}
+
+function cleanChartOptions(options = {}, config = {}) {
+  const datasets = Array.isArray(config.data?.datasets) ? config.data.datasets : [];
+  const scales = options.scales || {};
+  const normalizedScales = {};
+  const scaleEntries = Object.entries(scales).length ? Object.entries(scales) : [["x", {}], ["y", {}]];
+  for (const [key, scale] of scaleEntries) {
+    normalizedScales[key] = cleanChartScale(scale);
+  }
+  const plugins = options.plugins || {};
+  const tooltip = plugins.tooltip || {};
+  const legend = plugins.legend || {};
+  return {
+    ...options,
+    animation: {
+      duration: 420,
+      easing: "easeOutQuart",
+      ...(options.animation || {})
+    },
+    layout: {
+      padding: {
+        top: 4,
+        right: 8,
+        bottom: 0,
+        left: 2
+      },
+      ...(options.layout || {})
+    },
+    interaction: {
+      mode: "nearest",
+      intersect: false,
+      ...(options.interaction || {})
+    },
+    plugins: {
+      ...plugins,
+      legend: {
+        ...legend,
+        display: datasets.length > 1,
+        position: legend.position || "bottom",
+        labels: {
+          color: "#a8b8d4",
+          boxWidth: 10,
+          boxHeight: 2,
+          padding: 12,
+          usePointStyle: true,
+          pointStyle: "line",
+          font: { size: 10, weight: 500 },
+          ...(legend.labels || {})
+        }
+      },
+      tooltip: {
+        ...tooltip,
+        backgroundColor: "#101927",
+        borderColor: "rgba(120, 137, 168, 0.28)",
+        borderWidth: 1,
+        titleColor: "#e8eef8",
+        bodyColor: "#d9e6fb",
+        displayColors: datasets.length > 1,
+        padding: 10,
+        cornerRadius: 8
+      }
+    },
+    scales: normalizedScales
+  };
+}
+
+function cleanChartConfig(config = {}) {
+  const datasets = Array.isArray(config.data?.datasets) ? config.data.datasets : [];
+  return {
+    ...config,
+    data: {
+      ...(config.data || {}),
+      datasets: datasets.map((dataset, index) => (
+        cleanChartDataset(dataset, index, config.type || "bar", datasets.length)
+      ))
+    },
+    options: cleanChartOptions(config.options || {}, config)
+  };
+}
+
 function createChart(canvasId, config, options = {}) {
   const el = document.getElementById(canvasId);
   if (!el || typeof Chart === "undefined") {
     return;
   }
+  const cleanConfig = cleanChartConfig(config);
   const existing = chartRegistry.get(canvasId);
   if (existing) {
-    if (existing.canvas === el && existing.config.type === config.type) {
+    if (existing.canvas === el && existing.config.type === cleanConfig.type) {
       if (options.ariaLabel) {
         el.setAttribute("role", "img");
         el.setAttribute("aria-label", options.ariaLabel);
       }
-      existing.data = config.data;
-      existing.options = config.options || existing.options;
+      existing.data = cleanConfig.data;
+      existing.options = cleanConfig.options || existing.options;
       existing.update();
+      normalizeDataVisualContracts(el.parentElement || document);
       return;
     }
     existing.destroy();
@@ -3427,8 +3706,9 @@ function createChart(canvasId, config, options = {}) {
     el.setAttribute("role", "img");
     el.setAttribute("aria-label", options.ariaLabel);
   }
-  const chart = new Chart(el, config);
+  const chart = new Chart(el, cleanConfig);
   chartRegistry.set(canvasId, chart);
+  normalizeDataVisualContracts(el.parentElement || document);
 }
 
 function getInterventions() {

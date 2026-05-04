@@ -66,8 +66,8 @@ def test_golden_demo_path_covers_accounts_navigation_workflows_and_failure() -> 
 
     with TestClient(app, raise_server_exceptions=False) as client:
         platform = client.get("/platform/")
-        app_js = client.get("/platform/assets/app.js?v=20260309aj")
-        dataset_response = client.get("/platform/data/demo_dataset.json?v=20260309aj")
+        app_js = client.get("/platform/assets/app.js?v=20260309as")
+        dataset_response = client.get("/platform/data/demo_dataset.json?v=20260309as")
 
         assert platform.status_code == 200
         assert app_js.status_code == 200

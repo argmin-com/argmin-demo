@@ -266,7 +266,7 @@ def test_frontend_uses_vendored_chart_and_no_cdn_fonts() -> None:
     html = _read(FRONTEND_INDEX)
     css = _read(FRONTEND_APP_CSS)
     assert 'src="vendor/chart.umd.min.js?v=' in html
-    assert 'src="vendor/chart.umd.min.js?v=20260309aj" defer' in html
+    assert 'src="vendor/chart.umd.min.js?v=20260309as" defer' in html
     assert 'src="assets/app.js?v=' in html
     assert 'href="assets/app.css?v=' in html
     assert "cdnjs.cloudflare.com" not in html
@@ -442,6 +442,122 @@ def test_frontend_standardizes_visual_state_contracts() -> None:
     assert 'button.dataset.uiState = "idle";' in js
     assert 'panel.dataset.uiState = match ? match[0] : "idle";' in js
     assert "normalizeVisualStateContracts(scope);" in js
+
+
+def test_frontend_uses_clean_data_visual_contracts() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    for token in (
+        "--data-visual-surface: rgba(8, 14, 24, 0.42);",
+        "--data-visual-border: rgba(120, 137, 168, 0.12);",
+        "--data-visual-grid: rgba(120, 137, 168, 0.12);",
+        "--data-visual-axis: var(--text-muted);",
+        "--data-visual-primary: var(--brand);",
+        "--data-visual-highlight: var(--status-success);",
+    ):
+        assert token in css
+
+    assert "/* Clean Data Visual Contracts" in css
+    data_block = css.split("/* Clean Data Visual Contracts", 1)[1].split(
+        "/* Typography Role Contracts",
+        1,
+    )[0]
+    for selector in (
+        ".chart-frame,",
+        ".data-chart-frame,",
+        "[data-visual=\"chart\"]",
+        ".chart-axis-note,",
+        ".data-visual-caption",
+        ".metric-card,",
+        ".adoption-kpi-card,",
+        ".forecast-metric,",
+        "[data-visual=\"metric\"]",
+        ".metric-card[data-visual-priority=\"primary\"],",
+        ".scannable-table-wrap,",
+        "[data-visual=\"table\"]",
+        ".table tbody tr:nth-child(even):not([hidden]) td",
+        ".table-sort-indicator",
+    ):
+        assert selector in data_block
+    assert "box-shadow: none;" in data_block
+    assert "font-variant-numeric: tabular-nums;" in data_block
+    assert "background: var(--data-visual-surface);" in data_block
+    assert "border-color: var(--data-visual-border);" in data_block
+
+    for snippet in (
+        "const CLEAN_CHART_COLOR_SEQUENCE = Object.freeze",
+        "function cleanChartScale(scale = {})",
+        (
+            "function cleanChartDataset(dataset = {}, index = 0, "
+            "chartType = \"bar\", datasetCount = 1)"
+        ),
+        "function cleanChartOptions(options = {}, config = {})",
+        "function cleanChartConfig(config = {})",
+        "function normalizeDataVisualContracts(root = document)",
+        "frame.classList.add(\"data-chart-frame\");",
+        "frame.dataset.visual = \"chart\";",
+        "metric.dataset.visual = \"metric\";",
+        "metric.dataset.visualPriority = index === 0 ? \"primary\" : \"secondary\";",
+        "wrap.dataset.visual = \"table\";",
+        "normalizeDataVisualContracts(scope);",
+        "const cleanConfig = cleanChartConfig(config);",
+        "new Chart(el, cleanConfig)",
+        "display: datasets.length > 1",
+        "title: {\n      ...(scale.title || {}),\n      display: false",
+        'grid.display === false ? "transparent" : "rgba(120, 137, 168, 0.12)"',
+    ):
+        assert snippet in js
+
+
+def test_frontend_reduces_visual_noise_without_hiding_meaningful_state() -> None:
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "/* Low Visual Noise Contracts" in css
+    noise_block = css.split("/* Low Visual Noise Contracts", 1)[1].split(
+        "/* Typography Role Contracts",
+        1,
+    )[0]
+
+    for selector in (
+        ":root",
+        "body,\n.app-loader",
+        ".brand-logo,\n.avatar",
+        ".app-loader-skeleton,",
+        ".screen-priority::before,",
+        ".screen-priority::after,",
+        ".entry-home::before",
+        ".clickable-card:hover,",
+        ".small-btn.primary,",
+        ".entry-home-action .small-btn.primary,",
+        "body .entry-home-action .small-btn.primary,",
+        ".state-panel-icon,",
+        ".field-feedback-ok::before,",
+        ".recovery-banner.error",
+        ".metric-accent",
+        ".table-toolbar,\n.table-pagination",
+    ):
+        assert selector in noise_block
+
+    for snippet in (
+        "--action-primary-shadow: none;",
+        "background: var(--bg);",
+        "background-image: none;",
+        "display: none;",
+        "box-shadow: none;",
+        "transform: none;",
+        "border-right-width: 1px;",
+        "backdrop-filter: none;",
+        "background: var(--state-warning-bg);",
+        "background: var(--state-error-bg);",
+        "background: var(--data-visual-surface-subtle);",
+    ):
+        assert snippet in noise_block
+
+    assert "button:focus-visible,\ninput:focus-visible,\na:focus-visible" in css
+    focus_block = css.split("button:focus-visible,", 1)[1].split("button,", 1)[0]
+    assert "outline: 2px solid var(--blue);" in focus_block
+    assert "box-shadow: 0 0 0 3px rgba(79, 142, 248, 0.18);" in focus_block
 
 
 def test_frontend_empty_states_guide_first_use_with_examples() -> None:
@@ -811,16 +927,17 @@ def test_frontend_defines_semantic_typography_roles() -> None:
     assert '--font-ui: "Space Grotesk"' in css
     assert '--font-mono: "IBM Plex Mono"' in css
     assert "--type-heading-size: 24px;" in css
-    assert "--type-heading-line: 1.16;" in css
+    assert "--type-heading-line: 28px;" in css
     assert "--type-subheading-size: 15px;" in css
-    assert "--type-subheading-line: 1.32;" in css
+    assert "--type-subheading-line: 20px;" in css
     assert "--type-body-size: 13px;" in css
-    assert "--type-body-line: 1.55;" in css
+    assert "--type-body-line: 20px;" in css
     assert "--type-label-size: 10px;" in css
     assert "--type-label-tracking: 0;" in css
     assert "--type-meta-size: 11px;" in css
-    assert "--type-meta-line: 1.45;" in css
+    assert "--type-meta-line: 16px;" in css
     assert "--type-number-size: 28px;" in css
+    assert "--type-number-line: 32px;" in css
 
     for role in ("heading", "subheading", "body", "label", "meta", "number"):
         assert f'.type-{role},' in css
@@ -850,6 +967,124 @@ def test_frontend_defines_semantic_typography_roles() -> None:
     assert ".metric-label," in css
     assert ".metric-meta," in css
     assert ".status-badge" in css
+
+
+def test_frontend_enforces_pixel_alignment_contracts() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "/* Pixel Alignment Contracts" in css
+    alignment_block = css.split("/* Pixel Alignment Contracts", 1)[1].split(
+        "/* Typography Role Contracts",
+        1,
+    )[0]
+
+    for token in (
+        "--pixel-grid: 4px;",
+        "--chrome-inline-padding: var(--space-4);",
+        "--chrome-ribbon-min-height: 40px;",
+        "--chrome-role-min-height: 56px;",
+        "--entry-action-width: 280px;",
+        "--control-height-sm: 32px;",
+        "--control-height-md: 36px;",
+        "--control-height-lg: 44px;",
+    ):
+        assert token in alignment_block
+
+    for selector in (
+        '[data-alignment="pixel-grid"]',
+        ".topbar-left,\n.topbar-right",
+        ".runtime-copy,\n.runtime-label,\n.runtime-detail",
+        ".brand-title",
+        ".brand-sub,\n.nav-label",
+        ".demo-path-nav",
+        ".demo-path-status,\n.demo-path-copy em",
+        ".demo-path-step",
+        ".demo-path-copy strong",
+        ".nav-item",
+        ".context-ribbon,\n.context-ribbon.entry-context",
+        ".role-ribbon,\n.role-ribbon.entry-role",
+        ".entry-home",
+        ".entry-home-main,\n.entry-home-action",
+        ".entry-home-context-item strong",
+        ".card-header,\n.table-toolbar,\n.table-pagination",
+    ):
+        assert selector in alignment_block
+
+    for snippet in (
+        "line-height: 20px;",
+        "line-height: 16px;",
+        "line-height: 40px;",
+        "line-height: 24px;",
+        "grid-template-columns: minmax(0, 1fr) var(--entry-action-width);",
+        "padding-inline: var(--chrome-inline-padding);",
+        "padding: var(--space-2) var(--chrome-inline-padding);",
+        "padding: var(--space-2) var(--space-3);",
+    ):
+        assert snippet in alignment_block
+
+    assert "const PIXEL_ALIGNMENT_SELECTORS = Object.freeze([" in js
+    assert '".demo-path-nav"' in js
+    assert '".tenant-card"' in js
+    assert '".runtime-chip"' in js
+    assert "function normalizePixelAlignmentContracts(root = document)" in js
+    assert 'element.dataset.alignment = "pixel-grid";' in js
+    assert "normalizePixelAlignmentContracts(scope);" in js
+
+
+def test_frontend_maintains_responsive_integrity_contracts() -> None:
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "/* Responsive Integrity Contracts" in css
+    responsive_block = css.split("/* Responsive Integrity Contracts", 1)[1].split(
+        "@media (prefers-reduced-motion",
+        1,
+    )[0]
+
+    for token in (
+        "--responsive-mobile-touch-target: 44px;",
+        "--responsive-drawer-width: min(460px, calc(100vw - 32px));",
+        "--responsive-mobile-drawer-width: min(340px, calc(100vw - 24px));",
+    ):
+        assert token in responsive_block
+
+    for media_query in (
+        "@media (max-width: 1360px)",
+        "@media (max-width: 1100px)",
+        "@media (max-width: 960px)",
+        "@media (max-width: 720px)",
+        "@media (max-width: 520px)",
+    ):
+        assert media_query in responsive_block
+
+    for selector in (
+        ".app,\n.view-root,\n.topbar-left,\n.topbar-right",
+        ".runtime-chip,\n.screen-priority,\n.entry-home",
+        ".screen-priority .state-panel-actions",
+        ".entry-home-action .small-btn",
+        ".context-ribbon,\n  .role-ribbon",
+        ".entry-home-context,\n  .grid-4,\n  .grid-3,\n  .grid-2",
+        ".card-header,\n  .table-toolbar,\n  .table-pagination",
+        ".table-context",
+        ".table-tools",
+        ".table-filter-input",
+        ".mobile-nav-drawer",
+    ):
+        assert selector in responsive_block
+
+    for snippet in (
+        "min-width: 0;",
+        "grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);",
+        "grid-template-columns: repeat(2, minmax(0, 1fr));",
+        "grid-template-columns: 1fr;",
+        "max-width: 420px;",
+        "width: 100%;",
+        "flex-wrap: wrap;",
+        "min-height: var(--responsive-mobile-touch-target);",
+        "width: var(--responsive-drawer-width);",
+        "height: calc(100svh - 16px);",
+    ):
+        assert snippet in responsive_block
 
 
 def test_frontend_uses_restrained_semantic_color_palette() -> None:
