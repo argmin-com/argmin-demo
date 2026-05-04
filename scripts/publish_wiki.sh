@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
 REPO_OWNER="argmin-com"
 REPO_NAME="argmin-demo"
@@ -8,23 +8,32 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 WIKI_SRC_DIR="${REPO_ROOT}/wiki-src"
 
-if ! command -v gh >/dev/null 2>&1; then
-  echo "gh CLI is required" >&2
+fail() {
+  echo "Wiki publish failed: $*" >&2
   exit 1
+}
+
+on_error() {
+  local status=$?
+  echo "Wiki publish failed near line ${BASH_LINENO[0]}: ${BASH_COMMAND}" >&2
+  exit "${status}"
+}
+trap on_error ERR
+
+if ! command -v gh >/dev/null 2>&1; then
+  fail "gh CLI is required; install GitHub CLI and authenticate with 'gh auth login'."
 fi
 
 if ! gh auth status >/dev/null 2>&1; then
-  echo "gh auth login is required before publishing wiki" >&2
-  exit 1
+  fail "gh auth login is required before publishing wiki."
 fi
 
-tmpdir="$(mktemp -d /tmp/aci_wiki_publish_XXXXXX)"
+tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/aci_wiki_publish_XXXXXX")"
 cleanup() { rm -rf "$tmpdir"; }
 trap cleanup EXIT
 
 if [[ ! -d "$WIKI_SRC_DIR" ]]; then
-  echo "wiki-src directory not found at ${WIKI_SRC_DIR}" >&2
-  exit 1
+  fail "wiki-src directory not found at ${WIKI_SRC_DIR}."
 fi
 
 if ! git clone "$WIKI_REMOTE" "$tmpdir/wiki" >/dev/null 2>&1; then

@@ -70,13 +70,24 @@ To restore an already running demo to the known seeded baseline:
 ./scripts/reset_demo.sh
 ```
 
-The browser can also reset local session state and backend runtime state at
-`http://localhost:8000/platform/?reset=1`.
+The reset command is the one-command presenter recovery path. It clears ignored
+generated demo logs and stale PID files, calls the backend reset endpoint,
+validates health/readiness plus a seeded attribution lookup, and opens the
+browser reset URL. The browser reset URL clears Argmin demo session state and
+returns the UI to the opening Overview state:
+
+```text
+http://localhost:${ACI_DEMO_PORT:-8010}/platform/?reset=1
+```
+
+Use `ACI_RESET_OPEN_BROWSER=0 ./scripts/reset_demo.sh` for a CLI-only reset, or
+`ACI_RESET_CLEAR_GENERATED=0 ./scripts/reset_demo.sh` when preserving local demo
+logs for debugging.
 
 ## Recommended UI Flow
 
 1. In the top bar, open **Guided Demo**.
-2. Click **Start Full Walkthrough**.
+2. Click **Start Guided Demo**.
 3. Confirm the drawer shows the three decision-time proof points:
    - attributed request
    - policy intervention
@@ -217,8 +228,17 @@ Run the end-to-end local smoke test:
 ./scripts/smoke_demo.sh
 ```
 
+This starts a local demo server and then runs the golden presenter path:
+platform shell, synthetic login personas, navigation labels, seeded workloads,
+adoption data, integration handoffs, attribution/intercept, manual mapping,
+intervention lifecycle, forecasting, and a controlled 404 recovery envelope.
+
 For a quick reset of a running instance without starting a new server:
 
 ```bash
 ./scripts/reset_demo.sh
 ```
+
+This leaves any active demo process running, reseeds the fixed dummy data,
+clears generated demo artifacts by default, and opens `/platform/?reset=1` so
+the browser-side session cache is reset with the backend.

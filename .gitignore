@@ -22,5 +22,6 @@ venv/
 .demo-start-*.pid
 uv.lock
 results/
+output/
 .benchmarks/
 tmp/pdfs/

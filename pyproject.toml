@@ -57,6 +57,7 @@ asyncio_mode = "auto"
 markers = [
     "glass_jaw: Phase 0 Glass Jaw validation tests",
     "integration: integration tests requiring external services",
+    "smoke: local demo smoke tests",
 ]
 
 [tool.ruff]

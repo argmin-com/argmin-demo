@@ -15,7 +15,7 @@ def test_adoption_dashboard_rolls_up_org_bu_and_team_metrics() -> None:
         email="alex.rivera@novatech.example",
         employee_name="Alex Rivera",
         title="Engineering Manager",
-        team_id="team-platform-eng",
+        team_id="team-platform-engineering",
         team_name="Platform Engineering",
         business_unit_id="bu-product-platform",
         business_unit_name="Product and Platform",
@@ -63,7 +63,7 @@ def test_adoption_dashboard_rolls_up_org_bu_and_team_metrics() -> None:
         scope_id="bu-product-platform",
     )
     assert bu_dashboard.summary.active_employees_30d == 1
-    assert bu_dashboard.child_scopes[0].scope_id == "team-platform-eng"
+    assert bu_dashboard.child_scopes[0].scope_id == "team-platform-engineering"
 
 
 def test_adoption_service_consumes_org_and_inference_events() -> None:

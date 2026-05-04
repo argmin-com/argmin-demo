@@ -76,8 +76,14 @@ stakeholder walkthrough:
 ACI_DEMO_PORT=8010 ./scripts/reset_demo.sh
 ```
 
-You can also open `http://localhost:8010/platform/?reset=1` to clear browser
-session state and ask the local backend to reload the fixed demo baseline.
+The reset command clears generated demo logs and stale PID files, reseeds the
+backend runtime, validates health/readiness plus a seeded attribution lookup,
+and opens the configured reset URL. By default that URL is
+`http://localhost:${ACI_DEMO_PORT:-8010}/platform/?reset=1`, and the script
+prints the exact value it used. That browser reset URL
+clears Argmin demo session state and returns the UI to the opening Overview
+condition. Set `ACI_RESET_OPEN_BROWSER=0` for a CLI-only reset, or
+`ACI_RESET_CLEAR_GENERATED=0` if you want to preserve ignored local demo logs.
 
 If you prefer not to `cd` into the repo first, you can also launch it with an
 absolute path:
@@ -101,6 +107,23 @@ The demo launcher refuses `ACI_ENVIRONMENT=production` or `ACI_ENVIRONMENT=stagi
 and forces local-only memory backends so cloud or shared-backend shell variables
 cannot leak into an investor or design-partner walkthrough.
 
+### Maintainability After the Demo
+
+The demo deliberately uses synthetic fixtures, fake local personas, memory/local
+adapters, and simulated outbound integrations. These boundaries are marked with
+`DEMO_ONLY_*` comments and summarized in
+[docs/demo-only-boundaries.md](docs/demo-only-boundaries.md). Do not remove
+those markers or reuse the demo launcher as a production entrypoint. Production
+work should add explicit production paths, adapters, migrations, and tests
+instead of silently promoting local shortcuts.
+
+Deferred production-quality replacements are tracked as GitHub issues:
+[#1](https://github.com/argmin-com/argmin-demo/issues/1),
+[#2](https://github.com/argmin-com/argmin-demo/issues/2),
+[#3](https://github.com/argmin-com/argmin-demo/issues/3),
+[#4](https://github.com/argmin-com/argmin-demo/issues/4), and
+[#5](https://github.com/argmin-com/argmin-demo/issues/5).
+
 The dashboard and control-plane views are populated on startup. Use **Reset Demo**
 in the Guided Demo drawer to restore the baseline presentation state, or
 **Initialize Demo** if you want to reseed backend demo data during a walkthrough.
@@ -110,7 +133,7 @@ continues on deterministic local demo data so the story still plays cleanly.
 In the UI:
 
 1. Open **Guided Demo** from the top bar.
-2. Click **Start Full Walkthrough**.
+2. Click **Start Guided Demo**.
 3. Narrate the walkthrough in the same product-proof order the UI uses:
    - Overview
    - PRD Proof
@@ -153,13 +176,16 @@ requirements, see [docs/local-prerequisites.md](docs/local-prerequisites.md).
 For the view-by-view demo reference, see [docs/demo-feature-matrix.md](docs/demo-feature-matrix.md).
 For production capability-to-local mock coverage, see
 [docs/feature-demo-coverage-matrix.md](docs/feature-demo-coverage-matrix.md).
+For explicit `DEMO_ONLY_*` fixture, fake-auth, local-adapter, and script
+boundaries, see [docs/demo-only-boundaries.md](docs/demo-only-boundaries.md).
 For policy semantics and enforcement behavior, see [docs/policy-reference.md](docs/policy-reference.md).
 For ingestion contracts and examples, see [docs/ingestion-reference.md](docs/ingestion-reference.md).
 For the low-level foreground server without browser open or credential printout,
 run `./scripts/run_demo.sh`. For automated end-to-end demo verification, run
 `./scripts/smoke_demo.sh`.
 For a non-destructive state reset against an already running demo, run
-`./scripts/reset_demo.sh`.
+`./scripts/reset_demo.sh`; it reseeds dummy data, clears generated demo artifacts,
+opens the browser reset URL, and leaves any active demo server running.
 
 The launcher installs the minimal local-demo dependency set from
 `requirements-demo.lock` into `.venv` on the first run and reuses it until
@@ -353,9 +379,11 @@ Run quality gates locally:
 ```
 
 Set `ACI_VALIDATE_FULL=1` to include integration and glass-jaw tests. Set
-`ACI_VALIDATE_SMOKE=1` to include the end-to-end local demo smoke test. The
-script installs dev/test dependencies only when `requirements-dev.lock` or
-`pyproject.toml` changes.
+`ACI_VALIDATE_SMOKE=1` to include the end-to-end local demo smoke test. That
+smoke path now includes the golden presenter flow: synthetic demo accounts,
+navigation shell, seeded data visibility, mock API success states, core
+workflows, and one controlled failure envelope. The script installs dev/test
+dependencies only when `requirements-dev.lock` or `pyproject.toml` changes.
 
 ## CI/CD and Release Workflows
 

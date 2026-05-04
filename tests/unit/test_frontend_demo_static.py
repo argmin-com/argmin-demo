@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -104,10 +105,140 @@ def test_frontend_dataset_references_existing_models_and_teams() -> None:
             assert linked_model in model_names
 
 
+def test_frontend_dataset_has_coherent_enterprise_relationships() -> None:
+    dataset = json.loads(
+        (REPO_ROOT / "frontend" / "data" / "demo_dataset.json").read_text()
+    )
+    teams = dataset["teams"]
+    team_ids = {team["id"] for team in teams}
+    team_names = {team["name"] for team in teams}
+    team_by_id = {team["id"]: team for team in teams}
+    model_names = {model["name"] for model in dataset["models"]}
+    request_ids = {request["id"] for request in dataset["attribution_requests"]}
+
+    assert dataset["overview"]["total_spend_usd"] == sum(
+        team["spend_usd"] for team in teams
+    )
+    assert dataset["overview"]["total_spend_usd"] == sum(
+        model["spend_usd"] for model in dataset["models"]
+    )
+    assert dataset["overview"]["requests_30d"] == sum(
+        model["requests"] for model in dataset["models"]
+    )
+
+    assert len(team_ids) == len(teams)
+    assert len({team["lead"] for team in teams}) == len(teams)
+    for team in teams:
+        assert team["id"].startswith("team-")
+        assert team["business_unit_id"].startswith("bu-")
+        assert team["business_unit_name"]
+        assert team["cost_center"].startswith("CC-")
+        assert team["service_owner_email"].endswith("@novatech.example")
+
+    workflow_map = dataset["adoption"]["workflow_map"]
+    workflows = workflow_map["workflows"]
+    workflow_summary = workflow_map["summary"]
+    assert len({workflow["id"] for workflow in workflows}) == len(workflows)
+    assert workflow_summary["workflow_count"] == len(workflows)
+    assert workflow_summary["business_units_with_adoption"] == len(
+        {workflow["business_unit_id"] for workflow in workflows}
+    )
+    assert workflow_summary["teams_with_adoption"] == len(
+        {workflow["team_id"] for workflow in workflows}
+    )
+    assert workflow_summary["ai_services_used"] == len(
+        {workflow["service_name"] for workflow in workflows}
+    )
+    assert workflow_summary["capability_classes"] == len(
+        {workflow["capability_class"] for workflow in workflows}
+    )
+    assert workflow_summary["embedded_or_scaled_workflows"] == sum(
+        1
+        for workflow in workflows
+        if "embedded" in workflow["adoption_depth"].lower()
+        or "scaled" in workflow["adoption_depth"].lower()
+    )
+
+    for workflow in workflows:
+        team = team_by_id[workflow["team_id"]]
+        assert workflow["team_name"] == team["name"]
+        assert workflow["business_unit_id"] == team["business_unit_id"]
+        assert workflow["business_unit_name"] == team["business_unit_name"]
+    assert {workflow["team_id"] for workflow in workflows} == team_ids
+
+    capability_counts = {
+        capability["capability"]: capability["workflow_count"]
+        for capability in workflow_map["capabilities"]
+    }
+    service_counts = {
+        service["service"]: service["used_by_workflows"]
+        for service in workflow_map["services"]
+    }
+    for capability in {workflow["capability"] for workflow in workflows}:
+        assert capability_counts[capability] == sum(
+            1 for workflow in workflows if workflow["capability"] == capability
+        )
+    for service in {workflow["service_name"] for workflow in workflows}:
+        assert service_counts[service] == sum(
+            1 for workflow in workflows if workflow["service_name"] == service
+        )
+
+    partner_brief = dataset["design_partner_brief"]
+    pillar_evidence = {
+        item
+        for pillar in partner_brief["readiness_pillars"]
+        for item in pillar["evidence"]
+    }
+    assert f"{workflow_summary['workflow_count']} workflows mapped across business units" in (
+        pillar_evidence
+    )
+    assert (
+        f"{workflow_summary['ai_services_used']} AI services and "
+        f"{workflow_summary['capability_classes']} capability classes represented"
+    ) in pillar_evidence
+    workflow_metric = next(
+        metric
+        for metric in partner_brief["success_metrics"]
+        if metric["metric"] == "Workflow adoption visibility"
+    )
+    assert workflow_metric["baseline"] == (
+        f"{workflow_summary['workflow_count']} modeled workflows"
+    )
+
+    for request in dataset["attribution_requests"]:
+        assert request["model"] in model_names
+        for node in request["chain"]:
+            if node["layer"] == "Org Hierarchy":
+                assert node["value"] in (team_names | {"UNKNOWN"})
+
+    for mapping in dataset["manual_mapping"]:
+        assert mapping["request_id"] is None or mapping["request_id"] in request_ids
+        assert mapping["current_owner"] in (team_names | {"UNKNOWN"})
+        assert mapping["suggested_owner"] in team_names
+        assert mapping["resolved_team"] in (team_names | {"UNKNOWN"})
+        assert set(mapping["candidate_teams"]) <= (team_names | {"UNKNOWN"})
+
+    for delivery in dataset["integrations"]["recent_deliveries"]:
+        sent_at = datetime.fromisoformat(delivery["sent_at"].replace("Z", "+00:00"))
+        assert delivery["delivery_id"].startswith(f"delivery-{sent_at:%Y%m%d}-")
+
+    for row in dataset["exports"]["rows"]:
+        assert row["team_event_time"] in (team_names | {"UNKNOWN"})
+        assert row["model"] in (model_names | {"unknown-provider-model"})
+        for field in (
+            "billed_cost_usd",
+            "estimated_cost_usd",
+            "reconciled_cost_usd",
+            "trac_usd",
+        ):
+            assert row[field] is None or row[field] >= 0
+
+
 def test_frontend_uses_vendored_chart_and_no_cdn_fonts() -> None:
     html = _read(FRONTEND_INDEX)
     css = _read(FRONTEND_APP_CSS)
     assert 'src="vendor/chart.umd.min.js?v=' in html
+    assert 'src="vendor/chart.umd.min.js?v=20260309aa" defer' in html
     assert 'src="assets/app.js?v=' in html
     assert 'href="assets/app.css?v=' in html
     assert "cdnjs.cloudflare.com" not in html
@@ -139,7 +270,10 @@ def test_frontend_csp_and_accessibility_scaffolding_present() -> None:
     assert 'id="app-loader"' in html
     assert 'id="drawer-summary" role="status" aria-live="polite"' in html
     assert 'id="log-stream" role="log" aria-live="polite"' in html
+    assert 'id="recovery-banner" role="alert" aria-live="assertive"' in html
     assert 'aria-label="Close navigation menu">&times;' in html
+    assert "Preparing local demo workspace" in html
+    assert 'class="demo-boot-state"' in html
     assert "</body>" in html
     assert "focus-visible" in css
 
@@ -175,6 +309,463 @@ def test_frontend_uses_investor_facing_request_proof_and_tenant_labels() -> None
 def test_frontend_no_silent_bare_catches() -> None:
     js = _read(FRONTEND_APP_JS)
     assert "catch {}" not in js
+    assert "void error" not in js
+    assert "void recoveryError" not in js
+
+
+def test_frontend_demo_uses_controlled_recovery_states() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "recoveryNotice: null" in js
+    assert "function sanitizeOperatorMessage(message, fallback)" in js
+    assert "function apiResponseErrorMessage(response, data)" in js
+    assert "function setRecoveryNotice(notice)" in js
+    assert "function renderRecoveryBanner()" in js
+    assert "function renderControlledRecoveryState(error)" in js
+    assert "A render failure was contained" in js
+    assert "Frontend issue contained" in js
+    assert "Async demo action recovered" in js
+    assert "JSON.stringify(data)" not in js
+    assert "raw stack" not in js.lower()
+    assert ".recovery-banner" in css
+    assert ".recovery-state" in css
+
+
+def test_frontend_demo_uses_explicit_loading_success_empty_error_states() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "function explicitStateMarkup(kind, title, message, options = {})" in js
+    assert "function loadingStateMarkup(title, message, options = {})" in js
+    assert "function successStateMarkup(title, message, options = {})" in js
+    assert "function emptyStateMarkup(title, message, options = {})" in js
+    assert "function errorStateMarkup(title, message, options = {})" in js
+    assert "function tableEmptyRowMarkup(colspan, title, message, options = {})" in js
+    assert "function pageStateStripMarkup()" in js
+    assert "function renderViewWithState(markup)" in js
+    assert "root.innerHTML = renderViewWithState(" in js
+    assert "No demo activity yet." in js
+    assert "Integration fallback active" in js
+    assert "Unknown page" in js
+    assert ".state-panel-loading" in css
+    assert ".state-panel-success" in css
+    assert ".state-panel-empty" in css
+    assert ".state-panel-error" in css
+    assert ".page-state-strip" in css
+
+
+def test_frontend_empty_states_guide_first_use_with_examples() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "function singleNextStepAction(actions = [])" in js
+    assert "function guidedEmptyExampleFor(title)" in js
+    assert "function guidedEmptyNextStepFor(title)" in js
+    assert "function stateExampleMarkup(example)" in js
+    assert "function stateNextStepMarkup(nextStep)" in js
+    assert "function applyGuidedExample(inputKey, value)" in js
+    assert "guided-empty-state" in js
+    assert "Prefilled example" in js
+    assert "Search Governance" in js
+    assert "Search Deployment" in js
+    assert 'case "apply-guided-example"' in js
+    assert 'data: { "input-key": "glossary-query", value: "governance" }' in js
+    assert 'data: { "input-key": "faq-query", value: "deployment" }' in js
+    assert "const emptyActions = Array.isArray(options.actions) && options.actions.length" in js
+    assert "? options.actions" in js
+    assert ": (example?.actions || [])" in js
+    assert "singleNextStepAction(emptyActions)" in js
+    assert "This timeline records the proof points generated during a walkthrough." in js
+    assert "governance terminology" in js
+    assert "deployment diligence" in js
+    assert ".guided-empty-state" in css
+    assert ".state-panel-example" in css
+    assert ".state-panel-next-step" in css
+    assert ".deferred-example" in css
+
+
+def test_frontend_demo_optimizes_perceived_speed() -> None:
+    html = _read(FRONTEND_INDEX)
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert 'id="instant-feedback"' in html
+    assert "function instantActionLabel(actionEl, action)" in js
+    assert "function acknowledgeInstantAction(actionEl, action)" in js
+    assert "acknowledgeInstantAction(actionEl, action);" in js
+    assert ".instant-feedback" in css
+    assert ".click-ack" in css
+
+    assert "function deferredContentMarkup(key, title, message, contentMarkup, options = {})" in js
+    assert "function glossaryResultStats()" in js
+    assert "data-action=\"show-deferred-section\"" in js
+    assert "state.deferredSectionsVisible.add(\"glossary-results\")" in js
+    assert "state.deferredSectionsVisible.add(\"faq-results\")" in js
+    assert ".deferred-section" in css
+
+    assert ".state-panel-skeleton" in css
+    assert ".skeleton-line" in css
+    assert 'class="app-loader-skeleton"' in html
+    assert ".app-loader-skeleton" in css
+    assert "animation: spin" not in css
+    assert "@keyframes spin" not in css
+
+    forecast_block = js.split("async function runForecastDemo(options = {})", 1)[1].split(
+        "async function refreshIntegrationFeed()",
+        1,
+    )[0]
+    assert "const optimistic = buildLocalForecastEstimate" in forecast_block
+    assert "state.forecastResult = optimistic;" in forecast_block
+    assert (
+        "Local ${scenario.label.toLowerCase()} estimate ready while live forecast runs."
+        in forecast_block
+    )
+    assert forecast_block.index("state.forecastResult = optimistic;") < forecast_block.index(
+        'apiRequest("POST", "/v1/forecast/spend"',
+    )
+
+    intervention_block = js.split("async function updateInterventionStatus", 1)[1].split(
+        "async function updateManualMapping",
+        1,
+    )[0]
+    assert "const previousStatus = currentStatus;" in intervention_block
+    assert "intervention.status = normalized;" in intervention_block
+    assert intervention_block.index("intervention.status = normalized;") < intervention_block.index(
+        'apiRequest("POST", `/v1/interventions/${id}/status`',
+    )
+
+
+def test_frontend_standardizes_interaction_contracts() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "function normalizeInteractionContracts(root = document)" in js
+    assert "function isInteractiveFilterControl(button, action)" in js
+    assert "normalizeInteractionContracts(document);" in js
+    assert "button.setAttribute(\"type\", \"button\")" in js
+    assert "button.dataset.control = \"filter\";" in js
+    assert "button.dataset.control = \"button\";" in js
+    assert "button.dataset.control = \"disclosure\";" in js
+    assert "button.setAttribute(\"aria-pressed\", active ? \"true\" : \"false\")" in js
+    assert "wrap.setAttribute(\"role\", \"region\")" in js
+    assert "row.dataset.control = \"selectable-row\";" in js
+    assert "row.setAttribute(\"tabindex\", \"0\")" in js
+    assert "input.classList.add(\"control-input\")" in js
+    assert "select.classList.add(\"control-select\")" in js
+    assert "[data-action][role='button'], tr[data-action]" in js
+    assert 'class="control-input"' in js
+    assert 'class="simulation-select control-select"' in js
+
+    assert ".control-input" in css
+    assert ".control-select" in css
+    assert '[data-control="button"]' in css
+    assert '[data-control="filter"][aria-pressed="true"]' in css
+    assert '[data-control="selectable-row"]:focus-visible' in css
+    assert '[data-control="table-region"]' in css
+
+
+def test_frontend_forms_are_frictionless_and_validated() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "formStatus: {}" in js
+    assert "const FORM_MIN_SEARCH_LENGTH = 2" in js
+    assert "function searchFieldFeedback(inputKey, value, stats = {})" in js
+    assert "function fieldValidationAttrs(inputKey, fallbackStatus = null" in js
+    assert "function fieldFeedbackMarkup(inputKey, fallbackStatus = null" in js
+    assert "function syncFieldFeedback(inputKey, value, status" in js
+    assert 'aria-invalid="${status.kind === "error" ? "true" : "false"}"' in js
+    assert 'fieldValidationAttrs("glossary-query", feedback, state.glossaryQuery' in js
+    assert 'fieldValidationAttrs("faq-query", feedback, state.faqQuery' in js
+    assert 'id="${esc(key)}-feedback"' in js
+    assert 'fieldFeedbackMarkup("glossary-query", feedback, state.glossaryQuery)' in js
+    assert 'fieldFeedbackMarkup("faq-query", feedback, state.faqQuery)' in js
+    assert 'id="faq-summary"' in js
+    assert 'Loaded example "${exampleValue}". Results update automatically.' in js
+    assert "function selectedGovernanceRequestValue()" in js
+    assert "function governanceRequestSelectionFeedback(value)" in js
+    assert 'id="governance-request-select"' in js
+    assert 'fieldFeedbackMarkup("governance-request", governanceRequestStatus' in js
+    assert "No request samples are loaded." in js
+    assert "The previous valid selection was preserved." in js
+    assert "FORECAST_HORIZONS.includes(nextHorizon)" in js
+    assert "The local demo preserved the previous horizon" in js
+
+    assert '.control-input[aria-invalid="true"]' in css
+    assert ".field-feedback" in css
+    assert ".field-feedback-ok" in css
+    assert ".field-feedback-warn" in css
+    assert ".field-feedback-error" in css
+
+
+def test_frontend_provides_contextual_help_without_manuals() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "const CONTEXTUAL_HELP = {" in js
+    assert '"optimization-potential": {' in js
+    assert '"attribution-coverage": {' in js
+    assert '"trac": {' in js
+    assert '"entry-point": {' in js
+    assert '"insertion-point": {' in js
+    assert '"governed": {' in js
+    assert "function normalizeContextualHelp(root = document)" in js
+    assert "function contextualHelpTargets(scope)" in js
+    assert "function attachContextualHelp(target, entry)" in js
+    assert "function showContextHelp(helpKey)" in js
+    assert "normalizeContextualHelp(scope);" in js
+    assert 'data-action = "show-context-help"' not in js
+    assert 'button.dataset.action = "show-context-help";' in js
+    assert 'case "show-context-help":' in js
+    assert "showToast(entry.title, contextualHelpTooltip(entry));" in js
+    assert "Sort headers, filter rows, then page without losing the demo context." in js
+    assert "Next: ${entry.next}" in js
+
+    assert ".context-help-target" in css
+    assert ".context-help-button" in css
+    assert ".context-help-tooltip" in css
+    assert ".has-context-help::after" in css
+    assert ".table-microcopy" in css
+
+
+def test_frontend_demo_surfaces_one_primary_signal_per_screen() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "function pagePrioritySignal()" in js
+    assert "function pagePriorityMarkup()" in js
+    assert "Screen focus" in js
+    assert 'data-visual-role="dominant"' in js
+    assert 'data-visual-role="secondary"' in js
+    assert 'class="entry-home" data-visual-role="dominant"' in js
+    assert "renderViewWithState(markup)" in js
+    assert "${pageStateStripMarkup()}${pagePriorityMarkup()}" in js
+    assert 'class="screen-secondary-content" data-visual-role="secondary"' in js
+    assert 'return "";' in js.split("function pageStateStripMarkup()", 1)[1].split(
+        "function renderViewWithState",
+        1,
+    )[0]
+    assert ".screen-priority" in css
+    assert ".screen-priority::before" in css
+    assert "grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.38fr) auto;" in css
+    assert "min-height: 132px;" in css
+    assert ".screen-secondary-content" in css
+    assert ".screen-secondary-content .card:not(.metric-card)" in css
+    assert ".screen-secondary-content .partner-hero h1" in css
+    assert ".screen-secondary-content .admin-hero h1" in css
+    assert "font-size: clamp(20px, 1.8vw, 22px);" in css
+    assert ".screen-priority-measure strong" in css
+    assert "font-size: 34px;" in css
+    assert ".screen-priority .state-panel-actions" in css
+    page_keys = [
+        "overview",
+        "partner_brief",
+        "requirements",
+        "adoption",
+        "attribution",
+        "models",
+        "teams",
+        "manual_mapping",
+        "interventions",
+        "governance",
+        "coverage",
+        "exports",
+        "energy",
+        "forecast",
+        "integrations",
+        "admin",
+        "glossary",
+        "faq",
+    ]
+    for page_key in page_keys:
+        assert f'case "{page_key}":' in js
+
+
+def test_frontend_uses_consistent_grid_and_spacing_system() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "--space-1: 4px;" in css
+    assert "--space-3: 12px;" in css
+    assert "--space-4: 16px;" in css
+    assert "--layout-gutter: 18px;" in css
+    assert "--layout-section-gap: var(--space-4);" in css
+    assert "--layout-page-max: 1440px;" in css
+    assert ".layout-stack" in css
+    assert ".layout-stack > *" in css
+    assert ".layout-cluster" in css
+    assert ".layout-header" in css
+    assert ".layout-mt-3" in css
+    assert ".layout-mb-3" in css
+    assert ".chart-frame-md" in css
+    assert ".chart-frame-xl" in css
+    assert ".metric-card .context-help-tooltip" in css
+    assert ".table-sort-btn.has-context-help::after" in css
+    assert "gap: var(--layout-gap);" in css
+    assert "padding: var(--layout-gutter);" in css
+    assert "width: min(100%, var(--layout-page-max));" in css
+
+    assert "const LAYOUT_SPACING_CLASS_BY_PX = new Map" in js
+    assert "const CHART_FRAME_CLASS_BY_HEIGHT = new Map" in js
+    assert "function normalizeLayoutContracts(root = document)" in js
+    assert "function layoutSpacingClass(value, prefix)" in js
+    assert "function applyLayoutSpacingClass(element, styleProp, prefix)" in js
+    assert "normalizeLayoutContracts(scope);" in js
+    assert (
+        'stack.dataset.layout = stack.classList.contains("screen-secondary-content")'
+        ' ? "page-stack" : "section-stack";'
+    ) in js
+    assert 'grid.dataset.layout = "grid";' in js
+    assert 'cluster.dataset.layout = "cluster";' in js
+    assert 'header.dataset.layout = "header";' in js
+    assert 'frame.dataset.layout = "chart-frame";' in js
+
+
+def test_frontend_defines_semantic_typography_roles() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert '--font-ui: "Space Grotesk"' in css
+    assert '--font-mono: "IBM Plex Mono"' in css
+    assert "--type-heading-size: 24px;" in css
+    assert "--type-heading-line: 1.16;" in css
+    assert "--type-subheading-size: 15px;" in css
+    assert "--type-subheading-line: 1.32;" in css
+    assert "--type-body-size: 13px;" in css
+    assert "--type-body-line: 1.55;" in css
+    assert "--type-label-size: 10px;" in css
+    assert "--type-label-tracking: 0;" in css
+    assert "--type-meta-size: 11px;" in css
+    assert "--type-meta-line: 1.45;" in css
+    assert "--type-number-size: 28px;" in css
+
+    for role in ("heading", "subheading", "body", "label", "meta", "number"):
+        assert f'.type-{role},' in css
+        assert f'[data-typography="{role}"]' in css
+        assert f'.app [data-typography="{role}"]' in css
+        assert "element.dataset.typography = role;" in js
+        assert "element.classList.add(`type-${role}`);" in js
+
+    assert "const TYPOGRAPHY_ROLE_SELECTORS = Object.freeze({" in js
+    assert 'const TYPOGRAPHY_INLINE_PROPS = Object.freeze(["fontSize"' in js
+    assert 'heading: [' in js
+    assert '".screen-priority-title"' in js
+    assert '".integration-title"' in js
+    assert "function normalizeTypographyContracts(root = document)" in js
+    assert "normalizeTypographyContracts(scope);" in js
+    assert "for (const prop of TYPOGRAPHY_INLINE_PROPS)" in js
+    assert 'element.style[prop] = "";' in js
+    assert ".card-title" in js
+    assert ".metric-label" in js
+    assert ".metric-meta" in js
+    assert ".metric-value" in js
+
+    assert ".page-title," in css
+    assert ".screen-priority-title," in css
+    assert ".card-title," in css
+    assert ".card-subtitle," in css
+    assert ".metric-label," in css
+    assert ".metric-meta," in css
+    assert ".status-badge" in css
+
+
+def test_frontend_uses_restrained_semantic_color_palette() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+    dataset = json.loads((REPO_ROOT / "frontend" / "data" / "demo_dataset.json").read_text())
+
+    assert "--brand: #4f8ef8;" in css
+    assert "--brand-rgb: 79, 142, 248;" in css
+    assert "--brand-soft: rgba(var(--brand-rgb), 0.15);" in css
+    assert "--status-success: #2ac487;" in css
+    assert "--status-warning: #eda82e;" in css
+    assert "--status-danger: #ee5858;" in css
+    assert "--purple: var(--brand);" in css
+    assert "--cyan: var(--brand);" in css
+    assert "radial-gradient(circle at 90% 115%, rgba(var(--brand-rgb), 0.09)" in css
+    assert "linear-gradient(180deg, var(--brand-strong), var(--brand))" in css
+    assert ".metric-card .context-help-tooltip" in css
+
+    assert "const PALETTE = Object.freeze({" in js
+    assert "passive: { bg: \"rgba(79,142,248,0.14)\", color: PALETTE.brandText }" in js
+    assert "active: { bg: \"rgba(237,168,46,0.15)\", color: PALETTE.warningText }" in js
+    assert "function paletteChartColor(value, fallback = PALETTE.brand)" in js
+    assert "backgroundColor: [PALETTE.brand, PALETTE.success, PALETTE.neutral]" in js
+    assert (
+        "const comparePalette = [PALETTE.brand, PALETTE.success, "
+        "PALETTE.warning, PALETTE.neutral];"
+    ) in js
+
+    stale_accents = (
+        "#9470ff",
+        "#1dbcc8",
+        "#8f6af8",
+        "#d86ef5",
+        "#60dde6",
+        "#b49bff",
+        "#f18f42",
+        "rgba(29, 188, 200",
+        "rgba(148, 112, 255",
+        "rgba(232, 93, 140",
+        "255, 111, 145",
+        "255, 195, 92",
+    )
+    for stale in stale_accents:
+        assert stale not in css
+        assert stale not in js
+
+    allowed_dataset_colors = {"#4f8ef8", "#2ac487", "#eda82e", "#ee5858", "#8ea0bf"}
+    assert {
+        item["color"] for item in dataset["optimization_categories"] if item.get("color")
+    } <= allowed_dataset_colors
+
+
+def test_frontend_demo_validates_role_based_personas() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+    dataset = json.loads((REPO_ROOT / "frontend" / "data" / "demo_dataset.json").read_text())
+    account_roles = {account["role"] for account in dataset["admin"]["accounts"]}
+    summary_roles = set(dataset["admin"]["summary"]["rbac_roles"])
+
+    assert "const DEMO_PERSONAS = [" in js
+    assert 'key: "admin"' in js
+    assert 'key: "manager"' in js
+    assert 'key: "user"' in js
+    assert 'key: "auditor"' in js
+    assert "activePersonaKey: \"admin\"" in js
+    assert "function activeDemoPersona()" in js
+    assert "function personaCanAccessPage(pageKey, persona = activeDemoPersona())" in js
+    assert "function personaHasPermission(persona, permissions = [])" in js
+    assert (
+        "function personaCanUseAction(action, descriptor = {}, persona = activeDemoPersona())"
+        in js
+    )
+    assert "function normalizeRoleBasedControls(root = document)" in js
+    assert "function personaCanPerformOperation(operation, persona = activeDemoPersona())" in js
+    assert "function personaVisibleAccounts(accounts = [], persona = activeDemoPersona())" in js
+    assert "function personaVisibleOperations(operations = [], persona = activeDemoPersona())" in js
+    assert "function personaVisibleAuditEvents(events = [], persona = activeDemoPersona())" in js
+    assert "data-action=\"set-demo-persona\"" in js
+    assert "Persona Access Preview" in js
+    assert "Allowed for persona" in js
+    assert "Restricted</span>" not in js
+    assert "nav-item.locked" not in css
+    assert "nav-lock" not in js
+    assert "nav-lock" not in css
+    assert 'group.items.filter((item) => personaCanAccessPage(item.key, persona))' in js
+    assert "DEMO_PATH_ITEMS.filter((item) => personaCanAccessPage(item.page, persona))" in js
+    assert "This view lists only operations available to the selected persona." in js
+    assert (
+        "This persona has a read-only view here; mutation options are intentionally hidden."
+        in js
+    )
+    assert "Action Hidden For Role" in js
+    assert ".persona-card-grid" in css
+    assert ".persona-permission-panel" in css
+    assert {"Admin", "Manager", "User", "Auditor"} <= account_roles
+    assert account_roles == summary_roles
+
 
 def test_frontend_assets_are_externalized() -> None:
     html = _read(FRONTEND_INDEX)
@@ -191,6 +782,13 @@ def test_frontend_polish_and_responsive_guards_present() -> None:
     css = _read(FRONTEND_APP_CSS)
     js = _read(FRONTEND_APP_JS)
     assert ".app-loader" in css
+    assert ".demo-boot-state" in css
+    assert ".demo-skeleton-card" in css
+    assert "grid-template-columns: 1fr;" in css
+    assert ".entry-home" in css
+    assert ".entry-home-action .small-btn" in css
+    assert ".topbar.entry-home-active #start-walkthrough" in css
+    assert ".topbar.entry-home-active #open-guided-demo" in css
     assert ".view-root.transitioning" in css
     assert ".drawer-actions.busy .small-btn" in css
     assert "width: min(360px, calc(100vw - 280px));" in css
@@ -207,12 +805,36 @@ def test_frontend_polish_and_responsive_guards_present() -> None:
     assert 'No manual mapping items are available in the current dataset.' in js
     assert "state.pendingDemoAction && [" in js
     assert "\"clear-logs\"].includes(action)" in js
-    assert "closest(\"[data-action][role='button']\")" in js
+    assert "closest(\"[data-action][role='button'], tr[data-action]\")" in js
     assert 'role="button" tabindex="0" aria-label="Open Forecasting"' in js
     assert 'role="button" tabindex="0" aria-label="Open Manual Mapping"' in js
     assert 'role="button" tabindex="0" aria-label="Open Interventions"' in js
     assert "window.localStorage" not in js
     assert 'role="button" tabindex="0" aria-label="Open ${esc(team.name)} team detail"' in js
+    assert "Backend reachable; returned controlled operator response" in js
+    assert "response.status >= 500" in js
+    assert 'typeof value.status === "string"' in js
+    assert "Argmin demo is ready" in js
+    assert "root.classList.toggle(\"entry-context\", entryHomeActive)" in js
+    assert "root.classList.toggle(\"entry-role\", entryHomeActive)" in js
+    assert "TBD" not in js
+
+
+def test_overview_entry_home_has_one_primary_decision() -> None:
+    js = _read(FRONTEND_APP_JS)
+    overview_block = js.split("function overviewView()", 1)[1].split(
+        "function renderOverviewCharts()", 1
+    )[0]
+    entry_block = overview_block.split('<div class="entry-home"', 1)[1].split(
+        '<div class="section-title">Executive Summary</div>', 1
+    )[0]
+
+    assert 'aria-label="Prepared local demo home"' in entry_block
+    assert "Executive lens, Admin persona, Advisory mode" in entry_block
+    assert entry_block.count('data-action="start-walkthrough"') == 1
+    assert "Start Guided Demo" in entry_block
+    assert "Open Partner Brief" not in entry_block
+    assert "Open Guided Demo" not in entry_block
 
 
 def test_guided_demo_drawer_uses_presenter_facing_copy() -> None:
@@ -225,10 +847,36 @@ def test_guided_demo_drawer_uses_presenter_facing_copy() -> None:
     assert "Recommended next step" in js
     assert "Presentation mode" in js
     assert "The walkthrough is available from local demo data." in js
-    assert (
-        "No demo activity yet. Start the full product walkthrough, or run one live proof action."
-        in js
-    )
+    assert "No demo activity yet." in js
+    assert "Start Guided Demo" in js
+
+
+def test_presenter_mode_has_manual_path_recovery_and_shortcuts() -> None:
+    html = _read(FRONTEND_INDEX)
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert 'id="presenter-mode-toggle"' in html
+    assert 'id="presenter-console"' in html
+    assert 'data-action="toggle-presenter-mode"' in html
+    assert "presenterMode: false" in js
+    assert "function renderPresenterConsole()" in js
+    assert "function presenterAvailableSteps" in js
+    assert "function recoverPresenterStep()" in js
+    assert "function activeWalkthroughAnchor()" in js
+    assert 'case "presenter-next"' in js
+    assert 'case "presenter-prev"' in js
+    assert 'case "presenter-recover"' in js
+    assert 'case "presenter-step"' in js
+    assert 'event.key === "ArrowRight"' in js
+    assert 'event.key === "ArrowLeft"' in js
+    assert "Shift+R reset" in js
+    assert "Off script: current page is" in js
+    assert "Reset complete. Presenter mode is back at step 1." in js
+    assert ".presenter-console" in css
+    assert ".presenter-console.off-script" in css
+    assert ".presenter-step-dot.active" in css
+    assert ".top-btn.presenter-toggle.active" in css
 
 
 def test_forecast_scenario_selection_updates_preview_state_immediately() -> None:
@@ -252,8 +900,11 @@ def test_forecast_scenario_selection_updates_preview_state_immediately() -> None
 def test_frontend_uses_dataset_fallback_and_not_stale_overview_fetch() -> None:
     js = _read(FRONTEND_APP_JS)
     assert "const FALLBACK_DATASET" in js
+    assert "const DATASET_VERSION" in js
     assert "const DATASET_URL" in js
+    assert "demo_dataset.json?v=${DATASET_VERSION}" in js
     assert 'fetch(DATASET_URL' in js
+    assert 'fetch(DATASET_URL, { cache: "default" })' in js
     assert 'cloneData(FALLBACK_DATASET)' in js
     assert '"/v1/dashboard/overview"' not in js
 
@@ -296,12 +947,20 @@ def test_frontend_demo_reset_and_scenarios_are_deterministic() -> None:
     assert "demoScenarioRunCounts: {}" in js
     assert "async function resetBackendDemoState(options = {})" in js
     assert 'apiRequest("POST", "/v1/demo/reset", {})' in js
+    assert "function clearDemoSessionStorage(options = {})" in js
+    assert "includeAuthTokens = false" in js
+    assert "INTERVENTION_STORAGE_KEY" in js
+    assert "MANUAL_MAPPING_STORAGE_KEY" in js
+    assert "...(includeAuthTokens ? API_TOKEN_STORAGE_KEYS : [])" in js
     assert "function nextDemoScenarioRequestId(kind)" in js
     assert "Date.now()" not in scenario_block
     assert "nextDemoScenarioRequestId(kind)" in scenario_block
+    assert "clearDemoSessionStorage();" in reset_block
     assert "state.demoScenarioRunCounts = {};" in reset_block
     assert "resetBackendDemoState({ log: false, toast: false })" in reset_block
     assert 'params.get("reset") === "1"' in initialize_block
+    assert "clearDemoSessionStorage();" in initialize_block
+    assert "clearDemoSessionStorage({ includeAuthTokens: true });" in initialize_block
 
 
 def test_manual_mapping_view_handles_session_state_without_numeric_crashes() -> None:
@@ -326,11 +985,19 @@ def test_frontend_intervention_sync_can_clear_with_empty_live_payload() -> None:
     assert "if (!incoming.length)" not in js
 
 
-def test_frontend_intervention_write_failures_do_not_apply_local_success_state() -> None:
+def test_frontend_intervention_write_failures_keep_optimistic_demo_state() -> None:
     js = _read(FRONTEND_APP_JS)
-    assert 'intervention.status = normalized;' not in js
-    assert "Intervention Unchanged" in js
-    assert "kept the last confirmed state" in js
+    intervention_block = js.split("async function updateInterventionStatus", 1)[1].split(
+        "async function updateManualMapping",
+        1,
+    )[0]
+    assert "const previousStatus = currentStatus;" in intervention_block
+    assert "intervention.status = normalized;" in intervention_block
+    assert (
+        "Live intervention status update unavailable; the local demo retained"
+        in intervention_block
+    )
+    assert "Intervention Saved Locally" in intervention_block
 
 
 def test_frontend_glossary_and_faq_search_use_labels_and_partial_updates() -> None:
@@ -420,12 +1087,79 @@ def test_frontend_tables_are_wrapped_for_horizontal_scroll() -> None:
     assert wrapper_count >= table_count
 
 
+def test_frontend_tables_are_scannable_sortable_filterable_and_paged() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "tableUi: {}" in js
+    assert "const DEFAULT_TABLE_PAGE_SIZE = 8" in js
+    assert "const TABLE_PAGE_SIZE_OPTIONS = [8, 16, 32]" in js
+    assert "function normalizeScannableTables(root = document)" in js
+    assert "function setupScannableTable(table, tableKey)" in js
+    assert "function applyScannableTable(table)" in js
+    assert "function updateTableSort(tableKey, columnIndex)" in js
+    assert "function updateTableFilter(tableKey, value)" in js
+    assert "function updateTablePage(tableKey, delta)" in js
+    assert "function updateTablePageSize(tableKey, value)" in js
+    assert "normalizeScannableTables(scope);" in js
+    assert "const sortedMatchingRows = sortedRows.filter((row) => matchingSet.has(row));" in js
+    assert "const visibleRows = new Set(sortedMatchingRows.slice(" in js
+    assert 'data-action-input="table-filter"' in js
+    assert 'data-action-change="table-page-size"' in js
+    assert 'data-action="table-sort"' in js
+    assert 'data-action="table-page"' in js
+    assert "aria-sort" in js
+    assert "aria-pressed" in js
+    assert "No rows match this quick filter." in js
+    assert "Clear the quick filter to restore the current seeded table." in js
+    assert "state.tableUi = {};" in js
+
+    assert ".scannable-table-wrap" in css
+    assert ".table-toolbar" in css
+    assert ".table-filter-input" in css
+    assert ".table-pagination" in css
+    assert ".table-sort-btn" in css
+    assert ".table-sort-indicator" in css
+    assert ".table th.table-primary-column" in css
+    assert ".table td.table-number-column" in css
+    assert "position: sticky;" in css
+
+
 def test_frontend_navigation_is_not_decorative() -> None:
     js = _read(FRONTEND_APP_JS)
     assert "const NAV_ITEMS" in js
     assert 'data-action="go"' in js
     assert "aria-current" in js
     assert "state.scrollTopByPage[pageKey] = 0;" in js
+
+
+def test_frontend_navigation_has_shallow_demo_path_and_return_control() -> None:
+    html = _read(FRONTEND_INDEX)
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    assert "const DEMO_PATH_ITEMS" in js
+    assert "const SUPPORTING_PAGE_DEMO_PATH_TARGETS" in js
+    assert "function renderDemoPathNav" in js
+    assert "function demoPathTargetPage" in js
+    assert "function demoPathProgressLabel" in js
+    assert "case \"back-to-demo-path\"" in js
+    assert 'id="back-to-demo-path"' in html
+    assert 'data-action="back-to-demo-path"' in html
+    assert "${renderDemoPathNav(persona)}${directoryMarkup}" in js
+    assert ".demo-path-nav" in css
+    assert ".demo-path-step.active" in css
+    assert ".top-btn.path-return" in css
+    for label in (
+        "Start",
+        "Adoption",
+        "Proof",
+        "Resolve",
+        "Act",
+        "Plan",
+        "Trust",
+    ):
+        assert f'label: "{label}"' in js
 
 
 def test_frontend_investor_walkthrough_is_defined() -> None:
@@ -955,6 +1689,6 @@ def test_repo_demo_docs_match_current_frontend_behavior() -> None:
     demo_guide = _read(REPO_ROOT / "docs" / "demo-guide.md")
     feature_matrix = _read(REPO_ROOT / "docs" / "demo-feature-matrix.md")
 
-    assert "Start Full Walkthrough" in repo_readme
+    assert "Start Guided Demo" in repo_readme
     assert "local directional estimate" in demo_guide
     assert "continues on deterministic local demo data" in feature_matrix

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# DEMO_ONLY_LAUNCHER: one-command startup for the synthetic local demo. It
+# installs local demo dependencies, starts memory/local adapters, reseeds dummy
+# state, and prints fake presenter personas. Not a production entrypoint.
+set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -12,6 +15,9 @@ PID_FILE="${REPO_ROOT}/.demo-start-${PORT}.pid"
 OPEN_BROWSER="${ACI_START_OPEN_BROWSER:-1}"
 DETACH="${ACI_START_DETACH:-0}"
 DEMO_PASSWORD="${ACI_START_DEMO_PASSWORD:-argmin-demo-local}"
+CURL_CONNECT_TIMEOUT="${ACI_CURL_CONNECT_TIMEOUT:-2}"
+CURL_MAX_TIME="${ACI_CURL_MAX_TIME:-10}"
+CURL_OPTS=(-fsS --connect-timeout "${CURL_CONNECT_TIMEOUT}" --max-time "${CURL_MAX_TIME}")
 REUSED_EXISTING=0
 SERVER_PID=""
 
@@ -22,6 +28,28 @@ fail() {
     tail -n 120 "${SERVER_LOG}" >&2
   fi
   exit 1
+}
+
+on_error() {
+  local status=$?
+  fail "command failed near line ${BASH_LINENO[0]}: ${BASH_COMMAND}"
+  exit "${status}"
+}
+trap on_error ERR
+
+validate_port_number() {
+  local port="$1"
+  if [[ ! "${port}" =~ ^[0-9]+$ ]] || (( port < 1 || port > 65535 )); then
+    fail "ACI_DEMO_PORT must be a numeric TCP port from 1 to 65535; got '${port}'."
+  fi
+}
+
+validate_bool() {
+  local name="$1"
+  local value="$2"
+  if [[ "${value}" != "0" && "${value}" != "1" ]]; then
+    fail "${name} must be 0 or 1; got '${value}'."
+  fi
 }
 
 cleanup() {
@@ -42,8 +70,10 @@ require_command() {
   fi
 }
 
-is_demo_healthy() {
-  curl -fsS "${BASE_URL}/health" >/dev/null 2>&1
+is_demo_usable() {
+  curl "${CURL_OPTS[@]}" "${BASE_URL}/health" >/dev/null 2>&1 \
+    && curl "${CURL_OPTS[@]}" "${BASE_URL}/ready" >/dev/null 2>&1 \
+    && curl "${CURL_OPTS[@]}" "${BASE_URL}/platform/" >/dev/null 2>&1
 }
 
 wait_for_endpoint() {
@@ -51,8 +81,9 @@ wait_for_endpoint() {
   local label="$2"
   local attempts="${3:-90}"
 
-  for _ in $(seq 1 "${attempts}"); do
-    if curl -fsS "${BASE_URL}${endpoint}" >/dev/null 2>&1; then
+  local attempt
+  for ((attempt = 1; attempt <= attempts; attempt += 1)); do
+    if curl "${CURL_OPTS[@]}" "${BASE_URL}${endpoint}" >/dev/null 2>&1; then
       return 0
     fi
     if [[ -n "${SERVER_PID}" ]] && ! kill -0 "${SERVER_PID}" 2>/dev/null; then
@@ -129,10 +160,13 @@ PY
 }
 
 cd "${REPO_ROOT}"
+validate_port_number "${PORT}"
+validate_bool "ACI_START_OPEN_BROWSER" "${OPEN_BROWSER}"
+validate_bool "ACI_START_DETACH" "${DETACH}"
 require_command curl
 require_command python3
 
-if is_demo_healthy; then
+if is_demo_usable; then
   REUSED_EXISTING=1
   echo "Reusing healthy Argmin demo already running at ${BASE_URL}."
 else
@@ -152,9 +186,9 @@ else
 fi
 
 wait_for_endpoint "/ready" "readiness endpoint"
-curl -fsS "${BASE_URL}/platform/" >/dev/null || fail "platform UI did not respond"
+curl "${CURL_OPTS[@]}" "${BASE_URL}/platform/" >/dev/null || fail "platform UI did not respond"
 
-reset_payload="$(curl -fsS -X POST "${BASE_URL}/v1/demo/reset" \
+reset_payload="$(curl "${CURL_OPTS[@]}" -X POST "${BASE_URL}/v1/demo/reset" \
   -H "Content-Type: application/json" \
   -d '{}')" || fail "demo reset/seed endpoint failed"
 

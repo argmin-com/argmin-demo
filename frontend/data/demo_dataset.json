@@ -1,5 +1,8 @@
 {
   "meta": {
+    "demo_only": true,
+    "data_classification": "DEMO_ONLY_SYNTHETIC_FIXTURE",
+    "demo_only_notice": "Synthetic local demo data only. Not customer telemetry, production billing, production IAM, or cloud-derived operational state.",
     "tenant": "NovaTech Industries",
     "environment": "demo",
     "runtime_role": "all",
@@ -1694,16 +1697,16 @@
     "workflow_map": {
       "summary": {
         "organization_label": "NovaTech Industries",
-        "workflow_count": 20,
-        "business_units_with_adoption": 4,
-        "teams_with_adoption": 4,
-        "ai_services_used": 17,
-        "capability_classes": 20,
-        "embedded_or_scaled_workflows": 14,
-        "governed_workflow_pct": 88.5,
-        "primary_adoption_pattern": "AI is moving from individual copilots into governed operational workflow steps across product, support, risk, and finance.",
-        "highest_maturity_signal": "Platform Engineering and Customer Engineering have the most workflow-embedded adoption, with Finance now entering close and renewal workflows.",
-        "lowest_maturity_signal": "Procurement and SaaS-seat workflows are valuable but still depend on proxy signals and review queues."
+        "workflow_count": 23,
+        "business_units_with_adoption": 6,
+        "teams_with_adoption": 9,
+        "ai_services_used": 19,
+        "capability_classes": 23,
+        "embedded_or_scaled_workflows": 15,
+        "governed_workflow_pct": 87.4,
+        "primary_adoption_pattern": "AI is moving from individual copilots into governed workflow steps across product, platform, data, customer, risk, finance, research, and marketing teams.",
+        "highest_maturity_signal": "Platform Engineering, Customer Engineering, and Finance Systems have the most workflow-embedded adoption, while Data Science is becoming a governed analytics surface.",
+        "lowest_maturity_signal": "Research and Marketing use cases are credible but still need tighter approval evidence before broad rollout."
       },
       "capabilities": [
         {
@@ -1727,6 +1730,14 @@
           "category": "GRC evidence",
           "primary_services": [
             "Mistral Large + Cohere Command R+"
+          ],
+          "workflow_count": 1
+        },
+        {
+          "capability": "Campaign brief generation and localization",
+          "category": "Marketing operations",
+          "primary_services": [
+            "Azure OpenAI GPT-4o"
           ],
           "workflow_count": 1
         },
@@ -1819,6 +1830,14 @@
           "workflow_count": 1
         },
         {
+          "capability": "Research synthesis with cited evidence",
+          "category": "Strategic research synthesis",
+          "primary_services": [
+            "Google Gemini 1.5 Pro"
+          ],
+          "workflow_count": 1
+        },
+        {
           "capability": "Retrieval augmented answers",
           "category": "Knowledge intelligence",
           "primary_services": [
@@ -1857,6 +1876,14 @@
             "Claude via AWS Bedrock + GitHub Advanced Security"
           ],
           "workflow_count": 1
+        },
+        {
+          "capability": "Warehouse summarization and anomaly narrative",
+          "category": "Data platform intelligence",
+          "primary_services": [
+            "Databricks Mosaic AI + DeepSeek R1"
+          ],
+          "workflow_count": 1
         }
       ],
       "services": [
@@ -1879,7 +1906,7 @@
           "provider": "Argmin / Snowflake",
           "service_type": "Finance analytics AI",
           "used_by_workflows": 1,
-          "governance_posture": "Proxy or review required"
+          "governance_posture": "Gateway-routed"
         },
         {
           "service": "Argmin forecast planner + pricing catalog",
@@ -1899,7 +1926,7 @@
           "service": "Azure OpenAI GPT-4o",
           "provider": "Microsoft Azure",
           "service_type": "Private endpoint model platform",
-          "used_by_workflows": 1,
+          "used_by_workflows": 2,
           "governance_posture": "Proxy or review required"
         },
         {
@@ -1917,9 +1944,23 @@
           "governance_posture": "Gateway-routed"
         },
         {
+          "service": "Databricks Mosaic AI + DeepSeek R1",
+          "provider": "Databricks / DeepSeek",
+          "service_type": "Data-platform AI",
+          "used_by_workflows": 1,
+          "governance_posture": "Gateway-routed"
+        },
+        {
           "service": "GitHub Copilot + OpenAI GPT-4o",
           "provider": "GitHub / OpenAI",
           "service_type": "Developer productivity AI",
+          "used_by_workflows": 1,
+          "governance_posture": "Proxy or review required"
+        },
+        {
+          "service": "Google Gemini 1.5 Pro",
+          "provider": "Google Vertex AI",
+          "service_type": "Hosted model API",
           "used_by_workflows": 1,
           "governance_posture": "Proxy or review required"
         },
@@ -1977,7 +2018,7 @@
           "provider": "Snowflake / OpenAI",
           "service_type": "Retrieval augmented generation",
           "used_by_workflows": 1,
-          "governance_posture": "Proxy or review required"
+          "governance_posture": "Gateway-routed"
         }
       ],
       "workflows": [
@@ -2248,7 +2289,8 @@
           "primary_signal": "control_id and evidence packet",
           "decision_owner": "GRC Manager",
           "evidence": "Control ID, document packet hash, user identity, gateway prompt log",
-          "next_step": "Track which AI-authored summaries are accepted by auditors without revision."
+          "next_step": "Track which AI-authored summaries are accepted by auditors without revision.",
+          "team_name": "Security"
         },
         {
           "id": "wf-spend-reconciliation",
@@ -2344,8 +2386,8 @@
           "id": "wf-product-prd-synthesis",
           "business_unit_id": "bu-product-platform",
           "business_unit_name": "Product and Platform",
-          "team_id": "team-platform-engineering",
-          "team_name": "Platform Engineering",
+          "team_id": "team-product",
+          "team_name": "Product",
           "workflow_name": "PRD synthesis and requirement traceability",
           "workflow_stage": "Product planning",
           "service_name": "OpenAI GPT-4o / Argmin PRD Proof",
@@ -2355,8 +2397,8 @@
           "capability_class": "Product operating intelligence",
           "entry_point": "Product planning workspace",
           "embedded_in": "PRD review, design-partner synthesis, and release-readiness scoring",
-          "exact_where": "After source-document intake and before roadmap prioritization review",
-          "how_adopted": "Product leads use governed prompt templates to extract requirements, compare them to visible demo surfaces, and route gaps to delivery owners.",
+          "exact_where": "During quarterly roadmap intake and before PRD sign-off for AI-enabled features",
+          "how_adopted": "Product managers convert discovery notes, customer calls, and draft specs into traceable PRD requirements with explicit acceptance criteria.",
           "user_persona": "AI product leads",
           "users_30d": 21,
           "requests_30d": 14280,
@@ -2365,19 +2407,19 @@
           "adoption_depth": "Embedded",
           "maturity_score": 86,
           "spend_30d_usd": 18300,
-          "primary_signal": "document ingestion job and product workspace event",
+          "primary_signal": "prd_id and product area",
           "decision_owner": "VP Product",
-          "evidence": "Document provenance, PRD Proof matrix, roadmap review notes, export artifact history",
-          "next_step": "Connect design-partner notes to the same traceability graph."
+          "evidence": "PRD ID, product area, customer segment, source note hash, and requirement traceability row",
+          "next_step": "Track requirement edits accepted by engineering and design before roadmap lock."
         },
         {
           "id": "wf-platform-cost-regression",
           "business_unit_id": "bu-product-platform",
           "business_unit_name": "Product and Platform",
-          "team_id": "team-platform-engineering",
-          "team_name": "Platform Engineering",
+          "team_id": "team-ml-engineering",
+          "team_name": "ML Engineering",
           "workflow_name": "Model cost regression review",
-          "workflow_stage": "Release engineering",
+          "workflow_stage": "Model evaluation",
           "service_name": "Argmin forecast planner + pricing catalog",
           "provider": "Argmin",
           "ai_service_category": "Cost intelligence",
@@ -2385,8 +2427,8 @@
           "capability_class": "Financial operations intelligence",
           "entry_point": "Release readiness checklist",
           "embedded_in": "Pre-release service review and monthly platform economics review",
-          "exact_where": "After staging traffic replay and before production rollout approval",
-          "how_adopted": "Service owners compare expected model mix to reconciled billing and receive a routed pricing-drift handoff when divergence crosses threshold.",
+          "exact_where": "After benchmark replay completes and before a model release is promoted to production traffic",
+          "how_adopted": "ML engineers replay representative traffic against candidate models and compare latency, quality, cost, and policy fit before rollout.",
           "user_persona": "Platform economics leads",
           "users_30d": 17,
           "requests_30d": 9320,
@@ -2395,10 +2437,10 @@
           "adoption_depth": "Embedded",
           "maturity_score": 83,
           "spend_30d_usd": 9200,
-          "primary_signal": "forecast scenario and billing reconciliation delta",
-          "decision_owner": "Director of Platform Economics",
-          "evidence": "Forecast plan, provider pricing catalog, billing reconciliation ledger, release checklist",
-          "next_step": "Make drift thresholds configurable by service criticality."
+          "primary_signal": "model release and evaluation run",
+          "decision_owner": "ML Platform Manager",
+          "evidence": "Evaluation run ID, model version, replay request sample, pricing catalog snapshot, and approval decision",
+          "next_step": "Attach regression results directly to release approvals and policy exception reviews."
         },
         {
           "id": "wf-customer-escalation-copilot",
@@ -2579,15 +2621,105 @@
           "decision_owner": "Head of Procurement",
           "evidence": "Provider spend rollup, model substitution candidates, contract metadata, approval note",
           "next_step": "Separate production-critical and experimental usage before renewal scenarios."
+        },
+        {
+          "id": "wf-warehouse-ai-summary",
+          "business_unit_id": "bu-data-insights",
+          "business_unit_name": "Data and Insights",
+          "team_id": "team-data-science",
+          "team_name": "Data Science",
+          "workflow_name": "Warehouse AI summarization and anomaly narrative",
+          "workflow_stage": "Revenue analytics close",
+          "service_name": "Databricks Mosaic AI + DeepSeek R1",
+          "provider": "Databricks / DeepSeek",
+          "ai_service_category": "Data-platform AI",
+          "capability": "Warehouse summarization and anomaly narrative",
+          "capability_class": "Data platform intelligence",
+          "entry_point": "analytics-batch-nightly",
+          "embedded_in": "Warehouse refresh notebooks and revenue operations packet assembly",
+          "exact_where": "After nightly feature tables refresh and before the weekly revenue operations pack is published",
+          "how_adopted": "Analysts generate variance explanations, outlier narratives, and source-query citations from governed warehouse jobs.",
+          "user_persona": "Analytics engineers and data scientists",
+          "users_30d": 23,
+          "requests_30d": 6410,
+          "repeat_user_rate_pct": 62.8,
+          "governed_usage_pct": 83.6,
+          "adoption_depth": "Embedded",
+          "maturity_score": 73,
+          "spend_30d_usd": 28400,
+          "primary_signal": "warehouse job and notebook run",
+          "decision_owner": "Head of Data Science",
+          "evidence": "Databricks job ID, notebook path, warehouse query hash, table lineage, and scheduled run owner",
+          "next_step": "Add reviewer acceptance signals so generated narratives can be tied to downstream forecast accuracy."
+        },
+        {
+          "id": "wf-research-briefing",
+          "business_unit_id": "bu-product-platform",
+          "business_unit_name": "Product and Platform",
+          "team_id": "team-research",
+          "team_name": "Research",
+          "workflow_name": "Strategic research briefing synthesis",
+          "workflow_stage": "Market and capability research",
+          "service_name": "Google Gemini 1.5 Pro",
+          "provider": "Google Vertex AI",
+          "ai_service_category": "Hosted model API",
+          "capability": "Research synthesis with cited evidence",
+          "capability_class": "Strategic research synthesis",
+          "entry_point": "research-assistant-prod",
+          "embedded_in": "Design-partner research notes, market scans, and technical literature review",
+          "exact_where": "After research artifacts are uploaded and before the design-partner briefing memo is reviewed",
+          "how_adopted": "Researchers summarize long documents, extract decision implications, and retain citation trails for product and investor readouts.",
+          "user_persona": "Research leads and product strategists",
+          "users_30d": 11,
+          "requests_30d": 2940,
+          "repeat_user_rate_pct": 58.2,
+          "governed_usage_pct": 79.5,
+          "adoption_depth": "Emerging",
+          "maturity_score": 61,
+          "spend_30d_usd": 17400,
+          "primary_signal": "research packet and source citation",
+          "decision_owner": "Research Director",
+          "evidence": "Research packet ID, source-document hash, citation spans, prompt log, and reviewer decision",
+          "next_step": "Separate confidential-source handling from public-market scans before broader rollout."
+        },
+        {
+          "id": "wf-campaign-copilot",
+          "business_unit_id": "bu-revenue-marketing",
+          "business_unit_name": "Revenue and Marketing",
+          "team_id": "team-marketing",
+          "team_name": "Marketing",
+          "workflow_name": "Campaign brief generation and localization",
+          "workflow_stage": "Campaign planning",
+          "service_name": "Azure OpenAI GPT-4o",
+          "provider": "Microsoft Azure",
+          "ai_service_category": "Private endpoint model platform",
+          "capability": "Campaign brief generation and localization",
+          "capability_class": "Marketing operations",
+          "entry_point": "campaign-copilot-prod",
+          "embedded_in": "Campaign intake, audience brief drafting, and regional localization review",
+          "exact_where": "After product messaging is approved and before localized campaign briefs are routed to regional marketing teams",
+          "how_adopted": "Marketing managers draft audience-specific briefs and localized variants while retaining brand, legal, and market approvals.",
+          "user_persona": "Marketing managers and regional campaign leads",
+          "users_30d": 17,
+          "requests_30d": 3720,
+          "repeat_user_rate_pct": 54.9,
+          "governed_usage_pct": 76.8,
+          "adoption_depth": "Pilot",
+          "maturity_score": 49,
+          "spend_30d_usd": 12600,
+          "primary_signal": "campaign ID and regional market",
+          "decision_owner": "Marketing Operations Director",
+          "evidence": "Campaign ID, brand approval ticket, localization market, prompt log, and publishing status",
+          "next_step": "Connect legal-review outcomes so approved variants can be measured against campaign performance."
         }
       ]
     }
   },
   "teams": [
     {
-      "id": "plat",
+      "id": "team-platform-engineering",
       "name": "Platform Engineering",
-      "lead": "Sarah Chen",
+      "lead": "Alice Ng",
       "headcount": 42,
       "spend_usd": 218400,
       "previous_spend_usd": 198200,
@@ -2601,12 +2733,16 @@
         "mistral-large"
       ],
       "cloud": "AWS",
-      "trac_usd": 226900
+      "trac_usd": 226900,
+      "business_unit_id": "bu-product-platform",
+      "business_unit_name": "Product and Platform",
+      "cost_center": "CC-100",
+      "service_owner_email": "alice.ng@novatech.example"
     },
     {
-      "id": "ml",
+      "id": "team-ml-engineering",
       "name": "ML Engineering",
-      "lead": "David Kim",
+      "lead": "Nina Park",
       "headcount": 28,
       "spend_usd": 126400,
       "previous_spend_usd": 139800,
@@ -2620,12 +2756,16 @@
         "deepseek-r1"
       ],
       "cloud": "GCP",
-      "trac_usd": 134500
+      "trac_usd": 134500,
+      "business_unit_id": "bu-product-platform",
+      "business_unit_name": "Product and Platform",
+      "cost_center": "CC-510",
+      "service_owner_email": "nina.park@novatech.example"
     },
     {
-      "id": "prod",
+      "id": "team-product",
       "name": "Product",
-      "lead": "Maria Santos",
+      "lead": "Camila Torres",
       "headcount": 35,
       "spend_usd": 134200,
       "previous_spend_usd": 108900,
@@ -2639,12 +2779,16 @@
         "titan-text-premier"
       ],
       "cloud": "AWS",
-      "trac_usd": 139800
+      "trac_usd": 139800,
+      "business_unit_id": "bu-product-platform",
+      "business_unit_name": "Product and Platform",
+      "cost_center": "CC-420",
+      "service_owner_email": "camila.torres@novatech.example"
     },
     {
-      "id": "data",
+      "id": "team-data-science",
       "name": "Data Science",
-      "lead": "James Walsh",
+      "lead": "Owen Brooks",
       "headcount": 22,
       "spend_usd": 98700,
       "previous_spend_usd": 87400,
@@ -2658,12 +2802,16 @@
         "qwen-2.5"
       ],
       "cloud": "Azure",
-      "trac_usd": 104200
+      "trac_usd": 104200,
+      "business_unit_id": "bu-data-insights",
+      "business_unit_name": "Data and Insights",
+      "cost_center": "CC-230",
+      "service_owner_email": "owen.brooks@novatech.example"
     },
     {
-      "id": "cust",
+      "id": "team-customer-engineering",
       "name": "Customer Engineering",
-      "lead": "Priya Patel",
+      "lead": "Maya Ford",
       "headcount": 18,
       "spend_usd": 76300,
       "previous_spend_usd": 71200,
@@ -2677,12 +2825,16 @@
         "titan-text-premier"
       ],
       "cloud": "AWS",
-      "trac_usd": 82100
+      "trac_usd": 82100,
+      "business_unit_id": "bu-customer-operations",
+      "business_unit_name": "Customer Operations",
+      "cost_center": "CC-410",
+      "service_owner_email": "maya.ford@novatech.example"
     },
     {
-      "id": "sec",
+      "id": "team-security",
       "name": "Security",
-      "lead": "Alex Okafor",
+      "lead": "Helen Ward",
       "headcount": 15,
       "spend_usd": 52400,
       "previous_spend_usd": 48700,
@@ -2696,10 +2848,14 @@
         "gpt-4o"
       ],
       "cloud": "Azure",
-      "trac_usd": 55900
+      "trac_usd": 55900,
+      "business_unit_id": "bu-risk-and-trust",
+      "business_unit_name": "Risk and Trust",
+      "cost_center": "CC-330",
+      "service_owner_email": "helen.ward@novatech.example"
     },
     {
-      "id": "res",
+      "id": "team-research",
       "name": "Research",
       "lead": "Dr. Lin Zhang",
       "headcount": 12,
@@ -2715,12 +2871,16 @@
         "gemini-1.5-pro"
       ],
       "cloud": "GCP",
-      "trac_usd": 49200
+      "trac_usd": 49200,
+      "business_unit_id": "bu-product-platform",
+      "business_unit_name": "Product and Platform",
+      "cost_center": "CC-760",
+      "service_owner_email": "lin.zhang@novatech.example"
     },
     {
-      "id": "mkt",
+      "id": "team-marketing",
       "name": "Marketing",
-      "lead": "Rachel Green",
+      "lead": "Samira Okafor",
       "headcount": 20,
       "spend_usd": 35600,
       "previous_spend_usd": 28400,
@@ -2734,12 +2894,16 @@
         "mistral-large"
       ],
       "cloud": "AWS",
-      "trac_usd": 38100
+      "trac_usd": 38100,
+      "business_unit_id": "bu-revenue-marketing",
+      "business_unit_name": "Revenue and Marketing",
+      "cost_center": "CC-720",
+      "service_owner_email": "samira.okafor@novatech.example"
     },
     {
-      "id": "fin",
+      "id": "team-finance-systems",
       "name": "Finance Systems",
-      "lead": "Rachel Green",
+      "lead": "Leah Morgan",
       "headcount": 29,
       "spend_usd": 61200,
       "previous_spend_usd": 54500,
@@ -2753,7 +2917,11 @@
         "command-r+"
       ],
       "cloud": "Azure / AWS",
-      "trac_usd": 65400
+      "trac_usd": 65400,
+      "business_unit_id": "bu-finance-and-ops",
+      "business_unit_name": "Finance and Operations",
+      "cost_center": "CC-610",
+      "service_owner_email": "leah.morgan@novatech.example"
     }
   ],
   "models": [
@@ -2915,13 +3083,13 @@
       "name": "Model over-provisioning",
       "value_usd": 62800,
       "description": "High-cost models used where validated lower-cost equivalents exist",
-      "color": "#ef4545"
+      "color": "#ee5858"
     },
     {
       "name": "Duplicate requests",
       "value_usd": 29100,
       "description": "Repeated inference payloads without semantic-cache policy",
-      "color": "#9166f0"
+      "color": "#4f8ef8"
     },
     {
       "name": "Staging and dev sprawl",
@@ -2933,13 +3101,13 @@
       "name": "Prompt inefficiency",
       "value_usd": 13900,
       "description": "Token inflation from verbose templates and repeated context",
-      "color": "#4a8cf7"
+      "color": "#4f8ef8"
     },
     {
       "name": "Batch mispricing",
       "value_usd": 6300,
       "description": "Eligible deferred workloads still running on on-demand pricing",
-      "color": "#17bec8"
+      "color": "#8ea0bf"
     }
   ],
   "attribution_requests": [
@@ -4183,7 +4351,7 @@
       {
         "key": "advisory",
         "label": "Advisory",
-        "description": "Enriches request/response path with X-ACI cost and attribution headers.",
+        "description": "Argmin enriches request/response paths with X-ACI cost and attribution headers.",
         "impact": "Applications decide whether to act on optimization guidance."
       },
       {
@@ -4753,7 +4921,7 @@
         "description": "Shows how a savings recommendation becomes execution work.",
         "route_id": "intervention-implementation",
         "business_question": "How does an approved intervention become actual implementation work?",
-        "expected_outcome": "ACI pushes a structured handoff into downstream execution channels."
+        "expected_outcome": "Argmin pushes a structured handoff into downstream execution channels."
       },
       {
         "scenario_id": "pricing-drift",
@@ -4806,7 +4974,7 @@
     ],
     "recent_deliveries": [
       {
-        "delivery_id": "delivery-1709138520000-1",
+        "delivery_id": "delivery-20260228-162200-01",
         "channel": "slack",
         "target": "slack://ai-governance-war-room",
         "status": "simulated",
@@ -4822,7 +4990,7 @@
         "scenario_id": "policy-breach"
       },
       {
-        "delivery_id": "delivery-1709139000000-2",
+        "delivery_id": "delivery-20260228-163000-02",
         "channel": "webhook",
         "target": "webhook://service-desk/aci-implementation",
         "status": "simulated",
@@ -4838,7 +5006,7 @@
         "scenario_id": "intervention-approved"
       },
       {
-        "delivery_id": "delivery-1709139600000-3",
+        "delivery_id": "delivery-20260228-164000-03",
         "channel": "slack",
         "target": "slack://platform-economics",
         "status": "simulated",
@@ -4854,7 +5022,7 @@
         "scenario_id": "pricing-drift"
       },
       {
-        "delivery_id": "delivery-1709139720000-4",
+        "delivery_id": "delivery-20260228-164200-04",
         "channel": "email",
         "target": "exec-staff@novatech.example",
         "status": "simulated",
@@ -4870,7 +5038,7 @@
         "scenario_id": "executive-digest"
       },
       {
-        "delivery_id": "delivery-1709140080000-5",
+        "delivery_id": "delivery-20260228-164800-05",
         "channel": "jira",
         "target": "jira://finops-attribution",
         "status": "simulated",
@@ -4886,7 +5054,7 @@
         "scenario_id": "manual-mapping-dispute"
       },
       {
-        "delivery_id": "delivery-1709140260000-6",
+        "delivery_id": "delivery-20260228-165100-06",
         "channel": "slack",
         "target": "slack://security-ai-review",
         "status": "simulated",
@@ -4902,7 +5070,7 @@
         "scenario_id": "security-exception"
       },
       {
-        "delivery_id": "delivery-1709140440000-7",
+        "delivery_id": "delivery-20260228-165400-07",
         "channel": "email",
         "target": "service-owners@novatech.example",
         "status": "simulated",
@@ -4918,7 +5086,7 @@
         "scenario_id": "service-owner-scorecard"
       },
       {
-        "delivery_id": "delivery-1709140620000-8",
+        "delivery_id": "delivery-20260228-165700-08",
         "channel": "email",
         "target": "platform-sustainability@novatech.example",
         "status": "simulated",
@@ -4934,7 +5102,7 @@
         "scenario_id": "energy-review"
       },
       {
-        "delivery_id": "delivery-1709140740000-9",
+        "delivery_id": "delivery-20260228-165900-09",
         "channel": "servicenow",
         "target": "servicenow://change/ai-exceptions",
         "status": "simulated",
@@ -4950,7 +5118,7 @@
         "scenario_id": "security-exception"
       },
       {
-        "delivery_id": "delivery-1709140860000-10",
+        "delivery_id": "delivery-20260228-170100-10",
         "channel": "jira",
         "target": "jira://platform-economics/energy",
         "status": "failed",
@@ -5930,24 +6098,24 @@
     },
     {
       "id": "mm_003",
-      "request_id": null,
-      "workload_label": "ml-evals-sandbox",
-      "scope": "Shared experimentation namespace",
+      "request_id": "req_c9a18d42",
+      "workload_label": "research-briefing-sandbox",
+      "scope": "Shared research briefing workspace",
       "current_owner": "Research",
       "suggested_owner": "Product",
       "candidate_teams": [
-        "Product",
         "Research",
+        "Product",
         "Security"
       ],
-      "confidence_pct": 68,
+      "confidence_pct": 72,
       "spend_at_risk_usd": 9700,
-      "reason_code": "sandbox sprawl",
-      "reason": "Experiment traffic is inheriting an outdated org mapping",
-      "recommendation": "Assign the sandbox to the accountable production sponsor before enabling automated chargeback or budget enforcement.",
+      "reason_code": "sponsor ambiguity",
+      "reason": "Research briefing traffic is tagged to a shared sandbox while Product is sponsoring the active design-partner readout.",
+      "recommendation": "Assign the sandbox to the accountable product sponsor before enabling automated chargeback or budget enforcement.",
       "evidence": [
-        "Recent request growth came from a shared evaluation namespace with rotating service identities.",
-        "The legacy research mapping no longer reflects who is sponsoring the spend.",
+        "Recent request growth came from a shared research briefing workspace with rotating service identities.",
+        "The research team owns source analysis, while the active readout is budgeted to Product.",
         "Without a manual correction, the platform should continue treating this usage as provisional."
       ],
       "note": "This queue item shows investors that low-confidence attribution is surfaced explicitly instead of being hidden inside a blended cost number.",
@@ -8250,8 +8418,8 @@
         "status": "green",
         "design_partner_value": "Product and operations leaders can see where AI is embedded in actual work, not only which models were called.",
         "evidence": [
-          "20 workflows mapped across business units",
-          "17 AI services and 20 capability classes represented",
+          "23 workflows mapped across business units",
+          "19 AI services and 23 capability classes represented",
           "Insertion points and decision owners are visible"
         ]
       },
@@ -8475,7 +8643,7 @@
       },
       {
         "metric": "Workflow adoption visibility",
-        "baseline": "20 modeled workflows",
+        "baseline": "23 modeled workflows",
         "target": "Top 10 customer workflows mapped to team, tool, owner, and capability",
         "owner": "AI Product Lead",
         "proof_surface": "Employee Adoption"
@@ -8566,8 +8734,10 @@
         "Auditor",
         "Engineer",
         "FinOps",
+        "Manager",
         "Product",
-        "Security"
+        "Security",
+        "User"
       ],
       "read_only_integrations": 9,
       "mutation_surfaces": 8,
@@ -8630,6 +8800,20 @@
         "status": "active",
         "mfa": "enforced",
         "last_auth": "2026-02-28T14:48:00Z"
+      },
+      {
+        "name": "Samira Okafor",
+        "role": "Manager",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T16:22:00Z"
+      },
+      {
+        "name": "Noah Kim",
+        "role": "User",
+        "status": "active",
+        "mfa": "enforced",
+        "last_auth": "2026-02-28T13:17:00Z"
       },
       {
         "name": "Leah Morgan",

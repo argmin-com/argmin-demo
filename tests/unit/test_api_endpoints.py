@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 import pytest
@@ -8,13 +10,42 @@ from fastapi.testclient import TestClient
 from jwt import encode
 from pydantic import SecretStr
 
-from aci.api.app import SlidingWindowRateLimiter, app, get_state
+from aci.api.app import (
+    AdoptionDashboardResponse,
+    AdoptionHierarchyResponse,
+    DemoModeRequest,
+    IntegrationOverviewResponse,
+    InterceptRequest,
+    InterventionTransitionRequest,
+    ManualAttributionRequest,
+    SlidingWindowRateLimiter,
+    SpendForecastRequest,
+    app,
+    get_state,
+)
 from aci.interceptor.gateway import DeploymentMode
 from aci.models.attribution import AttributionIndexEntry
 from aci.models.carbon import EnforcementAction, PolicyDefinition, PolicyType
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def assert_operator_error_envelope(
+    payload: dict[str, object],
+    *,
+    status_code: int,
+) -> dict[str, object]:
+    assert "detail" in payload
+    error = payload["error"]
+    assert isinstance(error, dict)
+    assert error["message"]
+    assert error["operator_guidance"]
+    assert error["correlation_id"]
+    assert error["status_code"] == status_code
+    return error
 
 
 @pytest.fixture(autouse=True)
@@ -150,6 +181,53 @@ def test_health_echoes_correlation_id_header() -> None:
     assert response.headers["X-ACI-Correlation-Id"] == "corr-health-1"
 
 
+def test_http_errors_include_operator_guidance_without_breaking_detail() -> None:
+    with TestClient(app) as client:
+        response = client.get(
+            "/v1/attribution/missing-workload",
+            headers={"X-ACI-Correlation-Id": "corr-http-1"},
+        )
+
+    assert response.status_code == 404
+    payload = response.json()
+    assert payload["detail"] == "Workload not found in attribution index"
+    assert payload["error"]["message"] == "Workload not found in attribution index"
+    assert_operator_error_envelope(payload, status_code=404)
+    assert payload["error"]["correlation_id"] == "corr-http-1"
+    assert "Traceback" not in response.text
+
+
+def test_unhandled_api_errors_return_operator_safe_payload(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    app_state = get_state()
+
+    def raise_unexpected_forecast_error(*args: object, **kwargs: object) -> object:
+        raise RuntimeError('boom\nTraceback (most recent call last):\n  File "secret.py", line 1')
+
+    monkeypatch.setattr(app_state.forecast, "forecast", raise_unexpected_forecast_error)
+
+    with TestClient(app, raise_server_exceptions=False) as client:
+        response = client.post(
+            "/v1/forecast/spend",
+            headers={"X-ACI-Correlation-Id": "corr-500-1"},
+            json={
+                "monthly_spend_usd": [412000, 489000, 567000, 634000],
+                "horizon_months": 3,
+            },
+        )
+
+    assert response.status_code == 500
+    payload = response.json()
+    assert payload["detail"] == "The demo API hit an unexpected local runtime error."
+    assert payload["error"]["code"] == "local_runtime_error"
+    assert_operator_error_envelope(payload, status_code=500)
+    assert payload["error"]["correlation_id"] == "corr-500-1"
+    assert "Traceback" not in response.text
+    assert "secret.py" not in response.text
+    assert "boom" not in response.text
+
+
 def test_platform_demo_serves_csp_header_for_frame_ancestors() -> None:
     with TestClient(app) as client:
         response = client.get("/platform/")
@@ -162,18 +240,21 @@ def test_platform_demo_serves_csp_header_for_frame_ancestors() -> None:
     assert response.headers["Pragma"] == "no-cache"
 
 
-def test_platform_demo_assets_are_versioned_and_not_cached() -> None:
+def test_platform_demo_assets_are_versioned_and_cacheable() -> None:
     with TestClient(app) as client:
         html = client.get("/platform/")
-        js = client.get("/platform/assets/app.js?v=20260309e")
+        js = client.get("/platform/assets/app.js?v=20260309aa")
+        dataset = client.get("/platform/data/demo_dataset.json?v=20260309aa")
 
     assert html.status_code == 200
-    assert 'src="assets/app.js?v=20260309e"' in html.text
-    assert 'href="assets/app.css?v=20260309e"' in html.text
-    assert 'src="vendor/chart.umd.min.js?v=20260309e"' in html.text
+    assert 'src="assets/app.js?v=20260309aa"' in html.text
+    assert 'href="assets/app.css?v=20260309aa"' in html.text
+    assert 'src="vendor/chart.umd.min.js?v=20260309aa"' in html.text
     assert js.status_code == 200
-    assert js.headers["Cache-Control"] == "no-store, max-age=0"
-    assert js.headers["Pragma"] == "no-cache"
+    assert js.headers["Cache-Control"] == "public, max-age=86400, immutable"
+    assert "Pragma" not in js.headers
+    assert dataset.status_code == 200
+    assert dataset.headers["Cache-Control"] == "public, max-age=86400, immutable"
 
 
 def test_event_ingest_is_idempotent_by_source_and_key() -> None:
@@ -413,7 +494,12 @@ def test_demo_bootstrap_seeds_adoption_dashboard() -> None:
         assert dashboard.status_code == 200
         dashboard_payload = dashboard.json()
         assert dashboard_payload["scope_type"] == "organization"
-        assert dashboard_payload["summary"]["active_employees_30d"] > 0
+        summary = dashboard_payload["summary"]
+        assert summary["eligible_employees"] == 812
+        assert summary["active_employees_30d"] == 486
+        assert 55 <= summary["adoption_penetration_pct"] <= 65
+        assert 55 <= summary["repeat_user_rate_pct"] <= 80
+        assert 10 <= summary["power_user_rate_pct"] <= 30
         assert dashboard_payload["executive_lenses"]
         assert dashboard_payload["top_employees"]
 
@@ -430,6 +516,9 @@ def test_demo_reset_restores_deterministic_runtime_baseline() -> None:
         assert first_payload["reset_token"] == "argmin-demo-baseline-v1"
         assert len(first_payload["scenario_ids"]) == 8
         assert len(first_payload["demo_accounts"]) >= 6
+        assert {"Admin", "Manager", "User", "Auditor"} <= {
+            account["role"] for account in first_payload["demo_accounts"]
+        }
         assert first_payload["events_published"] == 6
 
         mode = client.post("/v1/demo/mode", json={"mode": "active"})
@@ -483,6 +572,157 @@ def test_demo_reset_restores_deterministic_runtime_baseline() -> None:
             first_payload["scenario_ids"]
         )
         assert all(item["sent_at"].startswith("2026-02-28T17:") for item in delivery_payload)
+
+
+def test_frontend_backend_contracts_match_demo_payloads_and_responses() -> None:
+    app_state = get_state()
+    app_state.config.environment = "demo"
+    dataset = json.loads((REPO_ROOT / "frontend" / "data" / "demo_dataset.json").read_text())
+
+    AdoptionHierarchyResponse.model_validate(dataset["adoption"]["hierarchy"])
+    for dashboard in dataset["adoption"]["dashboards"].values():
+        AdoptionDashboardResponse.model_validate(dashboard)
+    IntegrationOverviewResponse.model_validate(dataset["integrations"])
+
+    for key, scenario in dataset["demo_scenarios"].items():
+        InterceptRequest.model_validate(
+            {
+                **scenario["payload"],
+                "request_id": scenario["payload"].get("request_id", f"contract-{key}"),
+            }
+        )
+
+    for mode in ("passive", "advisory", "active"):
+        DemoModeRequest.model_validate({"mode": mode})
+    for status in ("recommended", "review", "approved", "implemented", "dismissed"):
+        InterventionTransitionRequest.model_validate(
+            {"status": status, "actor": "demo-ui", "note": "contract check"}
+        )
+
+    monthly_spend = [
+        float(point["total"]) * 1000.0
+        for point in dataset["overview"]["spend_trend_k_usd"]
+    ]
+    SpendForecastRequest.model_validate(
+        {"monthly_spend_usd": monthly_spend, "horizon_months": 3}
+    )
+
+    teams_by_name = {team["name"]: team for team in dataset["teams"]}
+    for mapping in dataset["manual_mapping"]:
+        if mapping["status"] == "deferred":
+            continue
+        resolved_team_name = (
+            mapping.get("resolved_team")
+            or mapping.get("suggested_owner")
+            or mapping.get("current_owner")
+        )
+        team = teams_by_name.get(resolved_team_name)
+        fallback_team_id = str(resolved_team_name).strip().lower().replace(" ", "-") or "unknown"
+        team_id = team["id"] if team is not None else f"team-{fallback_team_id}"
+        ManualAttributionRequest.model_validate(
+            {
+                "workload_id": mapping["workload_label"],
+                "true_team_id": team_id,
+                "true_team_name": resolved_team_name,
+                "true_cost_center_id": f"CC-{str(team_id).upper()}",
+                "true_cost_center_name": f"{resolved_team_name} Cost Center",
+                "actor": "demo-ui",
+                "note": f"Manual mapping {mapping['id']} resolved from the local demo UI.",
+            }
+        )
+
+    with TestClient(app) as client:
+        reset = client.post("/v1/demo/reset")
+        assert reset.status_code == 200
+        reset_payload = reset.json()
+        datetime.fromisoformat(reset_payload["reference_time"])
+        assert reset_payload["interceptor_mode"] in {"passive", "advisory", "active"}
+        assert all(" " not in workload for workload in reset_payload["workloads"])
+
+        hierarchy = client.get("/v1/adoption/hierarchy")
+        assert hierarchy.status_code == 200
+        AdoptionHierarchyResponse.model_validate(hierarchy.json())
+
+        dashboard = client.get(
+            "/v1/adoption/dashboard?scope=organization&scope_id=org-novatech&window_days=30"
+        )
+        assert dashboard.status_code == 200
+        dashboard_payload = dashboard.json()
+        AdoptionDashboardResponse.model_validate(dashboard_payload)
+        datetime.fromisoformat(dashboard_payload["generated_at"])
+        assert dashboard_payload["scope_type"] == "organization"
+        assert dashboard_payload["summary"]["active_employees_30d"] > 0
+
+        integrations = client.get("/v1/integrations/overview?limit=12")
+        assert integrations.status_code == 200
+        integration_payload = integrations.json()
+        IntegrationOverviewResponse.model_validate(integration_payload)
+        assert integration_payload["summary"]["live_delivery_mode"] in {"live", "simulated"}
+        route_ids = {route["route_id"] for route in integration_payload["routes"]}
+        for scenario in integration_payload["scenarios"]:
+            assert scenario["route_id"] in route_ids
+
+        scenario_id = integration_payload["scenarios"][0]["scenario_id"]
+        dispatch = client.post(f"/v1/integrations/scenarios/{scenario_id}/dispatch", json={})
+        assert dispatch.status_code == 200
+        dispatch_payload = dispatch.json()
+        assert dispatch_payload["scenario_id"] == scenario_id
+        assert dispatch_payload["deliveries"]
+        datetime.fromisoformat(dispatch_payload["deliveries"][0]["sent_at"])
+
+        interventions = client.get("/v1/interventions")
+        assert interventions.status_code == 200
+        intervention_payload = interventions.json()
+        valid_intervention_statuses = {
+            "recommended",
+            "review",
+            "approved",
+            "implemented",
+            "dismissed",
+        }
+        assert {
+            item["status"]
+            for item in intervention_payload["interventions"]
+        } <= valid_intervention_statuses
+        for item in intervention_payload["interventions"]:
+            datetime.fromisoformat(item["updated_at"])
+
+        mode_response = client.post("/v1/demo/mode", json={"mode": "active"})
+        assert mode_response.status_code == 200
+        assert mode_response.json()["interceptor_mode"] == "active"
+
+        intercept = client.post(
+            "/v1/intercept",
+            json={
+                **dataset["demo_scenarios"]["enriched"]["payload"],
+                "request_id": "contract-enriched",
+            },
+        )
+        assert intercept.status_code == 200
+        intercept_payload = intercept.json()
+        assert intercept_payload["request_id"] == "contract-enriched"
+        assert intercept_payload["outcome"] in {
+            "enriched",
+            "fail_open",
+            "soft_stopped",
+            "redirected",
+            "timeout",
+        }
+        assert isinstance(intercept_payload["enrichment_headers"], dict)
+
+        forecast = client.post(
+            "/v1/forecast/spend",
+            json={"monthly_spend_usd": monthly_spend, "horizon_months": 3},
+        )
+        assert forecast.status_code == 200
+        forecast_payload = forecast.json()
+        assert len(forecast_payload["points"]) == 3
+        assert {
+            "month_offset",
+            "predicted_spend_usd",
+            "lower_bound_usd",
+            "upper_bound_usd",
+        } <= set(forecast_payload["points"][0])
 
 
 def test_adoption_dashboard_supports_scope_drilldown() -> None:
@@ -582,7 +822,9 @@ def test_intercept_endpoint_can_be_disabled_by_runtime_role_flag() -> None:
             },
         )
         assert response.status_code == 503
-        assert "interceptor disabled" in response.json()["detail"]
+        payload = response.json()
+        assert "interceptor disabled" in payload["detail"]
+        assert_operator_error_envelope(payload, status_code=503)
 
 
 def test_gateway_runtime_restricts_non_intercept_v1_routes() -> None:
@@ -594,7 +836,10 @@ def test_gateway_runtime_restricts_non_intercept_v1_routes() -> None:
     with TestClient(app) as client:
         response = client.get("/v1/dashboard/overview")
         assert response.status_code == 503
-        assert "runtime role 'gateway'" in response.json()["detail"]
+        payload = response.json()
+        assert "runtime role 'gateway'" in payload["detail"]
+        error = assert_operator_error_envelope(payload, status_code=503)
+        assert error["code"] == "runtime_surface_unavailable"
 
 
 def test_v1_endpoints_require_auth_outside_development() -> None:
@@ -625,6 +870,8 @@ def test_v1_endpoints_require_auth_outside_development() -> None:
     with TestClient(app) as client:
         unauthenticated = client.get("/v1/dashboard/overview")
         assert unauthenticated.status_code == 401
+        error = assert_operator_error_envelope(unauthenticated.json(), status_code=401)
+        assert error["code"] == "missing_bearer_token"
 
         authenticated = client.get(
             "/v1/dashboard/overview",
@@ -672,7 +919,9 @@ def test_event_batch_ingest_rejects_oversized_batches() -> None:
     with TestClient(app) as client:
         response = client.post("/v1/events/ingest/batch", json=payload)
         assert response.status_code == 413
-        assert "exceeds configured max" in response.json()["detail"]
+        response_payload = response.json()
+        assert "exceeds configured max" in response_payload["detail"]
+        assert_operator_error_envelope(response_payload, status_code=413)
 
 
 def test_event_batch_ingest_rejects_empty_batches() -> None:
@@ -786,7 +1035,10 @@ def test_event_ingest_rejects_oversized_request_body_before_parsing() -> None:
         )
 
     assert response.status_code == 413
-    assert "request body exceeds configured max" in response.json()["detail"]
+    payload = response.json()
+    assert "request body exceeds configured max" in payload["detail"]
+    error = assert_operator_error_envelope(payload, status_code=413)
+    assert error["code"] == "request_body_too_large"
 
 
 def test_index_lookup_endpoint_contract() -> None:
@@ -847,7 +1099,12 @@ def test_intercept_gate_returns_413_schema_for_input_token_limit() -> None:
         )
         assert response.status_code == 413
         payload = response.json()
+        assert response.headers["X-ACI-Correlation-Id"]
+        assert response.headers["X-ACI-Correlation-Id"] == payload["error"]["correlation_id"]
+        assert payload["detail"] == payload["error"]["message"]
+        assert_operator_error_envelope(payload, status_code=413)
         assert payload["error"]["type"] == "token_size_exceeded"
+        assert payload["error"]["code"] == "token_size_exceeded"
         assert payload["error"]["policy_id"] == "token_budget_input"
         assert payload["error"]["request_id"] == "req-gate-413"
         assert payload["error"]["retry"] is False
@@ -885,7 +1142,10 @@ def test_intercept_gate_returns_403_schema_for_cost_ceiling() -> None:
 
     assert response.status_code == 403
     payload = response.json()
+    assert payload["detail"] == payload["error"]["message"]
+    assert_operator_error_envelope(payload, status_code=403)
     assert payload["error"]["type"] == "cost_approval_required"
+    assert payload["error"]["code"] == "cost_approval_required"
     assert payload["error"]["policy_id"] == "cost_ceiling"
     assert payload["error"]["request_id"] == "req-gate-cost"
     assert payload["error"]["approved_alternatives"] == ["gpt-4o-mini"]

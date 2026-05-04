@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# DEMO_ONLY_LAUNCHER: starts a laptop-safe runtime with synthetic fixtures,
+# fake-auth bypass, memory/local adapters, and outbound network disabled.
+# Do not reuse this script as a production or staging entrypoint.
+set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -7,6 +10,18 @@ PORT="${ACI_DEMO_PORT:-8000}"
 VENV_DIR="${ACI_DEMO_VENV_DIR:-${REPO_ROOT}/.venv}"
 REQUIREMENTS_FILE="${ACI_DEMO_REQUIREMENTS_FILE:-requirements-demo.lock}"
 DEPS_STAMP="${VENV_DIR}/.argmin-demo-deps.sha256"
+
+fail() {
+  echo "Demo runtime failed: $*" >&2
+  exit 1
+}
+
+on_error() {
+  local status=$?
+  echo "Demo runtime failed near line ${BASH_LINENO[0]}: ${BASH_COMMAND}" >&2
+  exit "${status}"
+}
+trap on_error ERR
 
 require_python312() {
   local interpreter="$1"
@@ -18,6 +33,13 @@ if sys.version_info < (3, 12):
     sys.stderr.write(f"Python 3.12+ is required; found Python {version}.\n")
     raise SystemExit(1)
 PY
+}
+
+validate_port_number() {
+  local port="$1"
+  if [[ ! "${port}" =~ ^[0-9]+$ ]] || (( port < 1 || port > 65535 )); then
+    fail "ACI_DEMO_PORT must be a numeric TCP port from 1 to 65535; got '${port}'."
+  fi
 }
 
 require_port_available() {
@@ -41,6 +63,7 @@ PY
 }
 
 cd "${REPO_ROOT}"
+validate_port_number "${PORT}"
 
 if [[ "${ACI_DEMO_SKIP_PREFLIGHT:-0}" != "1" ]]; then
   ACI_PREFLIGHT_PROFILE=demo ACI_PREFLIGHT_REQUIRE_PORT_FREE=1 "${SCRIPT_DIR}/preflight_local.sh"
@@ -72,6 +95,10 @@ fi
 source "${VENV_DIR}/bin/activate"
 require_python312 python
 
+if [[ ! -f "${REQUIREMENTS_FILE}" ]]; then
+  fail "requirements file not found: ${REQUIREMENTS_FILE}. Run from a complete clone or set ACI_DEMO_REQUIREMENTS_FILE to an existing lockfile."
+fi
+
 current_deps_hash="$(
   REQUIREMENTS_FILE="${REQUIREMENTS_FILE}" python - <<'PY'
 from hashlib import sha256
@@ -101,8 +128,9 @@ else
   echo "Skipping dependency installation because ACI_DEMO_SKIP_INSTALL=1."
 fi
 
-# Deterministic local-only runtime for demo mode. These are intentionally forced
-# so shell-level cloud or shared-backend settings cannot leak into a laptop demo.
+# DEMO_ONLY_LOCAL_ADAPTER_BOUNDARY: deterministic local-only runtime for demo
+# mode. These settings are intentionally forced so shell-level cloud,
+# production, or shared-backend settings cannot leak into a laptop demo.
 export ACI_ENVIRONMENT="demo"
 export ACI_TENANT_ID="demo-local"
 export ACI_RUNTIME_ROLE="all"
@@ -118,6 +146,8 @@ export ACI_INTERCEPTOR_CIRCUIT_STATE_BACKEND="local"
 export ACI_NOTIFICATION_LIVE_NETWORK="false"
 export ACI_NOTIFICATION_ALLOW_PRIVATE_TARGETS="false"
 export ACI_AUTH_ENABLED="true"
+# DEMO_ONLY_FAKE_AUTH_BOUNDARY: allowed only because ACI_ENVIRONMENT is forced
+# to demo above and production/staging requests are refused before startup.
 export ACI_AUTH_ALLOW_DEV_BYPASS="true"
 export PYTHONPATH="${REPO_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}"
 

@@ -1,8 +1,15 @@
-"""Deterministic demo bootstrap for local and reviewer-facing walkthroughs."""
+"""DEMO_ONLY_FIXTURE deterministic bootstrap for local walkthroughs.
+
+This module seeds synthetic employees, workloads, events, integrations, and
+demo personas. It is intentionally imported only by the dedicated demo runtime
+path and non-production `/v1/demo/*` controls; production bootstrap and tenant
+onboarding must use real ingestion, identity, and persistence paths instead.
+"""
 
 from __future__ import annotations
 
 import calendar
+from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from typing import TYPE_CHECKING
@@ -59,6 +66,24 @@ DEMO_USER_ACCOUNTS = (
         "status": "Active",
     },
     {
+        "name": "Samira Okafor",
+        "email": "samira.okafor@novatech.example",
+        "role": "Manager",
+        "status": "Active",
+    },
+    {
+        "name": "Noah Kim",
+        "email": "noah.kim@novatech.example",
+        "role": "User",
+        "status": "Active",
+    },
+    {
+        "name": "Priya Nair",
+        "email": "priya.nair@novatech.example",
+        "role": "Auditor",
+        "status": "Active",
+    },
+    {
         "name": "Former Ops User",
         "email": "former.ops@novatech.example",
         "role": "Engineer",
@@ -77,6 +102,22 @@ class DemoBootstrapResult:
     reference_time: str
     scenario_ids: list[str]
     demo_accounts: list[dict[str, str]]
+
+
+@dataclass(frozen=True)
+class DemoAdoptionCohort:
+    team_id: str
+    team_name: str
+    business_unit_id: str
+    business_unit_name: str
+    eligible_count: int
+    active_count: int
+    title: str
+    entry_point: str
+    model: str
+    cost_per_request: float
+    governed_pct: float
+    intervention_pct: float
 
 
 def demo_seed_entries() -> list[AttributionIndexEntry]:
@@ -115,7 +156,7 @@ def demo_seed_entries() -> list[AttributionIndexEntry]:
         ),
         AttributionIndexEntry(
             workload_id="code-intel-prod",
-            team_id="team-platform-eng",
+            team_id="team-platform-engineering",
             team_name="Platform Engineering",
             cost_center_id="CC-3100",
             confidence=0.95,
@@ -344,7 +385,7 @@ def _seed_graph(app_state: AppState) -> None:
             label="Data Science",
         ),
         GraphNode(
-            node_id="team:team-platform-eng",
+            node_id="team:team-platform-engineering",
             node_type=NodeType.TEAM,
             label="Platform Engineering",
         ),
@@ -420,7 +461,7 @@ def _seed_graph(app_state: AppState) -> None:
         GraphEdge.deterministic(
             edge_type=EdgeType.ATTRIBUTED_TO,
             from_id="resource:code-intel-prod",
-            to_id="team:team-platform-eng",
+            to_id="team:team-platform-engineering",
             valid_from=seeded_at,
             source="demo",
         ),
@@ -440,7 +481,7 @@ def _seed_graph(app_state: AppState) -> None:
         ),
         GraphEdge.deterministic(
             edge_type=EdgeType.OWNS_CODE,
-            from_id="team:team-platform-eng",
+            from_id="team:team-platform-engineering",
             to_id="repo:code-intelligence",
             valid_from=seeded_at,
             source="demo",
@@ -461,7 +502,7 @@ def _seed_graph(app_state: AppState) -> None:
         ),
         GraphEdge.deterministic(
             edge_type=EdgeType.BUDGETED_UNDER,
-            from_id="team:team-platform-eng",
+            from_id="team:team-platform-engineering",
             to_id="budget:CC-3100",
             valid_from=seeded_at,
             source="demo",
@@ -469,7 +510,7 @@ def _seed_graph(app_state: AppState) -> None:
         GraphEdge.deterministic(
             edge_type=EdgeType.MEMBER_OF,
             from_id="person:alice.ng",
-            to_id="team:team-platform-eng",
+            to_id="team:team-platform-engineering",
             valid_from=seeded_at,
             source="demo",
         ),
@@ -492,7 +533,7 @@ def _demo_events(app_state: AppState) -> list[DomainEvent]:
                 "user_email": "alice.ng@novatech.example",
                 "employee_title": "Director of Developer Productivity",
                 "previous_team": "",
-                "new_team": "team-platform-eng",
+                "new_team": "team-platform-engineering",
                 "new_team_name": "Platform Engineering",
                 "business_unit_id": "bu-product-platform",
                 "business_unit_name": "Product and Platform",
@@ -628,7 +669,7 @@ def _demo_events(app_state: AppState) -> list[DomainEvent]:
                 "person_name": "Alice Ng",
                 "user_email": "alice.ng@novatech.example",
                 "employee_title": "Director of Developer Productivity",
-                "team_id": "team-platform-eng",
+                "team_id": "team-platform-engineering",
                 "team_name": "Platform Engineering",
                 "business_unit_id": "bu-product-platform",
                 "business_unit_name": "Product and Platform",
@@ -657,7 +698,7 @@ def _seed_adoption(app_state: AppState) -> None:
             "name": "Alice Ng",
             "email": "alice.ng@novatech.example",
             "title": "Director of Developer Productivity",
-            "team_id": "team-platform-eng",
+            "team_id": "team-platform-engineering",
             "team_name": "Platform Engineering",
             "business_unit_id": "bu-product-platform",
             "business_unit_name": "Product and Platform",
@@ -667,7 +708,7 @@ def _seed_adoption(app_state: AppState) -> None:
             "name": "Devon Ross",
             "email": "devon.ross@novatech.example",
             "title": "Staff Platform Engineer",
-            "team_id": "team-platform-eng",
+            "team_id": "team-platform-engineering",
             "team_name": "Platform Engineering",
             "business_unit_id": "bu-product-platform",
             "business_unit_name": "Product and Platform",
@@ -790,7 +831,7 @@ def _seed_adoption(app_state: AppState) -> None:
             eligible_for_ai=True,
         )
 
-    seed_profiles = [
+    seed_profiles: list[tuple[str, int, float, float, float, str, str]] = [
         ("alice.ng", 38, 14.2, 0.96, 0.08, "Google / gemini-2.0-flash", "developer-copilot"),
         ("devon.ross", 26, 7.4, 0.94, 0.04, "Google / gemini-2.0-flash", "developer-copilot"),
         ("nina.park", 29, 11.1, 0.92, 0.06, "OpenAI / gpt-4o", "model-eval-workbench"),
@@ -804,6 +845,207 @@ def _seed_adoption(app_state: AppState) -> None:
         ("lena.price", 9, 2.7, 0.83, 0.01, "OpenAI / gpt-4o-mini", "finance-ops-assistant"),
         ("samir.bose", 11, 2.1, 0.79, 0.0, "OpenAI / gpt-4o-mini", "operations-briefing"),
     ]
+    cohorts = (
+        DemoAdoptionCohort(
+            team_id="team-platform-engineering",
+            team_name="Platform Engineering",
+            business_unit_id="bu-product-platform",
+            business_unit_name="Product and Platform",
+            eligible_count=132,
+            active_count=82,
+            title="Platform Engineer",
+            entry_point="developer-copilot",
+            model="Google / gemini-2.0-flash",
+            cost_per_request=3.4,
+            governed_pct=0.93,
+            intervention_pct=0.04,
+        ),
+        DemoAdoptionCohort(
+            team_id="team-ml-engineering",
+            team_name="ML Engineering",
+            business_unit_id="bu-product-platform",
+            business_unit_name="Product and Platform",
+            eligible_count=104,
+            active_count=64,
+            title="ML Engineer",
+            entry_point="model-eval-workbench",
+            model="OpenAI / gpt-4o",
+            cost_per_request=4.6,
+            governed_pct=0.89,
+            intervention_pct=0.07,
+        ),
+        DemoAdoptionCohort(
+            team_id="team-product",
+            team_name="Product",
+            business_unit_id="bu-product-platform",
+            business_unit_name="Product and Platform",
+            eligible_count=82,
+            active_count=54,
+            title="Product Manager",
+            entry_point="product-briefing-assistant",
+            model="OpenAI / gpt-4o-mini",
+            cost_per_request=1.6,
+            governed_pct=0.84,
+            intervention_pct=0.04,
+        ),
+        DemoAdoptionCohort(
+            team_id="team-data-science",
+            team_name="Data Science",
+            business_unit_id="bu-data-insights",
+            business_unit_name="Data and Insights",
+            eligible_count=96,
+            active_count=62,
+            title="Data Scientist",
+            entry_point="analytics-studio",
+            model="OpenAI / gpt-4o",
+            cost_per_request=4.2,
+            governed_pct=0.87,
+            intervention_pct=0.08,
+        ),
+        DemoAdoptionCohort(
+            team_id="team-customer-engineering",
+            team_name="Customer Engineering",
+            business_unit_id="bu-customer-operations",
+            business_unit_name="Customer Operations",
+            eligible_count=158,
+            active_count=102,
+            title="Customer Engineer",
+            entry_point="support-copilot",
+            model="OpenAI / gpt-4o-mini",
+            cost_per_request=1.3,
+            governed_pct=0.91,
+            intervention_pct=0.03,
+        ),
+        DemoAdoptionCohort(
+            team_id="team-security",
+            team_name="Security",
+            business_unit_id="bu-risk-and-trust",
+            business_unit_name="Risk and Trust",
+            eligible_count=96,
+            active_count=58,
+            title="Security Analyst",
+            entry_point="security-workbench",
+            model="OpenAI / gpt-4o",
+            cost_per_request=5.0,
+            governed_pct=0.98,
+            intervention_pct=0.1,
+        ),
+        DemoAdoptionCohort(
+            team_id="team-finance-systems",
+            team_name="Finance Systems",
+            business_unit_id="bu-finance-and-ops",
+            business_unit_name="Finance and Operations",
+            eligible_count=84,
+            active_count=42,
+            title="Finance Systems Analyst",
+            entry_point="finance-ops-assistant",
+            model="OpenAI / gpt-4o-mini",
+            cost_per_request=1.2,
+            governed_pct=0.8,
+            intervention_pct=0.02,
+        ),
+        DemoAdoptionCohort(
+            team_id="team-operations",
+            team_name="Operations",
+            business_unit_id="bu-finance-and-ops",
+            business_unit_name="Finance and Operations",
+            eligible_count=60,
+            active_count=22,
+            title="Operations Analyst",
+            entry_point="operations-briefing",
+            model="OpenAI / gpt-4o-mini",
+            cost_per_request=1.1,
+            governed_pct=0.75,
+            intervention_pct=0.01,
+        ),
+    )
+
+    generated_profiles: list[tuple[str, int, float, float, float, str, str]] = []
+    named_by_team = Counter(employee["team_id"] for employee in employees)
+    for cohort in cohorts:
+        named_count = named_by_team[cohort.team_id]
+        active_to_add = max(cohort.active_count - named_count, 0)
+        inactive_to_add = max(cohort.eligible_count - named_count - active_to_add, 0)
+        team_slug = cohort.team_id.removeprefix("team-")
+
+        for index in range(active_to_add):
+            sequence = index + 1
+            employee_id = f"{team_slug}.active.{sequence:03d}"
+            employee_name = f"{cohort.team_name} User {sequence:03d}"
+            employee = {
+                "employee_id": employee_id,
+                "name": employee_name,
+                "email": f"{employee_id}@novatech.example",
+                "title": cohort.title,
+                "team_id": cohort.team_id,
+                "team_name": cohort.team_name,
+                "business_unit_id": cohort.business_unit_id,
+                "business_unit_name": cohort.business_unit_name,
+            }
+            employees.append(employee)
+            app_state.adoption.upsert_employee(
+                employee_id=employee["employee_id"],
+                name=employee["name"],
+                email=employee["email"],
+                title=employee["title"],
+                team_id=employee["team_id"],
+                team_name=employee["team_name"],
+                business_unit_id=employee["business_unit_id"],
+                business_unit_name=employee["business_unit_name"],
+                organization_id="org-novatech",
+                organization_name="NovaTech Industries",
+                eligible_for_ai=True,
+            )
+
+            cycle = index % 20
+            if cycle < 6:
+                base_requests = 2 + (cycle % 2)
+            elif cycle < 16:
+                base_requests = 6 + (cycle % 5)
+            else:
+                base_requests = 24 + (cycle % 8)
+            profile_cost = round(cohort.cost_per_request * (0.42 + ((index % 5) * 0.09)), 2)
+            generated_profiles.append(
+                (
+                    employee_id,
+                    base_requests,
+                    profile_cost,
+                    cohort.governed_pct,
+                    cohort.intervention_pct,
+                    cohort.model,
+                    cohort.entry_point,
+                )
+            )
+
+        for index in range(inactive_to_add):
+            sequence = index + 1
+            employee_id = f"{team_slug}.eligible.{sequence:03d}"
+            employee = {
+                "employee_id": employee_id,
+                "name": f"{cohort.team_name} Eligible {sequence:03d}",
+                "email": f"{employee_id}@novatech.example",
+                "title": cohort.title,
+                "team_id": cohort.team_id,
+                "team_name": cohort.team_name,
+                "business_unit_id": cohort.business_unit_id,
+                "business_unit_name": cohort.business_unit_name,
+            }
+            employees.append(employee)
+            app_state.adoption.upsert_employee(
+                employee_id=employee["employee_id"],
+                name=employee["name"],
+                email=employee["email"],
+                title=employee["title"],
+                team_id=employee["team_id"],
+                team_name=employee["team_name"],
+                business_unit_id=employee["business_unit_id"],
+                business_unit_name=employee["business_unit_name"],
+                organization_id="org-novatech",
+                organization_name="NovaTech Industries",
+                eligible_for_ai=True,
+            )
+
+    seed_profiles.extend(generated_profiles)
 
     employee_lookup = {employee["employee_id"]: employee for employee in employees}
     for profile in seed_profiles:

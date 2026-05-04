@@ -39,9 +39,8 @@ requirements proof. It shows source documents, PRD user journeys, decision
 surface trust states, the RAIL/HRE pipeline, pathway coverage, invariants, and
 the local page that demonstrates each major requirement.
 
-Served by FastAPI at:
-
-- `http://localhost:8000/platform/`
+Served by FastAPI at the URL printed by `./scripts/start_demo.sh`. The default
+is `http://localhost:${ACI_DEMO_PORT:-8000}/platform/`.
 
 ## Quick Start
 
@@ -75,9 +74,21 @@ To restore a running demo to that known state:
 ./scripts/reset_demo.sh
 ```
 
+`reset_demo.sh` is the one-command reset path for presenter recovery. It clears
+ignored generated demo logs and stale PID files, reseeds the backend, validates
+the health/readiness and seeded attribution checks, and opens the browser reset
+URL. Set `ACI_RESET_OPEN_BROWSER=0` for a CLI-only reset while preserving the
+same backend checks.
+
 To reset both browser session state and backend runtime state in one load, open:
 
-- `http://localhost:8000/platform/?reset=1`
+- the reset URL printed by `./scripts/reset_demo.sh`, defaulting to
+  `http://localhost:${ACI_DEMO_PORT:-8010}/platform/?reset=1`
+
+The reset URL clears Argmin demo `sessionStorage` keys used for intervention and
+manual-mapping state, reloads the fixed backend baseline when available, and
+returns the UI to the opening Overview condition. The frontend does not use
+`localStorage`.
 
 Optional live API auth token:
 
@@ -88,9 +99,9 @@ This is only needed if the local backend is configured to require auth for demo 
 
 ## Primary Walkthrough
 
-1. Open `http://localhost:8000/platform/`
+1. Open the app URL printed by `./scripts/start_demo.sh`.
 2. Open **Guided Demo** (top bar, right side)
-3. Click **Start Full Walkthrough**
+3. Click **Start Guided Demo**
 4. Review:
    - Overview (financial summary and organizational spend)
    - PRD Proof (source-document requirements, trust states, and proof map)
@@ -121,6 +132,10 @@ The demo also exposes:
   scenario, and mode stay visible while navigating
 - an audience-lens ribbon (`Executive`, `Finance`, `Platform`, `Security`) that
   reframes the same data for different buyer or operator perspectives
+- a local-only persona switcher (`Admin`, `Manager`, `User`, `Auditor`,
+  `FinOps`, `Engineer`, `Security`) that changes visible menus, permission
+  previews, workflow access, and dummy records without contacting an identity
+  provider
 - exportable operating artifacts from Interventions, Exports, Forecasting, and Governance
 
 ## Demo Guarantees

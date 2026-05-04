@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -9,6 +9,13 @@ STRICT_BROWSER="${ACI_PREFLIGHT_STRICT_BROWSER:-0}"
 
 failures=0
 warnings=0
+
+on_error() {
+  local status=$?
+  printf 'FAIL: preflight command failed near line %s: %s\n' "${BASH_LINENO[0]}" "${BASH_COMMAND}" >&2
+  exit "${status}"
+}
+trap on_error ERR
 
 ok() {
   printf 'OK: %s\n' "$*"
@@ -26,6 +33,11 @@ fail() {
 
 have_command() {
   command -v "$1" >/dev/null 2>&1
+}
+
+is_valid_port() {
+  local port="$1"
+  [[ "${port}" =~ ^[0-9]+$ ]] && (( port >= 1 && port <= 65535 ))
 }
 
 check_os() {
@@ -141,6 +153,11 @@ check_required_files() {
 check_port_available() {
   local port="$1"
   local label="$2"
+
+  if ! is_valid_port "${port}"; then
+    fail "invalid port '${port}' for ${label}; set a numeric TCP port from 1 to 65535."
+    return
+  fi
 
   if [[ "${REQUIRE_PORT_FREE}" != "1" ]]; then
     ok "port check skipped for ${label}:${port}"

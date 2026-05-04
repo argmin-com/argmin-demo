@@ -6,6 +6,8 @@ presentation.
 
 For the production capability-to-local mock contract matrix, see
 [feature-demo-coverage-matrix.md](feature-demo-coverage-matrix.md).
+For explicit fixture, fake-auth, local-adapter, and launcher boundaries, see
+[demo-only-boundaries.md](demo-only-boundaries.md).
 
 ## Core Proof Points
 
@@ -34,7 +36,7 @@ For the production capability-to-local mock contract matrix, see
 | `Forecasting` | Translate platform posture into planning scenarios across multiple horizons, compare mode, and assumptions/drivers, with a local directional estimate fallback if the live planning endpoint is unavailable. | `frontend/index.html`, seeded demo dataset, optional `POST /v1/forecast/spend` |
 | `Governance` | Explain enforcement modes, active policies, fail-open posture, trust-boundary decisions, and request-level policy simulation. | `frontend/index.html`, policy engine and interceptor state |
 | `Integrations` | Show how Argmin connects inbound enterprise systems to owned downstream business workflows, including scenario-driven handoffs and delivery auditability. | `frontend/index.html`, seeded demo dataset, optional `GET /v1/integrations/overview`, `POST /v1/integrations/scenarios/{scenario_id}/dispatch`, `POST /v1/integrations/notify`, `GET /v1/integrations/deliveries` |
-| `Admin` | Simulate customer admin operations: RBAC, account lifecycle, read-only integration posture, scoped diagnostics, and audited operations. | `frontend/data/demo_dataset.json`, `frontend/index.html` |
+| `Admin` | Simulate customer admin operations: RBAC, account lifecycle, role-based persona switching, read-only integration posture, scoped diagnostics, and audited operations. | `frontend/data/demo_dataset.json`, `frontend/index.html` |
 | `Request Proof` | Walk one request through evidence, attribution, pricing, evidence quality, and staged decision replay in technical detail. | `frontend/index.html`, attribution/index/trac runtime |
 | `Glossary` and `FAQ` | Give reviewers a self-serve vocabulary and methodology reference while staying inside the product surface. | `frontend/data/demo_dataset.json`, `frontend/index.html` |
 
@@ -44,7 +46,7 @@ For the production capability-to-local mock contract matrix, see
 |---|---|
 | `Guided Demo` | Runs the automated full product walkthrough and the three live proof scenarios. |
 | `Active-context ribbon` | Keeps the current request, team, model, intervention, scenario, and mode visible while navigating. |
-| `Audience-lens ribbon` | Reframes the same operating data for executive, finance, platform, and security reviewers. |
+| `Audience-lens and persona ribbon` | Reframes the same operating data for executive, finance, platform, and security reviewers, and switches local-only Admin, Manager, User, Auditor, FinOps, Engineer, and Security persona permissions. |
 | Export actions | Emit operating artifacts such as intervention briefs, planning packs, and governance exceptions from the relevant pages. |
 
 ## Supporting Runtime Capabilities
@@ -61,8 +63,8 @@ For the production capability-to-local mock contract matrix, see
 
 - One-command launch: `./scripts/start_demo.sh`
 - Low-level server launch: `./scripts/run_demo.sh`
-- Browser: `http://localhost:8000/platform/`
-- Guided walkthrough: open **Guided Demo**, click **Start Full Walkthrough**
+- Browser: use the app URL printed by `./scripts/start_demo.sh`
+- Guided walkthrough: click **Start Guided Demo** from the prepared home screen
 - Reset presentation state: **Reset Demo**
 - Reseed backend demo state: **Initialize Demo**
 - Walkthrough runtime behavior: if backend initialization is unavailable, the sequence continues on deterministic local demo data

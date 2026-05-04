@@ -1,3 +1,11 @@
+/*
+ * DEMO_ONLY_FRONTEND_SURFACE
+ * This browser app is a deterministic local demo shell. It uses synthetic
+ * fixtures, local persona simulation, and controlled API fallbacks to make
+ * stakeholder walkthroughs safe without cloud credentials. Do not treat these
+ * mocks, roles, or fallback responses as production implementations.
+ */
+
 const NAV_ITEMS = [
   {
     group: "Platform",
@@ -29,6 +37,8 @@ const NAV_ITEMS = [
   }
 ];
 
+const ALL_PAGE_KEYS = NAV_ITEMS.flatMap((group) => group.items.map((item) => item.key));
+
 const PAGE_TITLES = {
   overview: "Overview",
   partner_brief: "Partner Brief",
@@ -50,10 +60,26 @@ const PAGE_TITLES = {
   faq: "FAQ"
 };
 
+const PALETTE = Object.freeze({
+  brand: "#4f8ef8",
+  brandStrong: "#6aa1ff",
+  brandText: "#9fc4ff",
+  success: "#2ac487",
+  successText: "#8be3ba",
+  warning: "#eda82e",
+  warningText: "#f4c978",
+  danger: "#ee5858",
+  dangerText: "#ff9f9f",
+  neutral: "#8ea0bf",
+  neutralStrong: "#d9e6fb",
+  surface: "#18263b",
+  border: "#274062"
+});
+
 const MODE_COLORS = {
-  passive: { bg: "rgba(29,188,200,0.18)", color: "#60dde6" },
-  advisory: { bg: "rgba(42,196,135,0.17)", color: "#73deb1" },
-  active: { bg: "rgba(148,112,255,0.16)", color: "#b49bff" }
+  passive: { bg: "rgba(79,142,248,0.14)", color: PALETTE.brandText },
+  advisory: { bg: "rgba(42,196,135,0.14)", color: PALETTE.successText },
+  active: { bg: "rgba(237,168,46,0.15)", color: PALETTE.warningText }
 };
 
 const ROLE_LENSES = [
@@ -76,6 +102,102 @@ const ROLE_LENSES = [
     key: "security",
     label: "Security",
     description: "Control coverage, policy behavior, and fail-open safety."
+  }
+];
+
+// DEMO_ONLY_FAKE_AUTH_PERSONAS: these records drive local persona UX and menu
+// restrictions only. They are not customer IAM, SSO, SCIM, or production RBAC.
+const DEMO_PERSONAS = [
+  {
+    key: "admin",
+    label: "Admin",
+    name: "Maya Patel",
+    role: "Admin",
+    email: "maya.patel@novatech.example",
+    description: "Owns account lifecycle, policy setup, connector diagnostics, and audited local mutations.",
+    allowedPages: ALL_PAGE_KEYS,
+    homePage: "admin",
+    permissions: ["manage_users", "manage_policy", "approve_exceptions", "export_packets", "run_diagnostics", "replay_scenarios"],
+    workflows: ["Invite user", "Set policy bundle", "Run connector backfill", "Disable user session"],
+    records: ["current-demo-policy-bundle", "Owen Brooks session", "demo presenter token"]
+  },
+  {
+    key: "manager",
+    label: "Manager",
+    name: "Samira Okafor",
+    role: "Manager",
+    email: "samira.okafor@novatech.example",
+    description: "Reviews team adoption, workflow usage, budget posture, and intervention impact for owned business units.",
+    allowedPages: ["overview", "partner_brief", "adoption", "teams", "manual_mapping", "interventions", "forecast", "integrations", "glossary", "faq"],
+    homePage: "adoption",
+    permissions: ["view_adoption", "review_team_records", "comment_on_interventions", "view_integration_handoffs"],
+    workflows: ["Review adoption by business unit", "Prioritize team intervention", "Approve workflow rollout plan"],
+    records: ["team-cs-platform adoption scorecard", "refund escalation workflow", "manager approval record"]
+  },
+  {
+    key: "user",
+    label: "User",
+    name: "Noah Kim",
+    role: "User",
+    email: "noah.kim@novatech.example",
+    description: "Sees personal/team context, request explanations, model guidance, and methodology references without admin surfaces.",
+    allowedPages: ["overview", "adoption", "attribution", "models", "teams", "glossary", "faq"],
+    homePage: "overview",
+    permissions: ["view_own_usage", "view_request_explanations", "view_model_guidance"],
+    workflows: ["Understand request attribution", "Compare approved model options", "Review team AI usage"],
+    records: ["customer-copilot-prod request", "gpt-4o-mini guidance", "team usage summary"]
+  },
+  {
+    key: "auditor",
+    label: "Auditor",
+    name: "Priya Nair",
+    role: "Auditor",
+    email: "priya.nair@novatech.example",
+    description: "Reviews immutable evidence, exports, policy posture, admin actions, and exception history in read-only mode.",
+    allowedPages: ["overview", "requirements", "attribution", "governance", "coverage", "exports", "admin", "glossary", "faq"],
+    homePage: "admin",
+    permissions: ["read_audit_trail", "export_evidence", "view_policy_history", "view_admin_records"],
+    workflows: ["Review chargeback packet", "Inspect policy exception", "Validate audit export"],
+    records: ["February 2026 preview", "req_audit_export_104", "security-exception-review route"]
+  },
+  {
+    key: "finops",
+    label: "FinOps",
+    name: "Ethan Chen",
+    role: "FinOps",
+    email: "ethan.chen@novatech.example",
+    description: "Owns chargeback, manual ownership correction, forecast planning, and savings capture workflows.",
+    allowedPages: ["overview", "partner_brief", "adoption", "teams", "manual_mapping", "interventions", "exports", "forecast", "integrations", "glossary", "faq"],
+    homePage: "exports",
+    permissions: ["manual_override", "export_packets", "forecast_spend", "review_savings"],
+    workflows: ["Manual ownership override", "Export chargeback packet", "Forecast spend scenario"],
+    records: ["mm_006 -> Data Science", "event-time owner mode", "optimization capture scenario"]
+  },
+  {
+    key: "engineer",
+    label: "Engineer",
+    name: "Rina Alvarez",
+    role: "Engineer",
+    email: "rina.alvarez@novatech.example",
+    description: "Debugs request lineage, model routing, integration health, and implementation tasks without finance/admin mutation rights.",
+    allowedPages: ["overview", "attribution", "models", "teams", "interventions", "coverage", "energy", "integrations", "glossary", "faq"],
+    homePage: "attribution",
+    permissions: ["view_request_lineage", "replay_scenarios", "view_interventions", "view_integration_health"],
+    workflows: ["Replay scenario harness", "Review model routing", "Inspect intervention implementation"],
+    records: ["S-015 agent workflow lineage", "customer-support-bot route", "model over-provisioning intervention"]
+  },
+  {
+    key: "security",
+    label: "Security",
+    name: "Jordan Lee",
+    role: "Security",
+    email: "jordan.lee@novatech.example",
+    description: "Reviews fail-open posture, policy simulation, exceptions, trust boundaries, and security handoff routes.",
+    allowedPages: ["overview", "requirements", "attribution", "governance", "coverage", "integrations", "admin", "glossary", "faq"],
+    homePage: "governance",
+    permissions: ["approve_exceptions", "view_policy_history", "view_trust_boundary", "view_security_handoffs"],
+    workflows: ["Approve policy exception", "Review fail-open scenario", "Route security exception"],
+    records: ["req_audit_export_104", "security-exception-review route", "fail-open safety scenario"]
   }
 ];
 
@@ -117,6 +239,17 @@ const UI_LIMITS = {
   maxIntegrationDeliveries: 12,
   runtimeDegradedThreshold: 2
 };
+const DEFAULT_TABLE_PAGE_SIZE = 8;
+const TABLE_PAGE_SIZE_OPTIONS = [8, 16, 32];
+const FORM_MIN_SEARCH_LENGTH = 2;
+const FORM_SEARCH_EXAMPLES = {
+  "glossary-query": "governance",
+  "faq-query": "deployment"
+};
+const FORM_SEARCH_LABELS = {
+  "glossary-query": "glossary terms",
+  "faq-query": "FAQ items"
+};
 const BUSINESS_RULES = {
   attributionCoverageCapPct: 98.9,
   forecastFloorShare: 0.45,
@@ -144,7 +277,108 @@ const VALID_INTERVENTION_TRANSITIONS = {
   implemented: new Set(["review"]),
   dismissed: new Set(["review"])
 };
-const DATASET_URL = new URL("data/demo_dataset.json", window.location.href).toString();
+const DATASET_VERSION = "20260309aa";
+const DATASET_URL = new URL(`data/demo_dataset.json?v=${DATASET_VERSION}`, window.location.href).toString();
+const TYPOGRAPHY_ROLE_SELECTORS = Object.freeze({
+  heading: [
+    ".page-title",
+    ".screen-priority-title",
+    ".integration-title"
+  ].join(", "),
+  subheading: [
+    ".card-title",
+    ".evidence-section-title",
+    ".intervention-title",
+    ".intervention-summary-title",
+    ".glossary-title",
+    ".deferred-section-title",
+    ".simulation-card-title",
+    ".allocation-title",
+    ".blindspot-title"
+  ].join(", "),
+  body: [
+    ".screen-priority-detail",
+    ".card-subtitle",
+    ".field-feedback",
+    ".table-microcopy",
+    ".intervention-detail",
+    ".intervention-summary-detail",
+    ".integration-detail",
+    ".integration-scenario-card p",
+    ".forecast-scenario-subtitle",
+    ".export-control-card p"
+  ].join(", "),
+  label: [
+    ".input-label",
+    ".nav-label",
+    ".section-title",
+    ".metric-label",
+    ".screen-priority-eyebrow",
+    ".screen-priority-measure span",
+    ".methodology-title",
+    ".forecast-metric-label",
+    ".adoption-kpi-label",
+    ".context-chip-label",
+    ".table th",
+    ".table-sort-btn > span:first-child",
+    ".export-control-label",
+    ".status-badge",
+    ".pill",
+    ".mode-button"
+  ].join(", "),
+  meta: [
+    ".metric-meta",
+    ".hint",
+    ".tenant-line",
+    ".demo-path-status",
+    ".demo-path-copy em",
+    ".context-chip",
+    ".integration-meta",
+    ".glossary-category-meta",
+    ".blindspot-meta",
+    ".intervention-summary-meta"
+  ].join(", "),
+  number: [
+    ".metric-value",
+    ".screen-priority-measure strong",
+    ".adoption-kpi-value",
+    ".forecast-metric-value",
+    ".export-control-value"
+  ].join(", ")
+});
+const TYPOGRAPHY_INLINE_PROPS = Object.freeze(["fontSize", "fontWeight", "lineHeight", "letterSpacing"]);
+const LAYOUT_SPACING_CLASS_BY_PX = new Map([
+  ["0px", "0"],
+  ["2px", "1"],
+  ["3px", "1"],
+  ["4px", "1"],
+  ["5px", "1"],
+  ["6px", "2"],
+  ["7px", "2"],
+  ["8px", "2"],
+  ["9px", "2"],
+  ["10px", "3"],
+  ["11px", "3"],
+  ["12px", "3"],
+  ["14px", "4"],
+  ["15px", "4"],
+  ["16px", "4"],
+  ["18px", "5"],
+  ["20px", "5"],
+  ["22px", "6"],
+  ["24px", "6"],
+  ["28px", "7"],
+  ["30px", "7"],
+  ["32px", "7"]
+]);
+const CHART_FRAME_CLASS_BY_HEIGHT = new Map([
+  ["220px", "chart-frame-sm"],
+  ["240px", "chart-frame-sm"],
+  ["260px", "chart-frame-md"],
+  ["280px", "chart-frame-lg"],
+  ["300px", "chart-frame-xl"],
+  ["320px", "chart-frame-xxl"]
+]);
 
 const FALLBACK_FORECAST_SCENARIOS = {
   baseline: {
@@ -278,7 +512,7 @@ const FALLBACK_INTEGRATION_OVERVIEW = {
       status: "active",
       system: "Slack",
       owner: "FinOps and Platform Operations",
-      business_value: "Routes urgent ACI decisions into the channels that already own triage.",
+      business_value: "Routes urgent Argmin decisions into the channels that already own triage.",
       primary_signals: ["policy alerts", "implementation handoffs", "executive digests"],
       downstream_consumers: ["FinOps war room", "Platform ops", "Executive staff"]
     }
@@ -356,7 +590,7 @@ const FALLBACK_INTEGRATION_OVERVIEW = {
       description: "Shows how a savings recommendation becomes execution work.",
       route_id: "intervention-implementation",
       business_question: "How does an approved intervention become actual implementation work?",
-      expected_outcome: "ACI pushes a structured handoff into downstream execution channels."
+      expected_outcome: "Argmin pushes a structured handoff into downstream execution channels."
     },
     {
       scenario_id: "pricing-drift",
@@ -506,12 +740,15 @@ const state = {
   modelSort: "spend_usd",
   mode: "advisory",
   roleLens: "executive",
+  activePersonaKey: "admin",
+  personaNotice: null,
   modeMenuOpen: false,
   mobileNavOpen: false,
   executionDrawerOpen: false,
   runtimeStatus: "local",
   runtimeDetail: "Using deterministic local demo data until a live action is requested",
   runtimeCapabilities: {},
+  recoveryNotice: null,
   logs: [],
   lastPayload: null,
   lastResponse: null,
@@ -538,9 +775,13 @@ const state = {
   selectedPartnerStage: "discover",
   glossaryQuery: "",
   faqQuery: "",
+  formStatus: {},
+  tableUi: {},
   faqOpenKeys: new Set(),
+  deferredSectionsVisible: new Set(),
   lastRenderedPage: null,
   pendingDemoAction: "",
+  instantFeedback: null,
   demoScenarioRunCounts: {},
   guidedDemoProgressLabel: "",
   walkthroughStatus: "idle",
@@ -551,6 +792,9 @@ const state = {
   walkthroughElapsedMs: 0,
   walkthroughTotalMs: 0,
   walkthroughAnchor: "",
+  presenterMode: false,
+  presenterStepIndex: 0,
+  presenterRecoveryNotice: "",
   scrollTopByPage: {},
   governanceSimulationMode: "advisory",
   governanceSimulationBundle: "current",
@@ -561,6 +805,7 @@ const state = {
 };
 
 let dataset = FALLBACK_DATASET;
+let datasetIndex = buildDatasetIndex(dataset);
 const chartRegistry = new Map();
 const INTERVENTION_STORAGE_KEY = "aci_demo_interventions_v3";
 const MANUAL_MAPPING_STORAGE_KEY = "aci_demo_manual_mapping_v1";
@@ -568,6 +813,7 @@ const API_TOKEN_STORAGE_KEYS = ["aci_demo_api_token", "aci_api_token"];
 const NUMBER_FORMATTER = new Intl.NumberFormat("en-US");
 const USD_FORMATTERS = new Map();
 let toastTimer = null;
+let instantFeedbackTimer = null;
 let lastActiveElementBeforeDrawer = null;
 let inputRenderTimer = null;
 let investorWalkthroughRunId = 0;
@@ -729,6 +975,65 @@ const INVESTOR_WALKTHROUGH_TOTAL_MS = INVESTOR_WALKTHROUGH_STEPS.reduce(
   0
 );
 
+const DEMO_PATH_ITEMS = [
+  {
+    step: "01",
+    page: "overview",
+    label: "Start",
+    detail: "Spend posture"
+  },
+  {
+    step: "02",
+    page: "adoption",
+    label: "Adoption",
+    detail: "Where teams use AI"
+  },
+  {
+    step: "03",
+    page: "attribution",
+    label: "Proof",
+    detail: "One request to owner"
+  },
+  {
+    step: "04",
+    page: "manual_mapping",
+    label: "Resolve",
+    detail: "Close ownership gaps"
+  },
+  {
+    step: "05",
+    page: "interventions",
+    label: "Act",
+    detail: "Approve one savings move"
+  },
+  {
+    step: "06",
+    page: "forecast",
+    label: "Plan",
+    detail: "Show spend impact"
+  },
+  {
+    step: "07",
+    page: "governance",
+    label: "Trust",
+    detail: "Show safe deployment"
+  }
+];
+
+const SUPPORTING_PAGE_DEMO_PATH_TARGETS = {
+  partner_brief: "overview",
+  requirements: "overview",
+  coverage: "adoption",
+  models: "adoption",
+  teams: "adoption",
+  exports: "manual_mapping",
+  energy: "interventions",
+  integrations: "interventions",
+  admin: "governance",
+  glossary: "overview",
+  faq: "overview"
+};
+
 function esc(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -736,6 +1041,1016 @@ function esc(value) {
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function isInteractiveFilterControl(button, action) {
+  if (!(button instanceof HTMLElement)) {
+    return false;
+  }
+  if (
+    button.classList.contains("filter-btn")
+    || button.classList.contains("lens-btn")
+    || button.classList.contains("forecast-horizon-btn")
+    || button.classList.contains("forecast-scenario-btn")
+    || button.classList.contains("adoption-window-btn")
+    || button.classList.contains("adoption-breadcrumb")
+    || button.classList.contains("request-sample-btn")
+    || button.classList.contains("decision-replay-stage")
+    || button.classList.contains("partner-stage-btn")
+    || button.classList.contains("proof-journey-btn")
+    || button.classList.contains("persona-card")
+    || button.classList.contains("table-sort-btn")
+    || button.classList.contains("table-page-btn")
+  ) {
+    return true;
+  }
+  return action.startsWith("set-")
+    || action.startsWith("table-")
+    || action.includes("-set-")
+    || action === "select-proof-journey"
+    || action === "select-request"
+    || action === "select-intervention";
+}
+
+const CONTEXTUAL_HELP = {
+  "total-ai-spend": {
+    title: "Total AI Spend",
+    summary: "Current month synthetic spend across AI providers, services, and workflows.",
+    next: "Use Teams or Models to see where it concentrates."
+  },
+  "attribution-coverage": {
+    title: "Attribution Coverage",
+    summary: "Share of spend with enough evidence to assign an owner confidently.",
+    next: "Open Request Proof to inspect the evidence chain."
+  },
+  "optimization-potential": {
+    title: "Optimization Potential",
+    summary: "Validated savings headroom from routing, policy, or implementation changes.",
+    next: "Open Interventions to choose a savings move."
+  },
+  "savings-captured": {
+    title: "Savings Captured",
+    summary: "Savings already moved from recommendation into the implemented baseline.",
+    next: "Compare with open pipeline to explain remaining upside."
+  },
+  "budget-utilization": {
+    title: "Budget Utilization",
+    summary: "Current AI spend as a percentage of the team budget envelope.",
+    next: "Use this to spot teams approaching operating limits."
+  },
+  "trac": {
+    title: "TRAC",
+    summary: "Transparent Reconciled AI Cost: the finance-safe cost delta after estimate, billing, and attribution checks.",
+    next: "Open Exports to see TRAC on chargeback rows."
+  },
+  "model-spend": {
+    title: "Model Spend",
+    summary: "Synthetic monthly spend grouped by model family.",
+    next: "Sort the model table by Spend or Requests."
+  },
+  "monthly-spend": {
+    title: "Monthly Spend",
+    summary: "Current monthly run-rate for the selected team, model, or export view.",
+    next: "Use Forecasting to project the impact."
+  },
+  "spend": {
+    title: "Spend",
+    summary: "Synthetic cost measured in the current demo period.",
+    next: "Sort or filter the table to isolate the largest drivers."
+  },
+  "requests": {
+    title: "Requests",
+    summary: "Count of AI calls or usage events in the selected period.",
+    next: "Compare with spend to separate demand from unit-cost issues."
+  },
+  "latency-p95": {
+    title: "Latency P95",
+    summary: "95th percentile request latency for the model or workflow.",
+    next: "Use this as a quality guard before proposing lower-cost routing."
+  },
+  "variance": {
+    title: "Variance",
+    summary: "Relative cost difference versus the expected low-cost baseline.",
+    next: "High variance usually deserves a routing or policy review."
+  },
+  "teams": {
+    title: "Teams",
+    summary: "Number of teams or business units using the selected model or workflow.",
+    next: "Open Employee Adoption for workflow-level detail."
+  },
+  "trend": {
+    title: "Trend",
+    summary: "Recent direction of spend, demand, or adoption compared with the prior period.",
+    next: "Use positive trend with spend to flag drift."
+  },
+  "workflow": {
+    title: "Workflow",
+    summary: "The business process where AI is being used, not just the technical service.",
+    next: "Use workflow names to tell the adoption story."
+  },
+  "ai-service": {
+    title: "AI Service",
+    summary: "The platform, model, or internal service being consumed by a team.",
+    next: "Compare it with Entry Point and Insertion Point."
+  },
+  "capability": {
+    title: "Capability",
+    summary: "What the AI service does for the workflow, such as drafting, search, coding, or classification.",
+    next: "Use this to show how adoption differs by business function."
+  },
+  "entry-point": {
+    title: "Entry Point",
+    summary: "Where a user starts the AI-powered workflow.",
+    next: "Entry points reveal whether adoption is embedded or ad hoc."
+  },
+  "insertion-point": {
+    title: "Insertion Point",
+    summary: "The step in the workflow where AI output changes work or decisions.",
+    next: "Use it to explain exactly how teams adopt AI."
+  },
+  "governed": {
+    title: "Governed",
+    summary: "Share of usage covered by policy, routing, attribution, or review controls.",
+    next: "Open Governance to simulate a decision."
+  },
+  "depth": {
+    title: "Depth",
+    summary: "How deeply AI is embedded in the workflow, from assistive to operational.",
+    next: "High depth with low governance is a design-partner talking point."
+  },
+  "manual-mapping": {
+    title: "Manual Mapping",
+    summary: "Human review for ambiguous ownership when graph evidence is not enough.",
+    next: "Resolve one item to show coverage lift."
+  },
+  "confidence": {
+    title: "Confidence",
+    summary: "Strength of the evidence behind an attribution or ownership decision.",
+    next: "Low confidence should route to review, not disappear."
+  },
+  "owner": {
+    title: "Owner",
+    summary: "The team or person accountable for the spend, workflow, or remediation.",
+    next: "Use owner to connect cost to action."
+  },
+  "owner-shift": {
+    title: "Owner Shift",
+    summary: "The business owner changes after stronger attribution evidence is applied.",
+    next: "Use it to show why review changes finance outcomes."
+  },
+  "policy-simulation": {
+    title: "Policy Simulation",
+    summary: "A local preview of how one request behaves under different governance postures.",
+    next: "Switch mode or bundle to show the decision changing."
+  },
+  "fail-open": {
+    title: "Fail-open",
+    summary: "Production work continues when context is missing, while the exception is logged.",
+    next: "Use this to explain safety without creating outages."
+  },
+  "next-action": {
+    title: "Next Action",
+    summary: "The shortest operator move that keeps the demo narrative moving.",
+    next: "Click the adjacent CTA or follow the demo path."
+  },
+  "why-it-matters": {
+    title: "Why It Matters",
+    summary: "The business reason this data point changes a decision.",
+    next: "Use this sentence as presenter talk track."
+  },
+  "truth-basis": {
+    title: "Truth Basis",
+    summary: "The evidence source used to treat a record as finance-safe or caveated.",
+    next: "Use it to separate known cost from provisional cost."
+  },
+  "chargeback-ready": {
+    title: "Chargeback Ready",
+    summary: "Spend that can be exported to finance with enough ownership evidence.",
+    next: "Open Exports to compare event-time and current-state views."
+  },
+  "review-required": {
+    title: "Review Required",
+    summary: "Spend or records that need a human decision before finance export.",
+    next: "Open Manual Mapping to close gaps."
+  },
+  "implementation-effort": {
+    title: "Implementation Effort",
+    summary: "Relative lift required to capture the recommendation.",
+    next: "Use low effort and high savings for the cleanest demo action."
+  },
+  "forecast-impact": {
+    title: "Forecast Impact",
+    summary: "Expected planning effect if the selected recommendation is executed.",
+    next: "Open Forecasting to show the run-rate change."
+  }
+};
+let contextualHelpIdCounter = 0;
+
+function normalizeHelpLabel(value) {
+  return String(value || "")
+    .replace(/\?.*$/g, "")
+    .replace(/\b(sort|asc|desc)\b/gi, "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function contextualHelpEntryForLabel(label) {
+  const key = normalizeHelpLabel(label);
+  if (CONTEXTUAL_HELP[key]) {
+    return { key, ...CONTEXTUAL_HELP[key] };
+  }
+  return null;
+}
+
+function contextualHelpTooltip(entry) {
+  if (!entry) {
+    return "";
+  }
+  return `${entry.summary}${entry.next ? ` Next: ${entry.next}` : ""}`;
+}
+
+function contextualHelpTargets(scope) {
+  const selector = [
+    ".metric-label",
+    ".forecast-metric-label",
+    ".adoption-lens-metric-label",
+    ".signal-title",
+    ".section-narrative-label",
+    ".simulation-card-title",
+    ".simulation-result-label",
+    ".card-title",
+    ".table-sort-btn > span:first-child"
+  ].join(",");
+  return Array.from(scope.querySelectorAll(selector));
+}
+
+function attachContextualHelp(target, entry) {
+  if (!(target instanceof HTMLElement) || !entry || target.dataset.contextHelpBound === "true") {
+    return;
+  }
+  target.dataset.contextHelpBound = "true";
+  const interactiveParent = target.closest("button");
+  if (interactiveParent instanceof HTMLElement && interactiveParent.contains(target)) {
+    interactiveParent.classList.add("has-context-help");
+    interactiveParent.dataset.tooltip = contextualHelpTooltip(entry);
+    const baseLabel = interactiveParent.getAttribute("aria-label") || target.textContent.trim();
+    interactiveParent.setAttribute("aria-label", `${baseLabel}. ${entry.summary}`);
+    if (!target.querySelector(".context-help-glyph")) {
+      const glyph = document.createElement("span");
+      glyph.className = "context-help-glyph";
+      glyph.setAttribute("aria-hidden", "true");
+      glyph.textContent = "?";
+      target.appendChild(glyph);
+    }
+    return;
+  }
+
+  target.classList.add("context-help-target");
+  const tooltipId = `context-help-${entry.key}-${contextualHelpIdCounter += 1}`;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "context-help-button";
+  button.dataset.action = "show-context-help";
+  button.dataset.helpKey = entry.key;
+  button.setAttribute("aria-label", `Explain ${entry.title}`);
+  button.setAttribute("aria-describedby", tooltipId);
+  button.textContent = "?";
+
+  const tooltip = document.createElement("span");
+  tooltip.className = "context-help-tooltip";
+  tooltip.id = tooltipId;
+  tooltip.setAttribute("role", "tooltip");
+  tooltip.textContent = contextualHelpTooltip(entry);
+
+  target.appendChild(button);
+  target.appendChild(tooltip);
+}
+
+function normalizeContextualHelp(root = document) {
+  const scope = root || document;
+  for (const target of contextualHelpTargets(scope)) {
+    const label = target.dataset.columnLabel || target.textContent || "";
+    const entry = contextualHelpEntryForLabel(label);
+    if (entry) {
+      attachContextualHelp(target, entry);
+    }
+  }
+}
+
+function showContextHelp(helpKey) {
+  const key = String(helpKey || "");
+  const entry = CONTEXTUAL_HELP[key];
+  if (!entry) {
+    return;
+  }
+  showToast(entry.title, contextualHelpTooltip(entry));
+}
+
+function tableSlug(value) {
+  const slug = String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || "demo-table";
+}
+
+function tableTitleFor(table) {
+  const card = table.closest(".card");
+  const title = card?.querySelector(".card-title")?.textContent?.trim();
+  if (title) {
+    return title;
+  }
+  const header = table.querySelector("thead th")?.textContent?.trim();
+  return header ? `${header} table` : "Demo table";
+}
+
+function tableHeaderLabels(table) {
+  return Array.from(table.querySelectorAll("thead th")).map((th, index) => {
+    return th.dataset.columnLabel || th.textContent.trim() || `Column ${index + 1}`;
+  });
+}
+
+function tableBaseKey(table) {
+  const headers = tableHeaderLabels(table).slice(0, 3).join("-");
+  return tableSlug(`${tableTitleFor(table)}-${headers}`);
+}
+
+function ensureTableKey(table, tables) {
+  if (table.dataset.tableKey) {
+    return table.dataset.tableKey;
+  }
+  const base = tableBaseKey(table);
+  const sameBaseBefore = tables.slice(0, tables.indexOf(table))
+    .filter((candidate) => tableBaseKey(candidate) === base)
+    .length;
+  const key = sameBaseBefore ? `${base}-${sameBaseBefore + 1}` : base;
+  table.dataset.tableKey = key;
+  return key;
+}
+
+function tableUiFor(tableKey) {
+  const key = String(tableKey || "");
+  if (!state.tableUi[key]) {
+    state.tableUi[key] = {
+      filter: "",
+      sortIndex: null,
+      sortDirection: "asc",
+      page: 1,
+      pageSize: DEFAULT_TABLE_PAGE_SIZE
+    };
+  }
+  return state.tableUi[key];
+}
+
+function tableForKey(tableKey) {
+  return Array.from(document.querySelectorAll("table.table"))
+    .find((table) => table.dataset.tableKey === tableKey) || null;
+}
+
+function tableDataRows(table) {
+  const tbody = table.tBodies[0];
+  if (!tbody) {
+    return [];
+  }
+  return Array.from(tbody.rows).filter((row) => {
+    return row.dataset.tableGenerated !== "empty"
+      && !row.querySelector(".state-panel-empty, .state-panel-error");
+  });
+}
+
+function parseTableNumericValue(value) {
+  const text = String(value || "")
+    .trim()
+    .replace(/,/g, "")
+    .replace(/\$/g, "")
+    .replace(/%/g, "")
+    .replace(/\b(ms|months?|requests?|users?|teams?|records?|rows?)\b/gi, "")
+    .trim();
+  const match = text.match(/^([+-]?\d+(?:\.\d+)?)\s*([kmb])?$/i);
+  if (!match) {
+    return null;
+  }
+  const base = Number(match[1]);
+  if (!Number.isFinite(base)) {
+    return null;
+  }
+  const multiplier = {
+    k: 1000,
+    m: 1000000,
+    b: 1000000000
+  }[String(match[2] || "").toLowerCase()] || 1;
+  return base * multiplier;
+}
+
+function tableComparableValue(text) {
+  const numeric = parseTableNumericValue(text);
+  if (numeric !== null) {
+    return { type: "number", value: numeric };
+  }
+  return {
+    type: "text",
+    value: String(text || "").trim().toLowerCase()
+  };
+}
+
+function compareTableCells(left, right, direction) {
+  const leftValue = tableComparableValue(left);
+  const rightValue = tableComparableValue(right);
+  const multiplier = direction === "desc" ? -1 : 1;
+  if (leftValue.type === "number" && rightValue.type === "number") {
+    return (leftValue.value - rightValue.value) * multiplier;
+  }
+  return leftValue.value.localeCompare(rightValue.value, undefined, {
+    numeric: true,
+    sensitivity: "base"
+  }) * multiplier;
+}
+
+function tableColumnLooksNumeric(rows, columnIndex) {
+  const values = rows
+    .map((row) => row.cells[columnIndex]?.textContent?.trim() || "")
+    .filter(Boolean);
+  if (!values.length) {
+    return false;
+  }
+  const numericCount = values.filter((value) => parseTableNumericValue(value) !== null).length;
+  return numericCount / values.length >= 0.6;
+}
+
+function normalizeTableCells(table, rows) {
+  const headers = Array.from(table.querySelectorAll("thead th"));
+  headers.forEach((th, columnIndex) => {
+    const numeric = tableColumnLooksNumeric(rows, columnIndex);
+    th.classList.toggle("table-primary-column", columnIndex === 0);
+    th.classList.toggle("table-number-column", numeric);
+    th.classList.toggle("table-detail-column", columnIndex === headers.length - 1);
+    for (const row of rows) {
+      const cell = row.cells[columnIndex];
+      if (!cell) {
+        continue;
+      }
+      cell.classList.toggle("table-primary-column", columnIndex === 0);
+      cell.classList.toggle("table-number-column", numeric);
+      cell.classList.toggle("table-detail-column", columnIndex === headers.length - 1);
+    }
+  });
+}
+
+function tableColumnCount(table) {
+  return table.querySelectorAll("thead th").length || table.rows[0]?.cells?.length || 1;
+}
+
+function noMatchTableRow(table) {
+  const tbody = table.tBodies[0];
+  if (!tbody) {
+    return null;
+  }
+  let row = tbody.querySelector('tr[data-table-generated="empty"]');
+  if (!row) {
+    row = document.createElement("tr");
+    row.dataset.tableGenerated = "empty";
+    row.innerHTML = `
+      <td colspan="${tableColumnCount(table)}">
+        ${emptyStateMarkup(
+          "No rows match this quick filter.",
+          "Clear the table filter or use fewer terms to restore the seeded rows.",
+          {
+            compact: true,
+            example: { label: "Filter state", value: "No matching rows on this page" },
+            nextStep: "Clear the quick filter to restore the current seeded table."
+          }
+        )}
+      </td>
+    `;
+    tbody.appendChild(row);
+  }
+  return row;
+}
+
+function setupScannableTable(table, tableKey) {
+  const wrap = table.closest(".table-wrap");
+  if (!wrap) {
+    return;
+  }
+  const ui = tableUiFor(tableKey);
+  const title = tableTitleFor(table);
+  wrap.classList.add("scannable-table-wrap");
+  wrap.dataset.tableKey = tableKey;
+  wrap.setAttribute("aria-label", `${title} table`);
+
+  if (!wrap.querySelector(`[data-table-toolbar="${tableKey}"]`)) {
+    const toolbar = document.createElement("div");
+    toolbar.className = "table-toolbar";
+    toolbar.dataset.tableToolbar = tableKey;
+    toolbar.innerHTML = `
+      <div class="table-context">
+        <strong>${esc(title)}</strong>
+        <span id="${esc(tableKey)}-status">Rows ready</span>
+        <em class="table-microcopy">Sort headers, filter rows, then page without losing the demo context.</em>
+      </div>
+      <div class="table-tools">
+        <label class="sr-only" for="${esc(tableKey)}-filter">Filter ${esc(title)}</label>
+        <input
+          id="${esc(tableKey)}-filter"
+          class="control-input table-filter-input"
+          type="text"
+          value="${esc(ui.filter)}"
+          placeholder="Filter rows"
+          data-action-input="table-filter"
+          data-table-key="${esc(tableKey)}"
+          autocomplete="off"
+          aria-label="Filter ${esc(title)} rows"
+        />
+        <select
+          class="control-select table-page-size"
+          data-action-change="table-page-size"
+          data-table-key="${esc(tableKey)}"
+          aria-label="Rows per page for ${esc(title)}"
+        >
+          ${TABLE_PAGE_SIZE_OPTIONS.map((size) => `<option value="${size}"${ui.pageSize === size ? " selected" : ""}>${size} rows</option>`).join("")}
+        </select>
+      </div>
+    `;
+    wrap.insertBefore(toolbar, table);
+  }
+
+  if (!wrap.querySelector(`[data-table-pagination="${tableKey}"]`)) {
+    const pagination = document.createElement("div");
+    pagination.className = "table-pagination";
+    pagination.dataset.tablePagination = tableKey;
+    pagination.innerHTML = `
+      <button class="small-btn table-page-btn" data-action="table-page" data-table-key="${esc(tableKey)}" data-page-delta="-1">Previous</button>
+      <span id="${esc(tableKey)}-page">Page 1 of 1</span>
+      <button class="small-btn table-page-btn" data-action="table-page" data-table-key="${esc(tableKey)}" data-page-delta="1">Next</button>
+    `;
+    wrap.appendChild(pagination);
+  }
+
+  Array.from(table.querySelectorAll("thead th")).forEach((th, columnIndex) => {
+    const label = th.dataset.columnLabel || th.textContent.trim() || `Column ${columnIndex + 1}`;
+    th.dataset.columnLabel = label;
+    th.setAttribute("scope", "col");
+    if (!th.querySelector(".table-sort-btn")) {
+      th.innerHTML = `
+        <button class="table-sort-btn" data-action="table-sort" data-table-key="${esc(tableKey)}" data-column-index="${columnIndex}" aria-label="Sort by ${esc(label)}">
+          <span>${esc(label)}</span>
+          <span class="table-sort-indicator">Sort</span>
+        </button>
+      `;
+    }
+  });
+}
+
+function applyScannableTable(table) {
+  const tableKey = table.dataset.tableKey;
+  if (!tableKey || !table.tBodies[0]) {
+    return;
+  }
+  const ui = tableUiFor(tableKey);
+  const rows = tableDataRows(table);
+  rows.forEach((row, index) => {
+    if (!row.dataset.originalIndex) {
+      row.dataset.originalIndex = String(index);
+    }
+    row.dataset.tableSearchText = (row.textContent || "").toLowerCase();
+  });
+  normalizeTableCells(table, rows);
+
+  const query = String(ui.filter || "").trim().toLowerCase();
+  const tokens = query.split(/\s+/).filter(Boolean);
+  const matchingRows = rows.filter((row) => {
+    if (!tokens.length) {
+      return true;
+    }
+    const haystack = row.dataset.tableSearchText || "";
+    return tokens.every((token) => haystack.includes(token));
+  });
+  const sortedRows = [...rows].sort((left, right) => {
+    if (Number.isInteger(ui.sortIndex)) {
+      const leftCell = left.cells[ui.sortIndex]?.textContent || "";
+      const rightCell = right.cells[ui.sortIndex]?.textContent || "";
+      const compared = compareTableCells(leftCell, rightCell, ui.sortDirection);
+      if (compared !== 0) {
+        return compared;
+      }
+    }
+    return Number(left.dataset.originalIndex || 0) - Number(right.dataset.originalIndex || 0);
+  });
+  const matchingSet = new Set(matchingRows);
+  const sortedMatchingRows = sortedRows.filter((row) => matchingSet.has(row));
+
+  const tbody = table.tBodies[0];
+  const generatedRow = noMatchTableRow(table);
+  for (const row of sortedRows) {
+    tbody.appendChild(row);
+  }
+  if (generatedRow) {
+    tbody.appendChild(generatedRow);
+  }
+
+  const pageSize = TABLE_PAGE_SIZE_OPTIONS.includes(Number(ui.pageSize))
+    ? Number(ui.pageSize)
+    : DEFAULT_TABLE_PAGE_SIZE;
+  ui.pageSize = pageSize;
+  const totalPages = Math.max(1, Math.ceil(sortedMatchingRows.length / pageSize));
+  ui.page = Math.min(Math.max(Number(ui.page) || 1, 1), totalPages);
+  const visibleStart = (ui.page - 1) * pageSize;
+  const visibleRows = new Set(sortedMatchingRows.slice(visibleStart, visibleStart + pageSize));
+  for (const row of sortedRows) {
+    const visible = visibleRows.has(row);
+    row.hidden = !visible;
+    row.classList.toggle("table-row-filtered-out", !matchingSet.has(row));
+  }
+  if (generatedRow) {
+    generatedRow.hidden = matchingRows.length > 0 || rows.length === 0;
+  }
+
+  const status = document.getElementById(`${tableKey}-status`);
+  if (status) {
+    const filteredLabel = rows.length && matchingRows.length !== rows.length
+      ? `${fmtNumber(matchingRows.length)} of ${fmtNumber(rows.length)} rows`
+      : `${fmtNumber(rows.length)} row${rows.length === 1 ? "" : "s"}`;
+    const sortedLabel = Number.isInteger(ui.sortIndex)
+      ? ` | sorted by ${tableHeaderLabels(table)[ui.sortIndex] || "column"} ${ui.sortDirection}`
+      : "";
+    status.textContent = `${filteredLabel}${sortedLabel}`;
+  }
+  const page = document.getElementById(`${tableKey}-page`);
+  if (page) {
+    page.textContent = `Page ${ui.page} of ${totalPages}`;
+  }
+  const wrap = table.closest(".table-wrap");
+  for (const button of wrap?.querySelectorAll(`[data-action="table-page"][data-table-key="${tableKey}"]`) || []) {
+    const delta = Number(button.dataset.pageDelta || 0);
+    button.disabled = delta < 0 ? ui.page <= 1 : ui.page >= totalPages;
+  }
+  const filter = document.getElementById(`${tableKey}-filter`);
+  if (filter instanceof HTMLInputElement && filter.value !== ui.filter) {
+    filter.value = ui.filter;
+  }
+  const pageSizeSelect = wrap?.querySelector(`[data-action-change="table-page-size"][data-table-key="${tableKey}"]`);
+  if (pageSizeSelect instanceof HTMLSelectElement) {
+    pageSizeSelect.value = String(pageSize);
+  }
+
+  Array.from(table.querySelectorAll("thead th")).forEach((th, columnIndex) => {
+    const active = ui.sortIndex === columnIndex;
+    th.setAttribute("aria-sort", active ? (ui.sortDirection === "desc" ? "descending" : "ascending") : "none");
+    const button = th.querySelector(".table-sort-btn");
+    const indicator = th.querySelector(".table-sort-indicator");
+    if (button instanceof HTMLElement) {
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    }
+    if (indicator) {
+      indicator.textContent = active ? ui.sortDirection.toUpperCase() : "Sort";
+    }
+  });
+}
+
+function normalizeScannableTables(root = document) {
+  const scope = root || document;
+  const tables = Array.from(document.querySelectorAll("table.table"));
+  for (const table of tables) {
+    if (scope !== document && !scope.contains(table)) {
+      continue;
+    }
+    const tableKey = ensureTableKey(table, tables);
+    table.dataset.control = "table";
+    table.dataset.scannable = "true";
+    setupScannableTable(table, tableKey);
+    applyScannableTable(table);
+  }
+}
+
+function updateTableSort(tableKey, columnIndex) {
+  const table = tableForKey(tableKey);
+  if (!table) {
+    return;
+  }
+  const ui = tableUiFor(tableKey);
+  const nextIndex = Number(columnIndex);
+  if (!Number.isInteger(nextIndex)) {
+    return;
+  }
+  if (ui.sortIndex === nextIndex) {
+    ui.sortDirection = ui.sortDirection === "asc" ? "desc" : "asc";
+  } else {
+    ui.sortIndex = nextIndex;
+    ui.sortDirection = "asc";
+  }
+  ui.page = 1;
+  applyScannableTable(table);
+}
+
+function updateTablePage(tableKey, delta) {
+  const table = tableForKey(tableKey);
+  if (!table) {
+    return;
+  }
+  const ui = tableUiFor(tableKey);
+  ui.page = (Number(ui.page) || 1) + Number(delta || 0);
+  applyScannableTable(table);
+}
+
+function updateTableFilter(tableKey, value) {
+  const table = tableForKey(tableKey);
+  if (!table) {
+    return;
+  }
+  const ui = tableUiFor(tableKey);
+  ui.filter = String(value || "");
+  ui.page = 1;
+  applyScannableTable(table);
+}
+
+function updateTablePageSize(tableKey, value) {
+  const table = tableForKey(tableKey);
+  if (!table) {
+    return;
+  }
+  const ui = tableUiFor(tableKey);
+  const pageSize = Number(value || DEFAULT_TABLE_PAGE_SIZE);
+  ui.pageSize = TABLE_PAGE_SIZE_OPTIONS.includes(pageSize) ? pageSize : DEFAULT_TABLE_PAGE_SIZE;
+  ui.page = 1;
+  applyScannableTable(table);
+}
+
+function layoutSpacingClass(value, prefix) {
+  const token = LAYOUT_SPACING_CLASS_BY_PX.get(String(value || "").trim().toLowerCase());
+  return token ? `${prefix}-${token}` : "";
+}
+
+function applyLayoutSpacingClass(element, styleProp, prefix) {
+  if (!(element instanceof HTMLElement)) {
+    return;
+  }
+  const className = layoutSpacingClass(element.style[styleProp], prefix);
+  if (!className) {
+    return;
+  }
+  element.classList.add(className);
+  element.style[styleProp] = "";
+}
+
+function normalizeTypographyContracts(root = document) {
+  const scope = root || document;
+  for (const [role, selector] of Object.entries(TYPOGRAPHY_ROLE_SELECTORS)) {
+    for (const element of scope.querySelectorAll(selector)) {
+      if (!(element instanceof HTMLElement)) {
+        continue;
+      }
+      element.dataset.typography = role;
+      element.classList.add(`type-${role}`);
+      for (const prop of TYPOGRAPHY_INLINE_PROPS) {
+        element.style[prop] = "";
+      }
+    }
+  }
+}
+
+function normalizeLayoutContracts(root = document) {
+  const scope = root || document;
+  const viewRoot = scope === document
+    ? document.getElementById("view-root")
+    : scope.closest?.("#view-root") || scope.querySelector?.("#view-root") || scope;
+
+  for (const stack of scope.querySelectorAll(".screen-secondary-content, .partner-page, .requirements-page, .coverage-page, .exports-page, .energy-page, .admin-page")) {
+    stack.classList.add("layout-stack");
+    stack.dataset.layout = stack.classList.contains("screen-secondary-content") ? "page-stack" : "section-stack";
+  }
+
+  for (const grid of scope.querySelectorAll(".grid, .adoption-kpi-grid, .adoption-lens-grid, .adoption-child-grid, .adoption-detail-grid, .workflow-spotlight-grid-wrap, .integration-summary-grid, .integration-source-grid, .integration-route-grid, .integration-scenario-grid, .coverage-split, .export-control-grid, .energy-model-grid-wrap, .persona-card-grid, .admin-diagnostic-grid")) {
+    grid.dataset.layout = "grid";
+  }
+
+  for (const cluster of scope.querySelectorAll(".filter-bar, .adoption-toolbar-right, .adoption-window-row, .adoption-breadcrumbs, .adoption-inline-list, .manual-mapping-actions, .intervention-actions")) {
+    cluster.classList.add("layout-cluster");
+    cluster.dataset.layout = "cluster";
+  }
+
+  for (const header of scope.querySelectorAll(".card-header")) {
+    header.classList.add("layout-header");
+    header.dataset.layout = "header";
+  }
+
+  const styledElements = Array.from(scope.querySelectorAll("[style]"));
+  if (scope instanceof HTMLElement && scope.hasAttribute("style")) {
+    styledElements.unshift(scope);
+  }
+  for (const element of styledElements) {
+    applyLayoutSpacingClass(element, "marginTop", "layout-mt");
+    applyLayoutSpacingClass(element, "marginBottom", "layout-mb");
+  }
+
+  for (const canvas of scope.querySelectorAll("canvas")) {
+    const frame = canvas.parentElement;
+    if (!(frame instanceof HTMLElement)) {
+      continue;
+    }
+    const frameClass = CHART_FRAME_CLASS_BY_HEIGHT.get(String(frame.style.height || "").trim().toLowerCase());
+    if (frameClass) {
+      frame.classList.add("chart-frame", frameClass);
+      frame.dataset.layout = "chart-frame";
+      frame.style.height = "";
+    }
+  }
+
+  if (viewRoot instanceof HTMLElement) {
+    viewRoot.dataset.layout = "viewport";
+  }
+}
+
+function normalizeInteractionContracts(root = document) {
+  const scope = root || document;
+  normalizeTypographyContracts(scope);
+  normalizeLayoutContracts(scope);
+  normalizeScannableTables(scope);
+  normalizeContextualHelp(scope);
+  for (const button of scope.querySelectorAll("button[data-action]")) {
+    const action = button.dataset.action || "";
+    if (!button.hasAttribute("type")) {
+      button.setAttribute("type", "button");
+    }
+    if (button.classList.contains("faq-question")) {
+      button.dataset.control = "disclosure";
+    } else if (isInteractiveFilterControl(button, action)) {
+      button.dataset.control = "filter";
+    } else {
+      button.dataset.control = "button";
+    }
+    const active = button.classList.contains("active") || button.classList.contains("current");
+    if (button.dataset.control === "filter") {
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    }
+    if (button.classList.contains("current")) {
+      button.setAttribute("aria-current", "page");
+    } else if (button.getAttribute("aria-current") === "page") {
+      button.removeAttribute("aria-current");
+    }
+    if (button.disabled) {
+      button.setAttribute("aria-disabled", "true");
+    } else {
+      button.removeAttribute("aria-disabled");
+    }
+  }
+
+  for (const input of scope.querySelectorAll("input[data-action-input]")) {
+    input.classList.add("control-input");
+    input.dataset.control = "input";
+    if (!input.hasAttribute("autocomplete")) {
+      input.setAttribute("autocomplete", "off");
+    }
+  }
+
+  for (const select of scope.querySelectorAll("select[data-action-change]")) {
+    select.classList.add("control-select");
+    select.dataset.control = "select";
+  }
+
+  for (const wrap of scope.querySelectorAll(".table-wrap")) {
+    wrap.dataset.control = "table-region";
+    if (!wrap.hasAttribute("role")) {
+      wrap.setAttribute("role", "region");
+    }
+    if (!wrap.hasAttribute("aria-label")) {
+      wrap.setAttribute("aria-label", "Data table");
+    }
+  }
+
+  for (const table of scope.querySelectorAll("table.table")) {
+    table.dataset.control = "table";
+  }
+
+  for (const row of scope.querySelectorAll("tr[data-action]")) {
+    row.dataset.control = "selectable-row";
+    if (!row.hasAttribute("tabindex")) {
+      row.setAttribute("tabindex", "0");
+    }
+    if (row.classList.contains("selected-row")) {
+      row.setAttribute("aria-selected", "true");
+    } else {
+      row.removeAttribute("aria-selected");
+    }
+  }
+
+  for (const card of scope.querySelectorAll("[data-action][role='button']")) {
+    card.dataset.control = card.dataset.control || "selectable-card";
+    if (!card.hasAttribute("tabindex")) {
+      card.setAttribute("tabindex", "0");
+    }
+  }
+
+  normalizeRoleBasedControls(scope);
+}
+
+function normalizeFormStatus(status = {}) {
+  const kind = ["hint", "ok", "warn", "error"].includes(status.kind)
+    ? status.kind
+    : "hint";
+  return {
+    kind,
+    message: String(status.message || ""),
+    example: String(status.example || ""),
+    value: String(status.value ?? "")
+  };
+}
+
+function setFormStatus(inputKey, status = {}, value = "") {
+  const key = String(inputKey || "");
+  if (!key) {
+    return;
+  }
+  state.formStatus[key] = normalizeFormStatus({
+    ...status,
+    value: String(value ?? "")
+  });
+}
+
+function formStatusFor(inputKey, fallbackStatus = null, currentValue = "") {
+  const key = String(inputKey || "");
+  const value = String(currentValue ?? "");
+  const explicit = key ? state.formStatus[key] : null;
+  if (explicit && explicit.value === value) {
+    return normalizeFormStatus(explicit);
+  }
+  return normalizeFormStatus(fallbackStatus || { kind: "hint", message: "" });
+}
+
+function searchFieldFeedback(inputKey, value, stats = {}) {
+  const key = String(inputKey || "");
+  const query = String(value || "").trim();
+  const example = FORM_SEARCH_EXAMPLES[key] || "";
+  const label = FORM_SEARCH_LABELS[key] || "results";
+  const count = Number(stats.filteredCount || 0);
+  if (!query) {
+    return {
+      kind: "hint",
+      message: example
+        ? `Optional. Leave blank to show all ${label}, or try "${example}".`
+        : `Optional. Leave blank to show all ${label}.`,
+      example
+    };
+  }
+  if (query.length < FORM_MIN_SEARCH_LENGTH) {
+    return {
+      kind: "warn",
+      message: example
+        ? `Keep typing for useful matches, or use "${example}" as a known-good example.`
+        : "Keep typing for useful matches.",
+      example
+    };
+  }
+  if (count === 0) {
+    return {
+      kind: "error",
+      message: example
+        ? `No matches for "${query}". Use "${example}" to restore a known-good search.`
+        : `No matches for "${query}". Try a broader term.`,
+      example
+    };
+  }
+  return {
+    kind: "ok",
+    message: `${count} ${label} shown. Your input is preserved while results update.`,
+    example
+  };
+}
+
+function fieldValidationAttrs(inputKey, fallbackStatus = null, currentValue = "", describedBy = []) {
+  const key = String(inputKey || "");
+  const status = formStatusFor(key, fallbackStatus, currentValue);
+  const describedIds = [`${key}-feedback`, ...describedBy].filter(Boolean).join(" ");
+  return `aria-describedby="${esc(describedIds)}" aria-invalid="${status.kind === "error" ? "true" : "false"}"`;
+}
+
+function fieldFeedbackMarkup(inputKey, fallbackStatus = null, currentValue = "") {
+  const key = String(inputKey || "");
+  const status = formStatusFor(key, fallbackStatus, currentValue);
+  return `
+    <div class="field-feedback field-feedback-${esc(status.kind)}" id="${esc(key)}-feedback" data-feedback-for="${esc(key)}" role="${status.kind === "error" ? "alert" : "status"}" aria-live="polite">
+      <span>${esc(status.message)}</span>
+    </div>
+  `;
+}
+
+function syncFieldFeedback(inputKey, value, status, describedBy = []) {
+  const key = String(inputKey || "");
+  if (!key) {
+    return;
+  }
+  setFormStatus(key, status, value);
+  const feedback = document.getElementById(`${key}-feedback`);
+  if (feedback) {
+    feedback.outerHTML = fieldFeedbackMarkup(key, status, value);
+  }
+  const field = document.getElementById(`${key}-input`);
+  if (field instanceof HTMLElement) {
+    field.setAttribute("aria-describedby", [`${key}-feedback`, ...describedBy].filter(Boolean).join(" "));
+    field.setAttribute("aria-invalid", normalizeFormStatus(status).kind === "error" ? "true" : "false");
+  }
 }
 
 function fmtNumber(value) {
@@ -778,6 +2093,41 @@ function nowLabel() {
   return d.toLocaleTimeString("en-US", { hour12: false });
 }
 
+function normalizeLookupKey(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function indexBy(items, keyFn) {
+  const index = new Map();
+  for (const item of items || []) {
+    const key = normalizeLookupKey(keyFn(item));
+    if (key) {
+      index.set(key, item);
+    }
+  }
+  return index;
+}
+
+function buildDatasetIndex(source) {
+  return {
+    requestsById: indexBy(source.attribution_requests, (item) => item.id),
+    teamsById: indexBy(source.teams, (item) => item.id),
+    teamsByName: indexBy(source.teams, (item) => item.name),
+    modelsByName: indexBy(source.models, (item) => item.name),
+    interventionsById: indexBy(source.interventions, (item) => item.id),
+    manualMappingsById: indexBy(source.manual_mapping, (item) => item.id),
+    glossaryByTerm: indexBy(source.glossary, (item) => item.term)
+  };
+}
+
+function rebuildDatasetIndex() {
+  datasetIndex = buildDatasetIndex(dataset);
+}
+
+function indexedLookup(index, key) {
+  return index.get(normalizeLookupKey(key)) || null;
+}
+
 function fmtDateTime(value) {
   if (!value) {
     return "N/A";
@@ -800,6 +2150,175 @@ function roleLensLabel(key = state.roleLens) {
 
 function roleLensDescription(key = state.roleLens) {
   return ROLE_LENSES.find((item) => item.key === key)?.description || "";
+}
+
+function activeDemoPersona() {
+  return DEMO_PERSONAS.find((persona) => persona.key === state.activePersonaKey) || DEMO_PERSONAS[0];
+}
+
+function personaCanAccessPage(pageKey, persona = activeDemoPersona()) {
+  return (persona.allowedPages || []).includes(pageKey);
+}
+
+function personaHasPermission(persona, permissions = []) {
+  const required = Array.isArray(permissions) ? permissions : [permissions];
+  if (!required.length) {
+    return true;
+  }
+  const owned = new Set(persona.permissions || []);
+  return required.some((permission) => owned.has(permission));
+}
+
+function actionPermissionRequirements(action, descriptor = {}) {
+  const normalizedAction = String(action || "");
+  if (normalizedAction === "manual-map-confirm" || normalizedAction === "manual-map-assign") {
+    return ["manual_override", "manage_policy"];
+  }
+  if (normalizedAction === "manual-map-defer") {
+    return ["manual_override", "manage_policy", "review_team_records"];
+  }
+  if (normalizedAction === "intervention-status") {
+    return ["review_savings", "comment_on_interventions", "manage_policy"];
+  }
+  if (normalizedAction === "set-mode") {
+    return ["manage_policy", "approve_exceptions"];
+  }
+  if (normalizedAction === "forecast-generate" || normalizedAction === "forecast-reset") {
+    return ["forecast_spend", "review_savings", "manage_policy"];
+  }
+  if (normalizedAction === "export-artifact") {
+    return ["export_packets", "export_evidence", "review_savings", "forecast_spend", "manage_policy"];
+  }
+  if (normalizedAction === "adoption-refresh") {
+    return ["view_adoption", "run_diagnostics", "manage_users"];
+  }
+  if (normalizedAction === "integrations-refresh" || normalizedAction === "integrations-run-scenario") {
+    return ["view_integration_handoffs", "view_integration_health", "view_security_handoffs", "replay_scenarios", "run_diagnostics"];
+  }
+  if (normalizedAction === "bootstrap-demo" || normalizedAction === "run-sequence" || normalizedAction === "run-scenario") {
+    return descriptor.scenario ? ["replay_scenarios", "manage_policy", "view_request_lineage"] : [];
+  }
+  return [];
+}
+
+function actionDescriptorFromElement(actionEl) {
+  return {
+    action: actionEl.dataset.action || "",
+    page: actionEl.dataset.page || "",
+    scenario: actionEl.dataset.scenario || "",
+    nextStatus: actionEl.dataset.nextStatus || ""
+  };
+}
+
+function personaCanUseAction(action, descriptor = {}, persona = activeDemoPersona()) {
+  const targetPage = descriptor.page || "";
+  if ((action === "go" || action === "back-to-demo-path") && targetPage) {
+    return personaCanAccessPage(targetPage, persona);
+  }
+  if (targetPage && PAGE_TITLES[targetPage] && !personaCanAccessPage(targetPage, persona)) {
+    return false;
+  }
+  return personaHasPermission(persona, actionPermissionRequirements(action, descriptor));
+}
+
+function personaCanUseActionElement(actionEl, persona = activeDemoPersona()) {
+  if (!(actionEl instanceof HTMLElement)) {
+    return true;
+  }
+  const descriptor = actionDescriptorFromElement(actionEl);
+  return personaCanUseAction(descriptor.action, descriptor, persona);
+}
+
+function personaCanUseActionDescriptor(action, descriptor = {}, persona = activeDemoPersona()) {
+  return personaCanUseAction(action, descriptor, persona);
+}
+
+function normalizeRoleBasedControls(root = document) {
+  const scope = root || document;
+  const persona = activeDemoPersona();
+  for (const actionEl of Array.from(scope.querySelectorAll("[data-action]"))) {
+    if (!(actionEl instanceof HTMLElement)) {
+      continue;
+    }
+    const action = actionEl.dataset.action || "";
+    if (action === "set-demo-persona" || action === "set-role-lens" || action.startsWith("table-") || action === "show-context-help") {
+      continue;
+    }
+    if (!personaCanUseActionElement(actionEl, persona)) {
+      actionEl.remove();
+    }
+  }
+}
+
+function setPersonaNotice(title, message, detail = "") {
+  state.personaNotice = { title, message, detail };
+  showToast(title, message);
+}
+
+function clearPersonaNotice() {
+  state.personaNotice = null;
+}
+
+function setActivePersona(personaKey) {
+  const nextPersona = DEMO_PERSONAS.find((persona) => persona.key === personaKey) || DEMO_PERSONAS[0];
+  state.activePersonaKey = nextPersona.key;
+  if (!personaCanAccessPage(state.page, nextPersona)) {
+    state.page = nextPersona.homePage || "overview";
+    state.scrollTopByPage[state.page] = 0;
+    setPersonaNotice(
+      "Persona View Applied",
+      `${nextPersona.label} starts on ${PAGE_TITLES[state.page] || "Overview"}.`,
+      "The previous page is outside this persona's local demo permission set."
+    );
+  } else {
+    clearPersonaNotice();
+    showToast("Persona View Applied", `${nextPersona.label} permissions and records are now active.`);
+  }
+  appendLog("ok", "Persona switched", `${nextPersona.name} (${nextPersona.role}) is active.`, null, {
+    hidden: true,
+    why: "The local demo uses synthetic personas to validate role-specific menus, workflows, and records."
+  });
+  render();
+}
+
+function operationRoles(operation) {
+  return String(operation.role_required || "")
+    .split(/\s+or\s+|,\s*/i)
+    .map((role) => role.trim())
+    .filter(Boolean);
+}
+
+function personaCanPerformOperation(operation, persona = activeDemoPersona()) {
+  const roles = operationRoles(operation);
+  return roles.includes(persona.role) || roles.includes(persona.label);
+}
+
+function personaCanViewAdminRecords(persona = activeDemoPersona()) {
+  return persona.role === "Admin"
+    || persona.role === "Auditor"
+    || persona.role === "Security"
+    || personaHasPermission(persona, ["view_admin_records", "manage_users"]);
+}
+
+function personaVisibleAccounts(accounts = [], persona = activeDemoPersona()) {
+  const rows = Array.isArray(accounts) ? accounts : [];
+  if (personaCanViewAdminRecords(persona)) {
+    return rows;
+  }
+  return rows.filter((account) => account.role === persona.role || account.name === persona.name);
+}
+
+function personaVisibleOperations(operations = [], persona = activeDemoPersona()) {
+  const rows = Array.isArray(operations) ? operations : [];
+  return rows.filter((operation) => personaCanPerformOperation(operation, persona));
+}
+
+function personaVisibleAuditEvents(events = [], persona = activeDemoPersona()) {
+  const rows = Array.isArray(events) ? events : [];
+  if (personaCanViewAdminRecords(persona)) {
+    return rows;
+  }
+  return rows.filter((event) => event.role === persona.role || event.actor === persona.name);
 }
 
 function pageLensNarrative(pageKey = state.page, lens = state.roleLens) {
@@ -876,33 +2395,43 @@ function pageLensNarrative(pageKey = state.page, lens = state.roleLens) {
 }
 
 function currentSelectedRequest() {
-  return (dataset.attribution_requests || []).find((item) => item.id === state.selectedRequestId) || null;
+  return indexedLookup(datasetIndex.requestsById, state.selectedRequestId);
+}
+
+function isEntryHomeActive() {
+  return state.page === "overview" && state.walkthroughStatus === "idle";
+}
+
+function preparedDemoRequestLabel() {
+  const request = currentSelectedRequest() || (dataset.attribution_requests || [])[0] || null;
+  const service = chainNode(request, "Service Attribution")?.value;
+  return service || request?.id || "customer-copilot-prod";
 }
 
 function currentSelectedTeam() {
-  return (dataset.teams || []).find((item) => item.id === state.selectedTeamId) || null;
+  return indexedLookup(datasetIndex.teamsById, state.selectedTeamId);
 }
 
 function currentSelectedModel() {
   if (state.selectedModelName) {
-    const explicit = (dataset.models || []).find((item) => item.name === state.selectedModelName);
+    const explicit = indexedLookup(datasetIndex.modelsByName, state.selectedModelName);
     if (explicit) {
       return explicit;
     }
   }
   const request = currentSelectedRequest();
   if (request) {
-    return (dataset.models || []).find((item) => item.name === request.model) || null;
+    return indexedLookup(datasetIndex.modelsByName, request.model);
   }
   const team = currentSelectedTeam();
   if (team && Array.isArray(team.top_models) && team.top_models.length) {
-    return (dataset.models || []).find((item) => item.name === team.top_models[0]) || null;
+    return indexedLookup(datasetIndex.modelsByName, team.top_models[0]);
   }
   return null;
 }
 
 function currentSelectedIntervention() {
-  return getInterventions().find((item) => item.id === state.selectedInterventionId) || null;
+  return indexedLookup(datasetIndex.interventionsById, state.selectedInterventionId);
 }
 
 function filteredInterventions() {
@@ -933,7 +2462,7 @@ function selectedRequestTeamName(request = currentSelectedRequest()) {
 }
 
 function syncContextFromRequest(requestId) {
-  const request = (dataset.attribution_requests || []).find((item) => item.id === requestId);
+  const request = indexedLookup(datasetIndex.requestsById, requestId);
   if (!request) {
     return;
   }
@@ -942,7 +2471,7 @@ function syncContextFromRequest(requestId) {
   state.selectedModelName = request.model || state.selectedModelName;
   const teamName = selectedRequestTeamName(request);
   if (teamName) {
-    const team = (dataset.teams || []).find((item) => item.name === teamName);
+    const team = indexedLookup(datasetIndex.teamsByName, teamName);
     if (team) {
       state.selectedTeamId = team.id;
     }
@@ -950,7 +2479,7 @@ function syncContextFromRequest(requestId) {
 }
 
 function syncContextFromTeam(teamId) {
-  const team = (dataset.teams || []).find((item) => item.id === teamId);
+  const team = indexedLookup(datasetIndex.teamsById, teamId);
   if (!team) {
     return;
   }
@@ -961,7 +2490,7 @@ function syncContextFromTeam(teamId) {
 }
 
 function syncContextFromModel(modelName) {
-  const model = (dataset.models || []).find((item) => item.name === modelName);
+  const model = indexedLookup(datasetIndex.modelsByName, modelName);
   if (!model) {
     return;
   }
@@ -969,7 +2498,7 @@ function syncContextFromModel(modelName) {
 }
 
 function syncContextFromIntervention(interventionId) {
-  const intervention = getInterventions().find((item) => item.id === interventionId);
+  const intervention = indexedLookup(datasetIndex.interventionsById, interventionId);
   if (!intervention) {
     return;
   }
@@ -981,7 +2510,7 @@ function syncContextFromIntervention(interventionId) {
 }
 
 function glossaryEntry(term) {
-  return (dataset.glossary || []).find((item) => String(item.term || "").toLowerCase() === String(term || "").toLowerCase()) || null;
+  return indexedLookup(datasetIndex.glossaryByTerm, term);
 }
 
 function inlineDefinition(term, label = term) {
@@ -1059,19 +2588,27 @@ function normalizeStatus(status) {
 
 function chartColors() {
   return [
-    "#4f8ef8",
-    "#2ac487",
-    "#eda82e",
-    "#9470ff",
-    "#1dbcc8",
-    "#ee5858",
-    "#f18f42",
-    "#52d8b1",
-    "#d86ef5",
-    "#7bc96f",
-    "#ffcf5a",
-    "#7aa8ff"
+    PALETTE.brand,
+    PALETTE.success,
+    PALETTE.warning,
+    PALETTE.danger,
+    PALETTE.neutral,
+    PALETTE.brandStrong,
+    PALETTE.successText,
+    PALETTE.warningText
   ];
+}
+
+function paletteChartColor(value, fallback = PALETTE.brand) {
+  const normalized = String(value || "").trim().toLowerCase();
+  const mapped = {
+    "#4f8ef8": PALETTE.brand,
+    "#2ac487": PALETTE.success,
+    "#eda82e": PALETTE.warning,
+    "#ee5858": PALETTE.danger,
+    "#8ea0bf": PALETTE.neutral
+  };
+  return mapped[normalized] || fallback;
 }
 
 function renderChartSemantics(items) {
@@ -1163,7 +2700,7 @@ function getApiBearerToken() {
         return fromSession;
       }
     } catch (error) {
-      void error;
+      appendLog("warn", "Session token unavailable", summarizeApiError(error, "Browser session storage is unavailable for API token lookup."), null, { hidden: true });
     }
   }
   return "";
@@ -1173,7 +2710,7 @@ function safeSessionGet(key) {
   try {
     return window.sessionStorage.getItem(key);
   } catch (error) {
-    void error;
+    appendLog("warn", "Session cache unavailable", summarizeApiError(error, "Browser session storage could not be read."), null, { hidden: true });
     return null;
   }
 }
@@ -1195,6 +2732,23 @@ function safeSessionRemove(key) {
   } catch (error) {
     appendLog("warn", "Session cache", `Could not clear session state: ${String(error)}`, null, { hidden: true });
     return false;
+  }
+}
+
+function clearDemoSessionStorage(options = {}) {
+  const { includeAuthTokens = false } = options;
+  const keys = [
+    INTERVENTION_STORAGE_KEY,
+    MANUAL_MAPPING_STORAGE_KEY,
+    ...(includeAuthTokens ? API_TOKEN_STORAGE_KEYS : [])
+  ];
+  const cleared = new Set();
+  for (const key of keys) {
+    if (cleared.has(key)) {
+      continue;
+    }
+    safeSessionRemove(key);
+    cleared.add(key);
   }
 }
 
@@ -1240,7 +2794,7 @@ function restoreFocusedInputState(snapshot) {
     try {
       target.setSelectionRange(snapshot.start, snapshot.end);
     } catch (error) {
-      void error;
+      appendLog("warn", "Focus restore skipped", summarizeApiError(error, "The active input could not restore its cursor position."), null, { hidden: true });
     }
   }
 }
@@ -1278,9 +2832,11 @@ function executiveReadinessRows() {
 }
 
 function activeContextItems() {
+  const persona = activeDemoPersona();
   const items = [
     { label: "Mode", value: modeLabel(state.mode) },
-    { label: "Lens", value: roleLensLabel(state.roleLens) }
+    { label: "Lens", value: roleLensLabel(state.roleLens) },
+    { label: "Persona", value: persona.label }
   ];
 
   const selectedTeam = currentSelectedTeam();
@@ -1304,6 +2860,8 @@ function activeContextItems() {
   if (state.page === "overview") {
     items.push({ label: "Focus", value: "Spend posture and savings levers" });
   }
+
+  items.push({ label: "Path", value: demoPathProgressLabel(state.page) });
 
   if (state.page === "partner_brief") {
     const stage = selectedPartnerStage();
@@ -1369,7 +2927,7 @@ function activeContextItems() {
   }
 
   if (state.page === "governance") {
-    const request = (dataset.attribution_requests || []).find((item) => item.id === state.governanceSimulationRequestId) || selectedRequest;
+    const request = indexedLookup(datasetIndex.requestsById, state.governanceSimulationRequestId) || selectedRequest;
     if (request) {
       items.push({ label: "Simulation request", value: request.id });
     }
@@ -1387,6 +2945,18 @@ function renderContextRibbon() {
   if (!root) {
     return;
   }
+  const entryHomeActive = isEntryHomeActive();
+  root.classList.toggle("entry-context", entryHomeActive);
+  if (entryHomeActive) {
+    root.innerHTML = `
+      <div class="entry-context-summary">
+        <span>Preselected context</span>
+        <strong>${esc(roleLensLabel())} lens / ${esc(activeDemoPersona().label)} persona / ${esc(modeLabel(state.mode))} mode</strong>
+        <em>${esc(preparedDemoRequestLabel())} is loaded with deterministic NovaTech data.</em>
+      </div>
+    `;
+    return;
+  }
   const items = activeContextItems();
   root.innerHTML = items.map((item) => `
     <div class="context-chip">
@@ -1401,17 +2971,44 @@ function renderRoleRibbon() {
   if (!root) {
     return;
   }
+  const entryHomeActive = isEntryHomeActive();
+  root.classList.toggle("entry-role", entryHomeActive);
+  if (entryHomeActive) {
+    root.innerHTML = `
+      <div class="role-ribbon-copy">
+        <div class="role-ribbon-title">Ready for first-time review</div>
+        <div class="role-ribbon-detail">The demo opens with the enterprise buyer context already selected. No persona, mode, tenant, or data setup is required.</div>
+      </div>
+    `;
+    return;
+  }
+  const persona = activeDemoPersona();
   root.innerHTML = `
     <div class="role-ribbon-copy">
-      <div class="role-ribbon-title">Audience lens</div>
+      <div class="role-ribbon-title">Audience lens and persona</div>
       <div class="role-ribbon-detail">${esc(roleLensDescription())}</div>
+      <div class="persona-current">
+        <span>${esc(persona.name)}</span>
+        <strong>${esc(persona.role)}</strong>
+        <em>${fmtNumber((persona.allowedPages || []).length)} menus</em>
+      </div>
+      ${state.personaNotice ? `<div class="persona-notice">${esc(state.personaNotice.message)} ${state.personaNotice.detail ? esc(state.personaNotice.detail) : ""}</div>` : ""}
     </div>
-    <div class="role-ribbon-actions">
-      ${ROLE_LENSES.map((item) => `
-        <button class="lens-btn${state.roleLens === item.key ? " active" : ""}" data-action="set-role-lens" data-role-lens="${esc(item.key)}">
-          ${esc(item.label)}
-        </button>
-      `).join("")}
+    <div class="role-ribbon-controls">
+      <div class="role-ribbon-actions" aria-label="Audience lens controls">
+        ${ROLE_LENSES.map((item) => `
+          <button class="lens-btn${state.roleLens === item.key ? " active" : ""}" data-action="set-role-lens" data-role-lens="${esc(item.key)}">
+            ${esc(item.label)}
+          </button>
+        `).join("")}
+      </div>
+      <div class="role-ribbon-actions persona-actions" aria-label="Demo persona controls">
+        ${DEMO_PERSONAS.map((item) => `
+          <button class="lens-btn persona-btn${state.activePersonaKey === item.key ? " active" : ""}" data-action="set-demo-persona" data-persona-key="${esc(item.key)}" title="${esc(item.name)} | ${esc(item.description)}">
+            ${esc(item.label)}
+          </button>
+        `).join("")}
+      </div>
     </div>
   `;
 }
@@ -1465,15 +3062,78 @@ function renderWalkthroughBanner() {
   `;
 }
 
+function renderPresenterConsole() {
+  const consoleEl = document.getElementById("presenter-console");
+  if (!consoleEl) {
+    return;
+  }
+  const toggle = document.getElementById("presenter-mode-toggle");
+  if (toggle instanceof HTMLButtonElement) {
+    toggle.textContent = state.presenterMode ? "Presenter On" : "Presenter Mode";
+    toggle.setAttribute("aria-pressed", state.presenterMode ? "true" : "false");
+    toggle.classList.toggle("active", state.presenterMode);
+  }
+  if (!state.presenterMode) {
+    consoleEl.hidden = true;
+    consoleEl.innerHTML = "";
+    return;
+  }
+
+  const steps = presenterAvailableSteps();
+  state.presenterStepIndex = clampPresenterStepIndex(state.presenterStepIndex);
+  const step = presenterCurrentStep();
+  const current = state.presenterStepIndex + 1;
+  const total = steps.length;
+  const offScript = presenterIsOffScript();
+  const dots = steps.map((item, index) => `
+    <button class="presenter-step-dot${index === state.presenterStepIndex ? " active" : ""}${state.page === item.page ? " current-page" : ""}" data-action="presenter-step" data-step-index="${index}" aria-label="Go to presenter step ${index + 1}: ${esc(item.title)}">
+      <span>${String(index + 1).padStart(2, "0")}</span>
+    </button>
+  `).join("");
+  const recoveryMarkup = offScript
+    ? `<div class="presenter-recovery warn">Off script: current page is ${esc(PAGE_TITLES[state.page] || state.page)}. Return to the highlighted step before continuing.</div>`
+    : state.presenterRecoveryNotice
+      ? `<div class="presenter-recovery ok">${esc(state.presenterRecoveryNotice)}</div>`
+      : `<div class="presenter-recovery">Script ready. The highlighted region is the current talk track.</div>`;
+
+  consoleEl.hidden = false;
+  consoleEl.classList.toggle("off-script", offScript);
+  consoleEl.innerHTML = `
+    <div class="presenter-console-main">
+      <div class="presenter-console-copy">
+        <div class="presenter-kicker">Presenter mode - Step ${current} of ${total}</div>
+        <div class="presenter-title">${esc(step?.title || "Presenter path")}</div>
+        <div class="presenter-detail">${esc(step?.headline || "Use the controls to keep the local demo on script.")}</div>
+        ${recoveryMarkup}
+      </div>
+      <div class="presenter-controls" aria-label="Presenter controls">
+        <button class="small-btn" data-action="presenter-prev" ${current <= 1 ? "disabled" : ""}>Previous</button>
+        <button class="small-btn primary" data-action="presenter-next" ${current >= total ? "disabled" : ""}>Next</button>
+        <button class="small-btn" data-action="presenter-recover">${offScript ? "Return To Step" : "Recover Step"}</button>
+        <button class="small-btn" data-action="clear-logs">Reset Demo</button>
+        <button class="small-btn" data-action="toggle-presenter-mode">Close</button>
+      </div>
+    </div>
+    <div class="presenter-step-row" aria-label="Presenter step indicators">${dots}</div>
+    <div class="presenter-shortcuts" aria-label="Presenter shortcuts">
+      <span>P toggle</span>
+      <span>Left/Right step</span>
+      <span>R recover</span>
+      <span>Shift+R reset</span>
+    </div>
+  `;
+}
+
 function applyWalkthroughHighlight() {
   const allTargets = Array.from(document.querySelectorAll("[data-walkthrough-anchor]"));
   for (const target of allTargets) {
     target.classList.remove("walkthrough-highlight");
   }
-  if (!state.walkthroughAnchor) {
+  const anchor = activeWalkthroughAnchor();
+  if (!anchor) {
     return;
   }
-  const activeTarget = document.querySelector(`[data-walkthrough-anchor="${state.walkthroughAnchor}"]`);
+  const activeTarget = document.querySelector(`[data-walkthrough-anchor="${anchor}"]`);
   if (activeTarget instanceof HTMLElement) {
     activeTarget.classList.add("walkthrough-highlight");
   }
@@ -1498,6 +3158,131 @@ function completeWalkthroughState() {
   state.walkthroughProgressPct = 100;
   state.walkthroughElapsedMs = state.walkthroughTotalMs;
   state.walkthroughAnchor = "";
+}
+
+function presenterAvailableSteps(persona = activeDemoPersona()) {
+  const steps = INVESTOR_WALKTHROUGH_STEPS.filter((step) => personaCanAccessPage(step.page, persona));
+  return steps.length ? steps : [INVESTOR_WALKTHROUGH_STEPS[0]].filter(Boolean);
+}
+
+function clampPresenterStepIndex(index = state.presenterStepIndex) {
+  const steps = presenterAvailableSteps();
+  return Math.max(0, Math.min(Number(index) || 0, Math.max(steps.length - 1, 0)));
+}
+
+function presenterCurrentStep() {
+  const steps = presenterAvailableSteps();
+  state.presenterStepIndex = clampPresenterStepIndex(state.presenterStepIndex);
+  return steps[state.presenterStepIndex] || steps[0] || null;
+}
+
+function presenterStepIndexForPage(pageKey = state.page) {
+  return presenterAvailableSteps().findIndex((step) => step.page === pageKey);
+}
+
+function syncPresenterStepFromPage(pageKey = state.page) {
+  const index = presenterStepIndexForPage(pageKey);
+  if (index >= 0) {
+    state.presenterStepIndex = index;
+  }
+}
+
+function presenterIsOffScript() {
+  const step = presenterCurrentStep();
+  return Boolean(state.presenterMode && step && state.page !== step.page);
+}
+
+function setPresenterMode(enabled) {
+  state.presenterMode = Boolean(enabled);
+  state.presenterRecoveryNotice = "";
+  if (state.presenterMode) {
+    syncPresenterStepFromPage();
+    state.modeMenuOpen = false;
+    state.mobileNavOpen = false;
+    setExecutionDrawer(false);
+    showToast("Presenter Mode On", "Use the presenter rail to move through the script or recover the current step.");
+  } else {
+    showToast("Presenter Mode Off", "The standard demo controls remain available.");
+  }
+  render();
+}
+
+async function preparePresenterStep(step, options = {}) {
+  if (!step) {
+    return;
+  }
+  state.modeMenuOpen = false;
+  state.mobileNavOpen = false;
+  state.executionDrawerOpen = false;
+  setExecutionDrawer(false);
+  setMobileNav(false);
+  hideToast();
+  if (!personaCanAccessPage(step.page, activeDemoPersona())) {
+    state.activePersonaKey = "admin";
+  }
+  switch (step.key) {
+    case "partner-brief":
+      state.selectedPartnerStage = "prove";
+      break;
+    case "requirements-proof":
+      state.selectedProofJourney = "trust";
+      break;
+    case "adoption":
+      state.adoptionWindowDays = 30;
+      applyAdoptionHierarchy(state.adoptionHierarchy || fallbackAdoptionHierarchy(), { preserveSelection: true });
+      break;
+    case "request-proof":
+      state.selectedRequestId = dataset.attribution_requests?.[0]?.id || state.selectedRequestId;
+      break;
+    case "exports":
+      state.exportViewMode = "event_time";
+      break;
+    case "interventions":
+      state.interventionFilter = "recommended";
+      break;
+    case "forecast":
+      state.forecastScenarioKey = "optimization_capture";
+      state.forecastHorizonMonths = 12;
+      if (!state.forecastResult && options.ensureForecast !== false) {
+        await resetForecastPlanner({ log: false, toast: false });
+      }
+      break;
+    case "governance":
+      state.governanceSimulationMode = state.mode || "advisory";
+      state.governanceSimulationRequestId = dataset.attribution_requests?.[0]?.id || state.governanceSimulationRequestId;
+      break;
+    default:
+      break;
+  }
+  go(step.page);
+}
+
+async function goToPresenterStep(index, options = {}) {
+  if (state.walkthroughStatus === "running") {
+    stopInvestorWalkthrough();
+  }
+  state.presenterMode = true;
+  state.presenterStepIndex = clampPresenterStepIndex(index);
+  const step = presenterCurrentStep();
+  state.presenterRecoveryNotice = options.recovery
+    ? `Recovered to ${step?.title || "the current presenter step"}.`
+    : "";
+  await preparePresenterStep(step, options);
+  render();
+}
+
+async function recoverPresenterStep() {
+  await goToPresenterStep(state.presenterStepIndex, { recovery: true, ensureForecast: true });
+}
+
+function activeWalkthroughAnchor() {
+  if (state.walkthroughStatus === "running" && state.walkthroughAnchor) {
+    return state.walkthroughAnchor;
+  }
+  if (state.presenterMode) {
+    return presenterCurrentStep()?.anchor || "";
+  }
+  return state.walkthroughAnchor || "";
 }
 
 async function waitForWalkthroughStep(durationMs, runId, stepIndex) {
@@ -1938,14 +3723,24 @@ async function runIntegrationScenario(scenarioId) {
       `${response.scenario_title} completed via ${response.route_name}.`
     );
   } catch (error) {
-    void error;
+    const fallbackMessage = summarizeApiError(
+      error,
+      "Live integration scenario dispatch failed; using deterministic local handoff data."
+    );
     const delivery = applyLocalIntegrationScenario(scenario);
+    setRecoveryNotice({
+      severity: "warn",
+      title: "Integration fallback active",
+      message: "The live integration dispatch was unavailable, so the demo used a deterministic local handoff.",
+      detail: fallbackMessage,
+      source: "integrations"
+    });
     appendLog(
-      "ok",
+      "warn",
       "Local integration handoff",
       `${scenario.title} added a ${delivery.channel} handoff from deterministic local demo data.`,
       null,
-      { hidden: true }
+      { why: "The UI shows the fallback instead of silently dropping the failed dispatch." }
     );
     showToast(
       "Integration Workflow Simulated",
@@ -2065,6 +3860,7 @@ function refreshModelsPageInPlace() {
   chartSemantics.innerHTML = renderModelChartSemantics();
   renderModelChart();
   renderContextRibbon();
+  normalizeInteractionContracts(document);
   return true;
 }
 
@@ -2136,7 +3932,7 @@ function manualMappingImpact(mapping) {
       ? 93
       : beforeConfidence;
   const forecastDelta = Math.round(Number(mapping.spend_at_risk_usd || 0) * BUSINESS_RULES.forecastRiskReserveShare);
-  const request = (dataset.attribution_requests || []).find((item) => item.id === mapping.request_id) || null;
+  const request = indexedLookup(datasetIndex.requestsById, mapping.request_id);
   const beforeOwner = mapping.current_owner;
   const afterOwner = status === "deferred"
     ? mapping.current_owner
@@ -2437,6 +4233,7 @@ function refreshForecastPageInPlace() {
   compareButtons.innerHTML = renderForecastCompareButtons();
   renderForecastChart();
   renderContextRibbon();
+  normalizeInteractionContracts(document);
   return true;
 }
 
@@ -2444,8 +4241,52 @@ function governancePolicyBundle(bundleKey = state.governanceSimulationBundle) {
   return GOVERNANCE_POLICY_BUNDLES.find((item) => item.key === bundleKey) || GOVERNANCE_POLICY_BUNDLES[0];
 }
 
+function selectedGovernanceRequestValue() {
+  const requests = Array.isArray(dataset.attribution_requests)
+    ? dataset.attribution_requests
+    : [];
+  if (!requests.length) {
+    state.governanceSimulationRequestId = "";
+    return "";
+  }
+  const current = String(state.governanceSimulationRequestId || "");
+  if (requests.some((request) => request.id === current)) {
+    return current;
+  }
+  const fallback = String(requests[0]?.id || "");
+  state.governanceSimulationRequestId = fallback;
+  return fallback;
+}
+
+function governanceRequestSelectionFeedback(value) {
+  const requestId = String(value || "");
+  const requests = Array.isArray(dataset.attribution_requests)
+    ? dataset.attribution_requests
+    : [];
+  if (!requests.length) {
+    return {
+      kind: "error",
+      message: "No request samples are loaded. Reset the local demo before presenting this simulator."
+    };
+  }
+  const request = requests.find((item) => item.id === requestId);
+  if (!request) {
+    return {
+      kind: "error",
+      message: "That request sample is not in the current dummy dataset. The previous valid selection was preserved."
+    };
+  }
+  const service = chainNode(request, "Service Attribution")?.value || request.id;
+  const owner = selectedRequestTeamName(request) || "review queue";
+  return {
+    kind: "ok",
+    message: `Selected ${service} for ${owner}. Changing this sample preserves the rest of the simulator context.`
+  };
+}
+
 function governanceSimulationResult() {
-  const request = (dataset.attribution_requests || []).find((item) => item.id === state.governanceSimulationRequestId) || currentSelectedRequest() || dataset.attribution_requests?.[0];
+  const requestId = selectedGovernanceRequestValue();
+  const request = indexedLookup(datasetIndex.requestsById, requestId) || currentSelectedRequest() || dataset.attribution_requests?.[0];
   if (!request) {
     return null;
   }
@@ -2728,7 +4569,9 @@ function runtimeCapabilityLabel(key) {
 }
 
 function refreshRuntimeStatus() {
-  const capabilityEntries = Object.entries(state.runtimeCapabilities || {});
+  const capabilityEntries = Object.entries(state.runtimeCapabilities || {}).filter(([, value]) => (
+    value && typeof value === "object" && typeof value.status === "string"
+  ));
   if (!capabilityEntries.length) {
     setRuntimeStatus("local", "Using deterministic local demo data until a live action is requested");
     return;
@@ -2804,12 +4647,816 @@ function showToast(title, message, options = {}) {
   }
 }
 
-function summarizeApiError(error, fallback = "The live demo action could not be completed.") {
-  const message = String(error || "");
-  if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
-    return "Live demo API unavailable. Start the local demo runtime and retry.";
+function instantActionLabel(actionEl, action) {
+  if (action === "go") {
+    return `Opening ${PAGE_TITLES[actionEl.dataset.page] || "demo view"}`;
   }
-  return fallback;
+  if (action === "back-to-demo-path") {
+    const targetPage = actionEl.dataset.page || demoPathTargetPage();
+    return `Moving to ${PAGE_TITLES[targetPage] || "the demo path"}`;
+  }
+  if (action === "start-walkthrough" || action === "run-sequence") {
+    return "Starting guided walkthrough";
+  }
+  if (action === "toggle-presenter-mode") {
+    return state.presenterMode ? "Closing presenter mode" : "Opening presenter mode";
+  }
+  if (action.startsWith("presenter-")) {
+    return "Presenter path updated";
+  }
+  if (action === "bootstrap-demo") {
+    return "Preparing seeded demo state";
+  }
+  if (action === "forecast-generate") {
+    return "Local forecast estimate readying";
+  }
+  if (action === "forecast-set-scenario" || action === "forecast-set-horizon" || action === "forecast-compare-toggle") {
+    return "Forecast inputs updated";
+  }
+  if (action === "intervention-status") {
+    return "Intervention updated locally";
+  }
+  if (action.startsWith("manual-map")) {
+    return "Mapping review updated locally";
+  }
+  if (action === "integrations-refresh") {
+    return "Refreshing integration feed";
+  }
+  if (action === "integrations-run-scenario") {
+    return "Simulating integration handoff";
+  }
+  if (action === "show-deferred-section") {
+    return "Loading reference content";
+  }
+  if (action === "toggle-faq") {
+    return "FAQ state updated";
+  }
+  if (action === "apply-guided-example") {
+    return "Example loaded";
+  }
+  return "Action received";
+}
+
+function renderInstantFeedback() {
+  const feedback = document.getElementById("instant-feedback");
+  if (!feedback) {
+    return;
+  }
+  if (!state.instantFeedback) {
+    feedback.hidden = true;
+    feedback.classList.remove("show");
+    feedback.textContent = "";
+    return;
+  }
+  feedback.hidden = false;
+  feedback.textContent = state.instantFeedback.message;
+  feedback.classList.add("show");
+}
+
+function acknowledgeInstantAction(actionEl, action) {
+  if (!action || action === "close-toast" || action === "close-drawer" || action === "close-mobile-nav") {
+    return;
+  }
+  if (actionEl instanceof HTMLElement) {
+    actionEl.classList.add("click-ack");
+    window.setTimeout(() => {
+      actionEl.classList.remove("click-ack");
+    }, 180);
+  }
+  state.instantFeedback = {
+    action,
+    message: instantActionLabel(actionEl, action),
+    at: Date.now()
+  };
+  renderInstantFeedback();
+  if (instantFeedbackTimer) {
+    clearTimeout(instantFeedbackTimer);
+  }
+  instantFeedbackTimer = window.setTimeout(() => {
+    state.instantFeedback = null;
+    renderInstantFeedback();
+  }, 1300);
+}
+
+function extractOperatorErrorMessage(error) {
+  if (!error) {
+    return "";
+  }
+  if (error instanceof Error) {
+    return error.message || "";
+  }
+  if (typeof error === "string") {
+    return error;
+  }
+  if (typeof error === "object") {
+    if (typeof error.message === "string") {
+      return error.message;
+    }
+    if (typeof error.detail === "string") {
+      return error.detail;
+    }
+    if (error.error && typeof error.error.message === "string") {
+      return error.error.message;
+    }
+  }
+  return String(error || "");
+}
+
+function sanitizeOperatorMessage(message, fallback) {
+  const raw = String(message || "").trim();
+  if (!raw) {
+    return fallback;
+  }
+  const hasStackMarker = raw.includes("\n    at ") || raw.includes("Traceback") || raw.includes('File "');
+  if (hasStackMarker) {
+    return fallback;
+  }
+  const withoutPrefix = raw.replace(/^Error:\s*/i, "").replace(/\s+/g, " ").trim();
+  return withoutPrefix.length > 260 ? `${withoutPrefix.slice(0, 257)}...` : withoutPrefix;
+}
+
+function summarizeApiError(error, fallback = "The live demo action could not be completed.") {
+  const message = sanitizeOperatorMessage(extractOperatorErrorMessage(error), fallback);
+  if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
+    return "Local demo API unavailable. Start the local runtime with ./scripts/start_demo.sh, or continue the walkthrough on seeded local data.";
+  }
+  return message || fallback;
+}
+
+function apiResponseErrorMessage(response, data) {
+  const statusLabel = `${response.status} ${response.statusText || "API error"}`.trim();
+  let detail = "";
+  if (data && typeof data.error?.message === "string") {
+    detail = data.error.message;
+  } else if (data && typeof data.detail === "string") {
+    detail = data.detail;
+  } else if (Array.isArray(data?.detail)) {
+    detail = "The request did not pass API validation. Check the visible inputs and retry.";
+  } else if (typeof data?.raw === "string" && data.raw && !data.raw.startsWith("<")) {
+    detail = data.raw;
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    detail = detail || "Live API authentication is required for this action.";
+    return `${statusLabel}. ${detail} Continue with local demo data or restart the demo profile.`;
+  }
+  if (response.status >= 500) {
+    const correlationId = data?.error?.correlation_id || response.headers.get("X-ACI-Correlation-Id") || "";
+    return [
+      `${statusLabel}. The local demo runtime hit an internal recovery boundary.`,
+      correlationId ? `Reference ${correlationId}.` : "",
+      "Use Reset Demo or run ./scripts/reset_demo.sh, then retry the action."
+    ].filter(Boolean).join(" ");
+  }
+  return `${statusLabel}. ${detail || "The demo API rejected the request. Use Reset Demo if the local state looks stale."}`;
+}
+
+function recoveryActionsMarkup() {
+  return `
+    <button class="small-btn" data-action="clear-logs">Reset Demo</button>
+    <button class="small-btn" data-action="go" data-page="overview">Open Overview</button>
+    <button class="small-btn" data-action="open-drawer">Guided Demo</button>
+  `;
+}
+
+function noteRecoveryRenderIssue(error) {
+  state.runtimeStatus = "degraded";
+  state.runtimeDetail = summarizeApiError(
+    error,
+    "A recovery UI element could not render, but the main controlled recovery state remains active."
+  );
+}
+
+function setRecoveryNotice(notice) {
+  state.recoveryNotice = {
+    severity: notice.severity || "warn",
+    title: notice.title || "Demo recovered",
+    message: notice.message || "The demo moved into a controlled recovery state.",
+    detail: notice.detail || "",
+    source: notice.source || "runtime"
+  };
+  try {
+    renderRecoveryBanner();
+    renderTopbar();
+  } catch (recoveryError) {
+    noteRecoveryRenderIssue(recoveryError);
+  }
+}
+
+function clearRecoveryNotice(source = "") {
+  if (!state.recoveryNotice) {
+    return;
+  }
+  if (source && state.recoveryNotice.source !== source) {
+    return;
+  }
+  state.recoveryNotice = null;
+  try {
+    renderRecoveryBanner();
+  } catch (recoveryError) {
+    noteRecoveryRenderIssue(recoveryError);
+  }
+}
+
+function renderRecoveryBanner() {
+  const banner = document.getElementById("recovery-banner");
+  if (!banner) {
+    return;
+  }
+  const notice = state.recoveryNotice;
+  if (!notice) {
+    banner.hidden = true;
+    banner.innerHTML = "";
+    banner.className = "recovery-banner";
+    return;
+  }
+  banner.hidden = false;
+  banner.className = `recovery-banner ${notice.severity === "error" ? "error" : "warn"}`;
+  banner.innerHTML = `
+    <div class="recovery-banner-inner">
+      <div>
+        <div class="recovery-banner-title">${esc(notice.title)}</div>
+        <div class="recovery-banner-copy">${esc(notice.message)}</div>
+        ${notice.detail ? `<div class="recovery-banner-detail">${esc(notice.detail)}</div>` : ""}
+      </div>
+      <div class="recovery-banner-actions">${recoveryActionsMarkup()}</div>
+    </div>
+  `;
+}
+
+function recoveryViewMarkup(notice) {
+  return `
+    <div class="recovery-state">
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">${esc(notice.title || "Demo recovered safely")}</div>
+            <div class="card-subtitle">${esc(notice.message || "A demo-critical path failed, so the UI moved into a controlled recovery state instead of leaving a blank screen.")}</div>
+          </div>
+          <div class="recovery-banner-actions">${recoveryActionsMarkup()}</div>
+        </div>
+        ${notice.detail ? `<div class="hint">${esc(notice.detail)}</div>` : ""}
+        <div class="recovery-steps">
+          <div class="recovery-step"><span>01</span><div>Click <strong>Reset Demo</strong> to clear browser session state and reload the seeded baseline.</div></div>
+          <div class="recovery-step"><span>02</span><div>If the backend was stopped, run <span class="mono">./scripts/start_demo.sh</span> from the repo root.</div></div>
+          <div class="recovery-step"><span>03</span><div>For command-line recovery, run <span class="mono">ACI_RESET_OPEN_BROWSER=0 ./scripts/reset_demo.sh</span> and reload <span class="mono">/platform/?reset=1</span>.</div></div>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function stateActionButtonsMarkup(actions = []) {
+  const visibleActions = actions.filter((action) => {
+    return personaCanUseActionDescriptor(
+      action.action || "",
+      {
+        page: action.page || "",
+        scenario: action.scenario || "",
+        ...(action.data || {})
+      },
+      activeDemoPersona()
+    );
+  });
+  return visibleActions.length
+    ? `
+      <div class="state-panel-actions">
+        ${visibleActions.map((action) => {
+          const extraData = Object.entries(action.data || {}).map(([key, value]) => (
+            ` data-${esc(key)}="${esc(value)}"`
+          )).join("");
+          return `
+          <button class="small-btn${action.primary ? " primary" : ""}" data-action="${esc(action.action)}"${action.page ? ` data-page="${esc(action.page)}"` : ""}${action.scenario ? ` data-scenario="${esc(action.scenario)}"` : ""}${extraData}>
+            ${esc(action.label)}
+          </button>
+        `;
+        }).join("")}
+      </div>
+    `
+    : "";
+}
+
+function singleNextStepAction(actions = []) {
+  if (!actions.length) {
+    return [];
+  }
+  const primary = actions.find((action) => action.primary);
+  return [primary || actions[0]];
+}
+
+function guidedEmptyExampleFor(title) {
+  const label = String(title || "").toLowerCase();
+  if (label.includes("glossary")) {
+    return {
+      label: "Prefilled example",
+      value: "governance",
+      actions: [{
+        label: "Search Governance",
+        action: "apply-guided-example",
+        primary: true,
+        data: { "input-key": "glossary-query", value: "governance" }
+      }]
+    };
+  }
+  if (label.includes("faq")) {
+    return {
+      label: "Prefilled example",
+      value: "deployment",
+      actions: [{
+        label: "Search Deployment",
+        action: "apply-guided-example",
+        primary: true,
+        data: { "input-key": "faq-query", value: "deployment" }
+      }]
+    };
+  }
+  if (label.includes("forecast")) {
+    return { label: "Example", value: "Baseline scenario / 12-month horizon" };
+  }
+  if (label.includes("demo activity")) {
+    return { label: "Example path", value: "Overview -> Adoption -> Request Proof" };
+  }
+  if (label.includes("request proof")) {
+    return { label: "Seeded example", value: "customer-support-bot using gpt-4o-mini" };
+  }
+  if (label.includes("models") || label.includes("model rows")) {
+    return { label: "Seeded example", value: "gpt-4o-mini, Claude Sonnet, Gemini Flash" };
+  }
+  if (label.includes("teams")) {
+    return { label: "Seeded example", value: "Customer Support AI / Data Platform / Revenue Operations" };
+  }
+  if (label.includes("manual mapping")) {
+    return { label: "Seeded example", value: "support-bot-staging ownership review" };
+  }
+  if (label.includes("interventions")) {
+    return { label: "Example filter", value: "All recommendations" };
+  }
+  if (label.includes("workflow")) {
+    return { label: "Seeded example", value: "Support copilot adoption workflow" };
+  }
+  if (label.includes("integration")) {
+    return { label: "Seeded example", value: "Jira remediation handoff" };
+  }
+  if (label.includes("export")) {
+    return { label: "Seeded example", value: "February chargeback preview" };
+  }
+  return { label: "Seeded example", value: "NovaTech local demo baseline" };
+}
+
+function guidedEmptyNextStepFor(title) {
+  const label = String(title || "").toLowerCase();
+  if (label.includes("glossary")) {
+    return "Use the prefilled Governance search to reveal the relevant terminology.";
+  }
+  if (label.includes("faq")) {
+    return "Use the prefilled Deployment search to open the most relevant diligence answers.";
+  }
+  if (label.includes("forecast")) {
+    return "Generate the baseline forecast using the preselected scenario and horizon.";
+  }
+  if (label.includes("demo activity")) {
+    return "Start the guided demo to create the first timeline event.";
+  }
+  if (label.includes("interventions")) {
+    return "Return to the All filter to see the seeded recommendation queue.";
+  }
+  if (label.includes("manual mapping")) {
+    return "Open Request Proof to show the evidence trail, then return to the seeded review queue.";
+  }
+  if (label.includes("request proof") || label.includes("models") || label.includes("teams")) {
+    return "Reset the demo to reload the seeded NovaTech records.";
+  }
+  return "Reset the demo to restore the known-good seeded baseline.";
+}
+
+function stateExampleMarkup(example) {
+  if (!example) {
+    return "";
+  }
+  const label = example.label || "Example";
+  const value = example.value || example;
+  return `
+    <div class="state-panel-example">
+      <span>${esc(label)}</span>
+      <strong>${esc(value)}</strong>
+    </div>
+  `;
+}
+
+function stateNextStepMarkup(nextStep) {
+  if (!nextStep) {
+    return "";
+  }
+  return `
+    <div class="state-panel-next-step">
+      <span>Next</span>
+      <strong>${esc(nextStep)}</strong>
+    </div>
+  `;
+}
+
+function explicitStateMarkup(kind, title, message, options = {}) {
+  const stateKind = ["loading", "success", "empty", "error", "warn"].includes(kind)
+    ? kind
+    : "success";
+  const compact = Boolean(options.compact);
+  const role = stateKind === "error" || stateKind === "warn" ? "alert" : "status";
+  const busy = stateKind === "loading" ? "true" : "false";
+  const isEmptyState = stateKind === "empty";
+  const example = isEmptyState
+    ? (options.example || guidedEmptyExampleFor(title))
+    : options.example;
+  const emptyActions = Array.isArray(options.actions) && options.actions.length
+    ? options.actions
+    : (example?.actions || []);
+  const actions = isEmptyState
+    ? singleNextStepAction(emptyActions)
+    : (options.actions || []);
+  const nextStep = isEmptyState
+    ? (options.nextStep || guidedEmptyNextStepFor(title))
+    : options.nextStep;
+  const className = [
+    "state-panel",
+    `state-panel-${stateKind}`,
+    isEmptyState ? "guided-empty-state" : "",
+    compact ? "compact" : "",
+    options.className || ""
+  ].filter(Boolean).join(" ");
+  return `
+    <div class="${className}" role="${role}" aria-live="${role === "alert" ? "assertive" : "polite"}" aria-busy="${busy}">
+      <span class="state-panel-icon" aria-hidden="true"></span>
+      <div class="state-panel-copy">
+        <div class="state-panel-title">${esc(title)}</div>
+        <div class="state-panel-message">${esc(message)}</div>
+        ${options.detail ? `<div class="state-panel-detail">${esc(options.detail)}</div>` : ""}
+        ${stateExampleMarkup(example)}
+        ${stateNextStepMarkup(nextStep)}
+        ${stateKind === "loading" ? `
+          <div class="state-panel-skeleton" aria-hidden="true">
+            <span class="skeleton-line wide"></span>
+            <span class="skeleton-line"></span>
+          </div>
+        ` : ""}
+      </div>
+      ${stateActionButtonsMarkup(actions)}
+    </div>
+  `;
+}
+
+function loadingStateMarkup(title, message, options = {}) {
+  return explicitStateMarkup("loading", title, message, options);
+}
+
+function successStateMarkup(title, message, options = {}) {
+  return explicitStateMarkup("success", title, message, options);
+}
+
+function emptyStateMarkup(title, message, options = {}) {
+  return explicitStateMarkup("empty", title, message, options);
+}
+
+function errorStateMarkup(title, message, options = {}) {
+  return explicitStateMarkup("error", title, message, options);
+}
+
+function tableEmptyRowMarkup(colspan, title, message, options = {}) {
+  return `
+    <tr>
+      <td colspan="${Number(colspan) || 1}">
+        ${emptyStateMarkup(title, message, { compact: true, ...options })}
+      </td>
+    </tr>
+  `;
+}
+
+function currentPageLoadingLabel() {
+  if (state.pendingDemoAction) {
+    return state.guidedDemoProgressLabel || "Running a guided demo action.";
+  }
+  if (state.page === "adoption" && state.adoptionLoading) {
+    return "Refreshing adoption analytics.";
+  }
+  if (state.page === "interventions" && state.interventionLoading) {
+    return "Syncing intervention recommendations.";
+  }
+  if (state.page === "forecast" && state.forecastLoading) {
+    return "Generating a live forecast.";
+  }
+  if (state.page === "integrations" && state.integrationLoading) {
+    return "Refreshing operational integrations.";
+  }
+  return "";
+}
+
+function pageReadyMessage() {
+  const label = PAGE_TITLES[state.page] || "Overview";
+  if (state.page === "adoption") {
+    const dashboard = currentAdoptionDashboard();
+    return dashboard
+      ? `${dashboard.scope_label} adoption data is loaded for ${dashboard.window_days} days.`
+      : "Adoption data is not loaded; the page will show a recovery state.";
+  }
+  if (state.page === "forecast") {
+    return state.forecastStatus || "Forecast planner is ready with seeded local data.";
+  }
+  if (state.page === "integrations") {
+    const summary = currentIntegrationOverview()?.summary || {};
+    return `${fmtNumber(summary.inbound_source_count || 0)} sources and ${fmtNumber(summary.outbound_route_count || 0)} handoff routes are loaded.`;
+  }
+  return `${label} is ready with deterministic local demo data.`;
+}
+
+function priorityAction(label, action, options = {}) {
+  return { label, action, primary: true, ...options };
+}
+
+function pagePrioritySignal() {
+  if (isEntryHomeActive()) {
+    return null;
+  }
+
+  const stats = computeOverview();
+  const title = PAGE_TITLES[state.page] || "Demo";
+  const adoptionDashboard = currentAdoptionDashboard();
+  const workflowRows = adoptionWorkflowRowsForDashboard(adoptionDashboard);
+  const workflowMap = adoptionWorkflowMap();
+  const workflowSummary = workflowMap.summary || {};
+  const selectedRequest = currentSelectedRequest() || (dataset.attribution_requests || [])[0] || null;
+  const lowestConfidenceRequest = (dataset.attribution_requests || [])
+    .slice()
+    .sort((a, b) => Number(a.confidence || 0) - Number(b.confidence || 0))[0] || null;
+  const selectedModel = currentSelectedModel()
+    || (dataset.models || []).slice().sort((a, b) => Number(b[state.modelSort] || 0) - Number(a[state.modelSort] || 0))[0]
+    || null;
+  const highestPotentialTeam = (dataset.teams || [])
+    .slice()
+    .sort((a, b) => Number(b.optimization_potential_usd || 0) - Number(a.optimization_potential_usd || 0))[0] || null;
+  const selectedTeam = currentSelectedTeam() || highestPotentialTeam;
+  const mappings = manualMappingCounts();
+  const openMapping = getManualMappings().find((item) => {
+    const status = normalizeManualMappingStatus(item.status);
+    return (status === "needs_review" || status === "deferred") && item.request_id;
+  }) || getManualMappings()[0] || null;
+  const interventions = getInterventions();
+  const interventionCountsByStatus = interventionCounts();
+  const topIntervention = currentSelectedIntervention()
+    || interventions.find((item) => normalizeStatus(item.status) === "recommended")
+    || interventions.find((item) => normalizeStatus(item.status) === "review")
+    || interventions[0]
+    || null;
+  const governancePolicies = dataset.governance?.policies || [];
+  const coverageSummary = dataset.coverage?.summary || {};
+  const exportSummary = dataset.exports?.summary || {};
+  const energySummary = dataset.energy_efficiency?.summary || {};
+  const forecast = forecastViewData();
+  const integrations = currentIntegrationOverview();
+  const integrationSummary = integrations?.summary || {};
+  const firstScenario = (integrations?.scenarios || [])[0] || null;
+  const admin = dataset.admin || {};
+  const proofRequirements = dataset.prd_traceability?.requirement_matrix || [];
+  const partnerSignals = dataset.design_partner_brief?.thesis?.signals || [];
+  const pilotSignal = partnerSignals.find((item) => item.label === "Pilot motion") || partnerSignals[0] || null;
+  const faqCount = (dataset.faq || []).reduce((count, category) => count + (category.items || []).length, 0);
+
+  switch (state.page) {
+    case "overview":
+      return {
+        title: "Start with the spend decision.",
+        label: "Primary metric",
+        value: fmtUSD(stats.totalSpend),
+        detail: `${fmtUSD(stats.totalPotential)} is addressable, with ${fmtUSD(stats.captured)} already captured.`,
+        actions: [priorityAction("Open Forecast", "go", { page: "forecast" })]
+      };
+    case "partner_brief":
+      return {
+        title: "Decide whether NovaTech is design-partner ready.",
+        label: "Pilot motion",
+        value: pilotSignal?.value || "4 stages",
+        detail: "Use the brief to show the buyer path, success metrics, proof moments, and trust-boundary posture.",
+        actions: [priorityAction("Run Buyer Walkthrough", "start-walkthrough")]
+      };
+    case "requirements":
+      return {
+        title: "Prove the demo maps to the source requirements.",
+        label: "Requirement rows",
+        value: fmtNumber(proofRequirements.length),
+        detail: "Each row ties a local demo surface to the PRD, engineering spec, RAIL, or architecture evidence.",
+        actions: [priorityAction("Open Coverage", "go", { page: "coverage" })]
+      };
+    case "adoption": {
+      const representedTeams = new Set(workflowRows.map((row) => row.team_id).filter(Boolean)).size;
+      return {
+        title: "Show where teams are actually adopting AI.",
+        label: "Mapped workflows",
+        value: fmtNumber(workflowRows.length || workflowSummary.workflow_count || 0),
+        detail: `${fmtNumber(representedTeams || workflowSummary.teams_with_adoption || 0)} teams and ${fmtNumber(new Set(workflowRows.map((row) => row.service_name).filter(Boolean)).size || workflowSummary.ai_services_used || 0)} AI services represented in the selected scope.`,
+        actions: [priorityAction("Organization View", "adoption-set-scope", { data: { "scope-type": "organization", "scope-id": "org-novatech" } })]
+      };
+    }
+    case "attribution": {
+      const request = lowestConfidenceRequest || selectedRequest;
+      const confidencePct = Number((request || selectedRequest)?.confidence || 0) * 100;
+      return {
+        title: "Inspect the request that needs the clearest proof.",
+        label: "Attribution confidence",
+        value: fmtPct(confidencePct, 0),
+        detail: `${chainNode(request || selectedRequest, "Service Attribution")?.value || "Selected request"} resolves to ${chainNode(request || selectedRequest, "Org Hierarchy")?.value || "review required"}.`,
+        actions: request ? [priorityAction("Inspect Request", "select-request", { data: { "request-id": request.id } })] : []
+      };
+    }
+    case "models":
+      return {
+        title: "Focus on the model creating the biggest planning decision.",
+        label: selectedModel?.name || "Model estate",
+        value: selectedModel ? fmtUSD(selectedModel.spend_usd || 0) : fmtNumber((dataset.models || []).length),
+        detail: selectedModel
+          ? `${fmtNumber(selectedModel.requests || 0)} requests with ${fmtUSD(selectedModel.optimization_potential_usd || 0)} optimization potential.`
+          : "Model records are unavailable; reset the demo to restore seeded data.",
+        actions: selectedModel ? [priorityAction("Select Model", "select-model", { data: { "model-name": selectedModel.name } })] : []
+      };
+    case "teams":
+      return {
+        title: "Open the team with the largest addressable opportunity.",
+        label: selectedTeam?.name || "Teams",
+        value: selectedTeam ? fmtUSD(selectedTeam.optimization_potential_usd || 0) : fmtNumber((dataset.teams || []).length),
+        detail: selectedTeam
+          ? `${fmtUSD(selectedTeam.spend_usd || 0)} current spend under ${selectedTeam.lead || "named owner"}.`
+          : "Team records are unavailable; reset the demo to restore seeded data.",
+        actions: selectedTeam ? [priorityAction("Open Team", "select-team", { data: { "team-id": selectedTeam.id } })] : []
+      };
+    case "manual_mapping":
+      return {
+        title: "Resolve the ownership queue before finance trusts chargeback.",
+        label: "Open mappings",
+        value: fmtNumber(mappings.needs_review + mappings.deferred),
+        detail: `${fmtNumber(mappings.confirmed + mappings.reassigned)} mappings are already resolved in the local story.`,
+        actions: openMapping?.request_id
+          ? [priorityAction("Inspect Evidence", "manual-map-open-request", { data: { "request-id": openMapping.request_id } })]
+          : []
+      };
+    case "interventions": {
+      const openActions = interventionCountsByStatus.recommended + interventionCountsByStatus.review;
+      return {
+        title: "Move one recommendation from insight to execution.",
+        label: "Open actions",
+        value: fmtNumber(openActions),
+        detail: topIntervention
+          ? `${topIntervention.title} can affect ${fmtUSD(topIntervention.monthly_savings_usd || 0)} per month.`
+          : "No intervention is selected in the local dataset.",
+        actions: topIntervention ? [priorityAction("Start Review", "intervention-status", { data: { "intervention-id": topIntervention.id, "next-status": "review" } })] : []
+      };
+    }
+    case "governance":
+      return {
+        title: "Keep the policy posture visible before automation.",
+        label: "Deployment mode",
+        value: modeLabel(state.mode),
+        detail: `${fmtNumber(governancePolicies.length)} policy bundles show confidence floors, model controls, and fail-open behavior.`,
+        actions: [priorityAction("Export Exception Log", "export-artifact", { data: { artifact: "governance-log" } })]
+      };
+    case "coverage":
+      return {
+        title: "Separate captured truth from known blind spots.",
+        label: "Capture coverage",
+        value: fmtPct(coverageSummary.capture_coverage_pct || 0),
+        detail: `${fmtNumber(coverageSummary.blind_spot_count || 0)} blind spots remain explicit, not hidden in the demo math.`,
+        actions: [priorityAction("Open Request Proof", "go", { page: "attribution" })]
+      };
+    case "exports":
+      return {
+        title: "Export only the spend finance can defend.",
+        label: "Chargeback ready",
+        value: fmtUSD(exportSummary.exportable_chargeback_usd || 0),
+        detail: `${fmtUSD(exportSummary.provisional_review_usd || 0)} remains in review and ${fmtUSD(exportSummary.unknown_excluded_usd || 0)} is excluded.`,
+        actions: [priorityAction("Export Preview", "export-artifact", { data: { artifact: "chargeback-export" } })]
+      };
+    case "energy":
+      return {
+        title: "Show energy estimates without pretending unknowns are known.",
+        label: "Known requests",
+        value: fmtPct(energySummary.energy_known_request_pct || 0),
+        detail: `${fmtNumber(energySummary.unrated_model_count || 0)} models remain explicitly unrated in the local demo.`,
+        actions: [priorityAction("Open Models", "go", { page: "models" })]
+      };
+    case "forecast": {
+      const projectedValue = forecast.finalPoint
+        ? fmtUSD(forecast.finalPoint.predicted_spend_usd || 0)
+        : signedPct(forecast.scenarioDeltaPct || 0);
+      return {
+        title: "Turn the current scenario into a planning number.",
+        label: forecast.finalPoint ? "Projected spend" : "Scenario delta",
+        value: projectedValue,
+        detail: `${forecast.scenario.label} over ${fmtNumber(state.forecastHorizonMonths)} months from the seeded spend curve.`,
+        actions: [priorityAction("Generate Forecast", "forecast-generate")]
+      };
+    }
+    case "integrations":
+      return {
+        title: "Prove insights become operational handoffs.",
+        label: "Delivery success",
+        value: fmtPct(integrationSummary.success_rate_pct || 0, 0),
+        detail: `${fmtNumber(integrationSummary.recent_delivery_count || 0)} recent simulated handoffs across ${fmtNumber(integrationSummary.outbound_route_count || 0)} routes.`,
+        actions: firstScenario
+          ? [priorityAction("Run Scenario", "integrations-run-scenario", { data: { "scenario-id": firstScenario.scenario_id } })]
+          : [priorityAction("Refresh Feed", "integrations-refresh")]
+      };
+    case "admin":
+      return {
+        title: "Make the local trust boundary inspectable.",
+        label: "Demo accounts",
+        value: fmtNumber((admin.accounts || []).length),
+        detail: `${fmtNumber(admin.summary?.mutation_surfaces || 0)} local mutation surfaces remain audited and demo-only.`,
+        actions: [priorityAction("Open Governance", "go", { page: "governance" })]
+      };
+    case "glossary":
+      return {
+        title: "Use this as the shared vocabulary for the walkthrough.",
+        label: "Terms",
+        value: fmtNumber((dataset.glossary || []).length),
+        detail: "Definitions keep investor, design partner, finance, platform, and security language aligned.",
+        actions: [priorityAction("Open FAQ", "go", { page: "faq" })]
+      };
+    case "faq":
+      return {
+        title: "Answer the first diligence question before drilling deeper.",
+        label: "Answers",
+        value: fmtNumber(faqCount),
+        detail: "The FAQ focuses the conversation on product behavior, local-only boundaries, and production parity.",
+        actions: [priorityAction("Open Overview", "go", { page: "overview" })]
+      };
+    default:
+      return {
+        title: `${title} focus`,
+        label: "Primary action",
+        value: "Review",
+        detail: "Use the visible controls to continue the local demo path.",
+        actions: [priorityAction("Open Overview", "go", { page: "overview" })]
+      };
+  }
+}
+
+function pagePriorityMarkup() {
+  const signal = pagePrioritySignal();
+  if (!signal) {
+    return "";
+  }
+
+  return `
+    <section class="screen-priority screen-priority-${esc(signal.tone || "focus")}" data-visual-role="dominant" aria-label="${esc((PAGE_TITLES[state.page] || "Current page") + " primary focus")}">
+      <div class="screen-priority-copy">
+        <div class="screen-priority-eyebrow">Screen focus</div>
+        <div class="screen-priority-title">${esc(signal.title)}</div>
+        <div class="screen-priority-detail">${esc(signal.detail || "")}</div>
+      </div>
+      <div class="screen-priority-measure">
+        <span>${esc(signal.label || "Primary metric")}</span>
+        <strong>${esc(signal.value || "Ready")}</strong>
+      </div>
+      ${stateActionButtonsMarkup(signal.actions || [])}
+    </section>
+  `;
+}
+
+function pageStateStripMarkup() {
+  if (isEntryHomeActive()) {
+    return "";
+  }
+  const loadingMessage = currentPageLoadingLabel();
+  if (loadingMessage) {
+    return loadingStateMarkup("Working", loadingMessage, { compact: true, className: "page-state-strip" });
+  }
+  if (state.recoveryNotice) {
+    return explicitStateMarkup(
+      state.recoveryNotice.severity === "error" ? "error" : "warn",
+      state.recoveryNotice.title,
+      state.recoveryNotice.message,
+      {
+        compact: true,
+        className: "page-state-strip",
+        detail: state.recoveryNotice.detail
+      }
+    );
+  }
+  if (state.runtimeStatus === "offline") {
+    return errorStateMarkup("Local runtime offline", state.runtimeDetail || "The UI is using local demo data only.", {
+      compact: true,
+      className: "page-state-strip",
+      actions: [{ label: "Reset Demo", action: "clear-logs", primary: true }]
+    });
+  }
+  if (state.runtimeStatus === "degraded") {
+    return explicitStateMarkup("warn", "Runtime partially available", state.runtimeDetail || "Some live proof controls may use local fallbacks.", {
+      compact: true,
+      className: "page-state-strip",
+      actions: [{ label: "Guided Demo", action: "open-drawer" }]
+    });
+  }
+  return "";
+}
+
+function renderViewWithState(markup) {
+  const contentMarkup = markup || errorStateMarkup("View unavailable", "This page returned no content. Use Reset Demo to restore the seeded baseline.");
+  return `${pageStateStripMarkup()}${pagePriorityMarkup()}<div class="screen-secondary-content" data-visual-role="secondary">${contentMarkup}</div>`;
 }
 
 function visibleDrawerEntries() {
@@ -2949,9 +5596,11 @@ async function clearExecutionLogs() {
   if (!window.confirm("Reset the guided demo, mapping queue, and forecast state?")) {
     return;
   }
+  const keepPresenterMode = state.presenterMode;
   stopInvestorWalkthrough();
-  safeSessionRemove(INTERVENTION_STORAGE_KEY);
-  safeSessionRemove(MANUAL_MAPPING_STORAGE_KEY);
+  clearDemoSessionStorage();
+  clearRecoveryNotice();
+  clearPersonaNotice();
   state.logs = [];
   state.lastPayload = null;
   state.lastResponse = null;
@@ -2977,12 +5626,21 @@ async function clearExecutionLogs() {
   state.integrationDeliveries = [];
   state.glossaryQuery = "";
   state.faqQuery = "";
+  state.formStatus = {};
+  state.tableUi = {};
   state.faqOpenKeys = new Set();
+  state.deferredSectionsVisible = new Set();
   state.governanceSimulationMode = "advisory";
   state.governanceSimulationBundle = "current";
   state.governanceSimulationRequestId = null;
   state.replayStageIndex = 0;
   state.lastMappingImpactId = null;
+  state.instantFeedback = null;
+  state.presenterMode = keepPresenterMode;
+  state.presenterStepIndex = 0;
+  state.presenterRecoveryNotice = keepPresenterMode
+    ? "Reset complete. Presenter mode is back at step 1."
+    : "";
   state.page = "overview";
   state.runtimeCapabilities = {};
   await loadDataset();
@@ -3128,6 +5786,7 @@ function applyInterventionApiRows(rows) {
   });
 
   dataset.interventions = merged;
+  rebuildDatasetIndex();
   if (state.selectedInterventionId && !merged.some((item) => item.id === state.selectedInterventionId)) {
     state.selectedInterventionId = merged[0]?.id || null;
   }
@@ -3156,7 +5815,7 @@ async function syncInterventionsFromApi(options = {}) {
 }
 
 async function updateInterventionStatus(id, nextStatus) {
-  const intervention = getInterventions().find((item) => item.id === id);
+  const intervention = indexedLookup(datasetIndex.interventionsById, id);
   if (!intervention) {
     return;
   }
@@ -3170,6 +5829,11 @@ async function updateInterventionStatus(id, nextStatus) {
     return;
   }
 
+  const previousStatus = currentStatus;
+  intervention.status = normalized;
+  persistInterventionStatuses();
+  render();
+
   try {
     const response = await apiRequest("POST", `/v1/interventions/${id}/status`, {
       status: normalized,
@@ -3178,8 +5842,15 @@ async function updateInterventionStatus(id, nextStatus) {
     });
     intervention.status = normalizeStatus(response.status);
   } catch (error) {
-    appendLog("warn", "Intervention update blocked", summarizeApiError(error, "Live intervention status update unavailable; the UI kept the last confirmed state."), null, { hidden: true });
-    showToast("Intervention Unchanged", "Live status update was unavailable, so the intervention state was left unchanged.");
+    appendLog("warn", "Intervention update kept local", summarizeApiError(error, "Live intervention status update unavailable; the local demo retained the visible optimistic state."), {
+      intervention_id: id,
+      previous_status: previousStatus,
+      local_status: normalized
+    }, {
+      hidden: true,
+      why: "The demo uses synthetic data, so local intervention workflow feedback stays responsive when the API is offline."
+    });
+    showToast("Intervention Saved Locally", `${id} is ${normalized.replace("_", " ")} in the local demo state.`);
     render();
     return;
   }
@@ -3191,7 +5862,7 @@ async function updateInterventionStatus(id, nextStatus) {
 }
 
 async function updateManualMapping(id, status, resolvedTeam) {
-  const mapping = getManualMappings().find((item) => item.id === id);
+  const mapping = indexedLookup(datasetIndex.manualMappingsById, id);
   if (!mapping) {
     return;
   }
@@ -3215,8 +5886,7 @@ async function updateManualMapping(id, status, resolvedTeam) {
 }
 
 function teamForManualMappingOwner(ownerName) {
-  const normalized = String(ownerName || "").trim().toLowerCase();
-  return (dataset.teams || []).find((team) => String(team.name || "").trim().toLowerCase() === normalized) || null;
+  return indexedLookup(datasetIndex.teamsByName, ownerName);
 }
 
 function fallbackTeamId(ownerName) {
@@ -3285,6 +5955,22 @@ function go(pageKey) {
   if (!PAGE_TITLES[pageKey]) {
     return;
   }
+  const persona = activeDemoPersona();
+  if (!personaCanAccessPage(pageKey, persona)) {
+    setPersonaNotice(
+      "Permission Preview",
+      `${persona.label} cannot open ${PAGE_TITLES[pageKey] || pageKey} in the local RBAC demo.`,
+      `Switch to Admin, Auditor, or another permitted persona to view that surface.`
+    );
+    appendLog("warn", "Persona access blocked", `${persona.name} attempted to open ${PAGE_TITLES[pageKey] || pageKey}.`, null, {
+      hidden: true,
+      why: "The local demo keeps persona permission boundaries visible without calling production identity systems."
+    });
+    renderRoleRibbon();
+    renderSidebar();
+    return;
+  }
+  clearPersonaNotice();
   const viewRoot = document.getElementById("view-root");
   if (viewRoot) {
     state.scrollTopByPage[state.page] = viewRoot.scrollTop;
@@ -3305,6 +5991,91 @@ function go(pageKey) {
   render();
 }
 
+function demoPathIndexForPage(pageKey = state.page) {
+  return DEMO_PATH_ITEMS.findIndex((item) => item.page === pageKey);
+}
+
+function demoPathItemForPage(pageKey = state.page) {
+  const index = demoPathIndexForPage(pageKey);
+  return index >= 0 ? DEMO_PATH_ITEMS[index] : null;
+}
+
+function nearestDemoPathPage(pageKey = state.page) {
+  return demoPathItemForPage(pageKey)?.page
+    || SUPPORTING_PAGE_DEMO_PATH_TARGETS[pageKey]
+    || "overview";
+}
+
+function nextDemoPathPage(pageKey = state.page) {
+  const index = demoPathIndexForPage(pageKey);
+  if (index < 0) {
+    return nearestDemoPathPage(pageKey);
+  }
+  const nextItem = DEMO_PATH_ITEMS[Math.min(index + 1, DEMO_PATH_ITEMS.length - 1)];
+  return nextItem?.page || "overview";
+}
+
+function demoPathTargetPage(pageKey = state.page, persona = activeDemoPersona()) {
+  const preferred = demoPathItemForPage(pageKey)
+    ? nextDemoPathPage(pageKey)
+    : nearestDemoPathPage(pageKey);
+  if (personaCanAccessPage(preferred, persona)) {
+    return preferred;
+  }
+  return DEMO_PATH_ITEMS.find((item) => personaCanAccessPage(item.page, persona))?.page || "overview";
+}
+
+function demoPathProgressLabel(pageKey = state.page, persona = activeDemoPersona()) {
+  const allowedItems = DEMO_PATH_ITEMS.filter((item) => personaCanAccessPage(item.page, persona));
+  const item = allowedItems.find((pathItem) => pathItem.page === pageKey);
+  if (!item) {
+    const target = demoPathItemForPage(nearestDemoPathPage(pageKey));
+    return target ? `Return to ${target.step} ${target.label}` : "Return to demo path";
+  }
+  const index = allowedItems.findIndex((pathItem) => pathItem.page === pageKey);
+  const lastStep = index === allowedItems.length - 1;
+  return lastStep ? "Demo path complete" : `${String(index + 1).padStart(2, "0")} of ${String(allowedItems.length).padStart(2, "0")}: ${item.label}`;
+}
+
+function renderDemoPathNav(persona = activeDemoPersona()) {
+  const currentIndex = demoPathIndexForPage(state.page);
+  const nearestPage = nearestDemoPathPage(state.page);
+  const nearestIndex = demoPathIndexForPage(nearestPage);
+  const targetPage = demoPathTargetPage(state.page, persona);
+  const targetItem = demoPathItemForPage(targetPage);
+  const backLabel = demoPathItemForPage(state.page) ? "Next Step" : "Back To Path";
+  const pathItems = DEMO_PATH_ITEMS.filter((item) => personaCanAccessPage(item.page, persona)).map((item) => {
+    const index = demoPathIndexForPage(item.page);
+    const active = item.page === state.page;
+    const nearby = !active && index === nearestIndex && currentIndex < 0;
+    const complete = currentIndex >= 0 && index < currentIndex;
+    return `
+      <button class="demo-path-step${active ? " active" : ""}${nearby ? " nearby" : ""}${complete ? " complete" : ""}" data-action="go" data-page="${esc(item.page)}" ${active ? 'aria-current="step"' : ""} aria-label="${esc(item.step)} ${esc(item.label)}">
+        <span class="demo-path-number">${esc(item.step)}</span>
+        <span class="demo-path-copy">
+          <strong>${esc(item.label)}</strong>
+          <em>${esc(item.detail)}</em>
+        </span>
+      </button>
+    `;
+  }).join("");
+
+  return `
+    <div class="demo-path-nav" aria-label="Primary demo path">
+      <div class="demo-path-head">
+        <div>
+          <div class="demo-path-title">Demo Path</div>
+          <div class="demo-path-status">${esc(demoPathProgressLabel(state.page, persona))}</div>
+        </div>
+        <button class="demo-path-return" data-action="back-to-demo-path" data-page="${esc(targetPage)}" aria-label="${esc(backLabel)}${targetItem ? ` to ${targetItem.label}` : ""}">
+          ${esc(backLabel)}
+        </button>
+      </div>
+      <div class="demo-path-steps">${pathItems}</div>
+    </div>
+  `;
+}
+
 function renderSidebar() {
   const nav = document.getElementById("sidebar-nav");
   const mobileNav = document.getElementById("mobile-sidebar-nav");
@@ -3313,8 +6084,13 @@ function renderSidebar() {
   }
   const counts = interventionCounts();
   const mappingCounts = manualMappingCounts();
-  const markup = NAV_ITEMS.map((group) => {
-    const items = group.items.map((item) => {
+  const persona = activeDemoPersona();
+  const directoryMarkup = NAV_ITEMS.map((group) => {
+    const allowedItems = group.items.filter((item) => personaCanAccessPage(item.key, persona));
+    if (!allowedItems.length) {
+      return "";
+    }
+    const items = allowedItems.map((item) => {
       const isActive = item.key === state.page;
       let badge = "";
       if (item.key === "interventions") {
@@ -3344,6 +6120,7 @@ function renderSidebar() {
       </div>
     `;
   }).join("");
+  const markup = `${renderDemoPathNav(persona)}${directoryMarkup}`;
   if (nav) {
     nav.innerHTML = markup;
   }
@@ -3359,6 +6136,8 @@ function renderModeMenu() {
   }
 
   const modes = dataset.governance?.modes || [];
+  const persona = activeDemoPersona();
+  const canSetMode = personaCanUseActionDescriptor("set-mode", {}, persona);
   menu.classList.toggle("open", state.modeMenuOpen);
   menu.setAttribute("aria-hidden", state.modeMenuOpen ? "false" : "true");
   menu.innerHTML = `
@@ -3373,7 +6152,7 @@ function renderModeMenu() {
           </div>
           <div class="mode-desc">${esc(mode.description || "")}</div>
           <div class="mode-desc" style="margin-top:3px">${esc(mode.impact || "")}</div>
-          ${active ? "" : `<button class="mode-set-btn" data-action="set-mode" data-mode="${esc(mode.key)}">Set ${esc(mode.label)}</button>`}
+          ${active || !canSetMode ? "" : `<button class="mode-set-btn" data-action="set-mode" data-mode="${esc(mode.key)}">Set ${esc(mode.label)}</button>`}
         </div>
       `;
     }).join("")}
@@ -3391,6 +6170,10 @@ function renderModeMenu() {
 }
 
 function renderTopbar() {
+  const topbar = document.querySelector(".topbar");
+  if (topbar) {
+    topbar.classList.toggle("entry-home-active", isEntryHomeActive());
+  }
   const title = document.getElementById("page-title");
   if (title) {
     title.textContent = PAGE_TITLES[state.page] || "Overview";
@@ -3399,8 +6182,27 @@ function renderTopbar() {
   if (walkthroughButton instanceof HTMLButtonElement) {
     const running = state.walkthroughStatus === "running";
     walkthroughButton.disabled = running;
-    walkthroughButton.textContent = running ? "Walkthrough Running..." : "Start Full Walkthrough";
+    walkthroughButton.textContent = running ? "Walkthrough Running..." : "Start Guided Demo";
     walkthroughButton.setAttribute("aria-expanded", running ? "true" : "false");
+  }
+  const presenterButton = document.getElementById("presenter-mode-toggle");
+  if (presenterButton instanceof HTMLButtonElement) {
+    presenterButton.textContent = state.presenterMode ? "Presenter On" : "Presenter Mode";
+    presenterButton.setAttribute("aria-pressed", state.presenterMode ? "true" : "false");
+    presenterButton.classList.toggle("active", state.presenterMode);
+  }
+  const pathReturnButton = document.getElementById("back-to-demo-path");
+  if (pathReturnButton instanceof HTMLButtonElement) {
+    const onPath = Boolean(demoPathItemForPage(state.page));
+    const targetPage = demoPathTargetPage();
+    const targetItem = demoPathItemForPage(targetPage);
+    pathReturnButton.dataset.page = targetPage;
+    pathReturnButton.textContent = onPath ? "Next Demo Step" : "Back to Demo Path";
+    pathReturnButton.title = targetItem
+      ? `${onPath ? "Continue" : "Return"} to ${targetItem.step} ${targetItem.label}: ${targetItem.detail}`
+      : "Return to the recommended demo path";
+    pathReturnButton.setAttribute("aria-label", pathReturnButton.title);
+    pathReturnButton.hidden = isEntryHomeActive();
   }
   const streamCount = document.getElementById("stream-count");
   if (streamCount) {
@@ -3447,7 +6249,16 @@ function renderDrawer() {
             </div>
           `;
         }).join("")
-      : `<div class="hint">No demo activity yet. Start the full product walkthrough, or run one live proof action.</div>`;
+      : emptyStateMarkup(
+        "No demo activity yet.",
+        "This timeline records the proof points generated during a walkthrough. Start the guided demo to populate it from the seeded NovaTech scenario.",
+        {
+          compact: true,
+          actions: [
+            { label: "Start Guided Demo", action: "start-walkthrough", primary: true }
+          ]
+        }
+      );
   }
 
   const summaryEl = document.getElementById("drawer-summary");
@@ -3923,15 +6734,15 @@ function designPartnerView() {
             <div class="partner-stage-grid">
               <div>
                 <span>Customer commitment</span>
-                <strong>${esc(selectedStage?.customer_commitment || "TBD")}</strong>
+                <strong>${esc(selectedStage?.customer_commitment || "Customer next step not configured")}</strong>
               </div>
               <div>
                 <span>Argmin commitment</span>
-                <strong>${esc(selectedStage?.argmin_commitment || "TBD")}</strong>
+                <strong>${esc(selectedStage?.argmin_commitment || "Argmin next step not configured")}</strong>
               </div>
               <div>
                 <span>Success signal</span>
-                <strong>${esc(selectedStage?.success_signal || "TBD")}</strong>
+                <strong>${esc(selectedStage?.success_signal || "Success signal not configured")}</strong>
               </div>
             </div>
             <div class="partner-chip-row">${selectedSurfaces}</div>
@@ -4084,6 +6895,9 @@ function overviewView() {
   }).join("");
 
   const modeColor = MODE_COLORS[state.mode] || MODE_COLORS.advisory;
+  const entryRequestLabel = preparedDemoRequestLabel();
+  const entryPersona = activeDemoPersona();
+  const entryLens = roleLensLabel();
 
   const adoptionCallout = adoptionSummary
     ? `
@@ -4108,15 +6922,34 @@ function overviewView() {
 
   return `
     <div class="overview-zone" data-walkthrough-anchor="walkthrough-overview">
-      <div class="mode-banner">
-        <div>
-          <div class="pill" style="background:${modeColor.bg};color:${modeColor.color}">${esc(modeLabel(state.mode))}</div>
-          <div class="hint" style="margin-top:6px">This page answers the first investor question: where AI spend sits today, how much of it is owned, and where the savings levers are.</div>
+      <div class="entry-home" data-visual-role="dominant" aria-label="Prepared local demo home">
+        <div class="entry-home-main">
+          <div class="entry-home-kicker">Local demo workspace</div>
+          <h1 class="entry-home-title">Argmin demo is ready</h1>
+          <p class="entry-home-copy">Start with the guided path. The Executive lens, Admin persona, Advisory mode, and ${esc(entryRequestLabel)} workflow are already selected with deterministic NovaTech data.</p>
+          <div class="entry-home-context" aria-label="Preselected demo context">
+            <div class="entry-home-context-item">
+              <span>Lens</span>
+              <strong>${esc(entryLens)}</strong>
+            </div>
+            <div class="entry-home-context-item">
+              <span>Persona</span>
+              <strong>${esc(entryPersona.label)}</strong>
+            </div>
+            <div class="entry-home-context-item">
+              <span>Mode</span>
+              <strong style="color:${modeColor.color}">${esc(modeLabel(state.mode))}</strong>
+            </div>
+            <div class="entry-home-context-item">
+              <span>Workflow</span>
+              <strong>${esc(entryRequestLabel)}</strong>
+            </div>
+          </div>
         </div>
-        <div class="mode-banner-right">
-          <button class="small-btn primary" data-action="go" data-page="partner_brief">Open Partner Brief</button>
-          <button class="small-btn" data-action="open-drawer">Open Guided Demo</button>
-          <button class="small-btn" data-action="go" data-page="faq">Why these numbers are trustworthy</button>
+        <div class="entry-home-action">
+          <button class="small-btn primary" data-action="start-walkthrough">Start Guided Demo</button>
+          <button class="small-btn" data-action="toggle-presenter-mode">Presenter Mode</button>
+          <span>No setup required. Deeper controls remain available after the walkthrough starts.</span>
         </div>
       </div>
 
@@ -4369,7 +7202,7 @@ function renderOverviewCharts() {
         {
           label: "Spend",
           data: clouds.map((x) => x.value),
-          backgroundColor: ["#4f8ef8", "#2ac487", "#9470ff"],
+          backgroundColor: [PALETTE.brand, PALETTE.success, PALETTE.neutral],
           borderRadius: 6,
           barPercentage: 0.68
         }
@@ -4412,7 +7245,7 @@ function renderOverviewCharts() {
         {
           label: "Addressable Spend",
           data: categories.map((x) => x.value_usd),
-          backgroundColor: categories.map((x) => x.color || "#4f8ef8"),
+          backgroundColor: categories.map((x) => paletteChartColor(x.color, PALETTE.brand)),
           borderRadius: 8,
           barPercentage: 0.7
         }
@@ -4602,12 +7435,17 @@ function adoptionView() {
       <div class="card">
         <div class="card-title">Employee AI Adoption</div>
         <div class="card-subtitle">Executive adoption analytics become available when the live demo runtime is online.</div>
-        <div class="adoption-empty" style="margin-top:12px">
-          This page depends on the live adoption analytics API. Start the local demo runtime, initialize the demo, then reopen this page.
-          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-            <button class="small-btn primary" data-action="bootstrap-demo">Initialize Demo</button>
-            <button class="small-btn" data-action="adoption-refresh">Retry</button>
-          </div>
+        <div style="margin-top:12px">
+          ${emptyStateMarkup(
+            "Adoption analytics not loaded",
+            "This page needs the seeded adoption hierarchy and dashboard. Initialize or reset the demo, then retry this view.",
+            {
+              actions: [
+                { label: "Initialize Demo", action: "bootstrap-demo", primary: true },
+                { label: "Retry", action: "adoption-refresh" }
+              ]
+            }
+          )}
         </div>
       </div>
     `;
@@ -4685,9 +7523,11 @@ function adoptionView() {
         </button>
       `).join("")
     : `
-      <div class="adoption-empty">
-        Team scope is the terminal drill-down. Use the top employees table and the executive lenses below to understand whether adoption is broad, embedded, and controlled.
-      </div>
+      ${emptyStateMarkup(
+        "No deeper child scope",
+        "Team scope is the terminal drill-down. Use the employees, workflows, and lenses below to evaluate whether adoption is broad, embedded, and controlled.",
+        { compact: true }
+      )}
     `;
 
   const lensesMarkup = (dashboard.executive_lenses || []).map((lens) => `
@@ -4854,7 +7694,7 @@ function adoptionView() {
           <div class="card-subtitle">Highest-maturity workflows in the selected scope, with the service, capability, exact insertion point, and adoption mechanism visible together.</div>
         </div>
       </div>
-      <div class="workflow-spotlight-grid-wrap">${workflowSpotlightMarkup || `<div class="adoption-empty">No workflow-level adoption records are available for this scope.</div>`}</div>
+      <div class="workflow-spotlight-grid-wrap">${workflowSpotlightMarkup || emptyStateMarkup("No workflow records", "No workflow-level adoption records are available for this scope.", { compact: true })}</div>
     </section>
 
     <section class="card" style="margin-bottom:12px">
@@ -4879,7 +7719,7 @@ function adoptionView() {
               <th>Depth</th>
             </tr>
           </thead>
-          <tbody>${workflowMatrixRows || `<tr><td colspan='9' class='muted'>No workflow adoption records captured yet.</td></tr>`}</tbody>
+          <tbody>${workflowMatrixRows || tableEmptyRowMarkup(9, "No workflow adoption records", "No workflow adoption records are captured for this scope and window.")}</tbody>
         </table>
       </div>
     </section>
@@ -4896,7 +7736,7 @@ function adoptionView() {
           <thead>
             <tr><th>Capability Class</th><th>Services</th><th>Users</th><th>Requests</th><th>Governed</th></tr>
           </thead>
-          <tbody>${capabilityRows || `<tr><td colspan='5' class='muted'>No capability records captured yet.</td></tr>`}</tbody>
+          <tbody>${capabilityRows || tableEmptyRowMarkup(5, "No capability records", "No capability summary rows are captured for this scope.")}</tbody>
         </table>
       </div>
     </section>
@@ -4946,7 +7786,7 @@ function adoptionView() {
                   <th>Stage</th>
                 </tr>
               </thead>
-              <tbody>${topEmployeesMarkup || `<tr><td colspan='7' class='muted'>No employee activity captured yet.</td></tr>`}</tbody>
+              <tbody>${topEmployeesMarkup || tableEmptyRowMarkup(7, "No employee activity", "No employee activity is captured for this scope and window.")}</tbody>
             </table>
           </div>
         </div>
@@ -5225,7 +8065,18 @@ function attributionView() {
     return `
       <div class="card">
         <div class="card-title">Request Proof</div>
-        <div class="hint" style="margin-top:8px">No request-level proof examples are available in the demo dataset.</div>
+        <div style="margin-top:12px">
+          ${emptyStateMarkup(
+            "No request proof examples",
+            "No request-level proof examples are available in the demo dataset. Reset the demo to reload seeded attribution requests.",
+            {
+              actions: [
+                { label: "Reset Demo", action: "clear-logs", primary: true },
+                { label: "Open Overview", action: "go", page: "overview" }
+              ]
+            }
+          )}
+        </div>
       </div>
     `;
   }
@@ -5571,7 +8422,16 @@ function modelsView() {
         "No model portfolio is loaded in the current dataset.",
         "Load or restore a demo dataset before using this page in a live walkthrough."
       )}
-      <div class="hint" style="padding:24px;text-align:center">No models available in the current dataset.</div>
+      ${emptyStateMarkup(
+        "No models available in the current dataset.",
+        "The model estate is empty, so charts and optimization references cannot be rendered. Reset the demo to restore the seeded model portfolio.",
+        {
+          actions: [
+            { label: "Reset Demo", action: "clear-logs", primary: true },
+            { label: "Open Integrations", action: "go", page: "integrations" }
+          ]
+        }
+      )}
     `;
   }
 
@@ -5735,7 +8595,7 @@ function modelsView() {
               <th>Optimization Potential</th>
             </tr>
           </thead>
-          <tbody id="models-table-body">${rows}</tbody>
+          <tbody id="models-table-body">${rows || tableEmptyRowMarkup(9, "No model rows", "No model records match the current sort and context.")}</tbody>
         </table>
       </div>
     </div>
@@ -5808,7 +8668,16 @@ function teamsView() {
         "The current dataset does not include any accountable team rows.",
         "Restore a populated dataset before using the team drill-down in the demo."
       )}
-      <div class="hint" style="padding:24px;text-align:center">No teams available in the current dataset.</div>
+      ${emptyStateMarkup(
+        "No teams available in the current dataset.",
+        "The organization hierarchy is empty, so ownership and budget drill-downs cannot be shown. Reset the demo to restore seeded team rows.",
+        {
+          actions: [
+            { label: "Reset Demo", action: "clear-logs", primary: true },
+            { label: "Open Request Proof", action: "go", page: "attribution" }
+          ]
+        }
+      )}
     `;
   }
   if (!selected) {
@@ -5896,7 +8765,7 @@ function teamsView() {
         <div class="metric-meta">${fmtPct(selected.optimization_pct)} of spend</div>
       </div>
       <div class="card metric-card">
-        <div class="metric-accent" style="background:var(--purple)"></div>
+        <div class="metric-accent" style="background:var(--blue)"></div>
         <div class="metric-label">Model Footprint</div>
         <div class="metric-value">${fmtNumber((selected.top_models || []).length)}</div>
         <div class="metric-meta">${esc((selected.top_models || []).join(", "))}</div>
@@ -6038,7 +8907,7 @@ function applyManualMappingToRequest(mapping) {
   if (!mapping.request_id) {
     return;
   }
-  const request = (dataset.attribution_requests || []).find((item) => item.id === mapping.request_id);
+  const request = indexedLookup(datasetIndex.requestsById, mapping.request_id);
   if (!request) {
     return;
   }
@@ -6096,7 +8965,16 @@ function manualMappingView() {
         "This surface is intentionally empty when attribution evidence is already complete enough for the current dataset.",
         "Switch to a dataset with ambiguous ownership if you want to demonstrate the human-in-the-loop workflow."
       )}
-      <div class="hint" style="padding:24px;text-align:center">No manual mapping items are available in the current dataset.</div>
+      ${emptyStateMarkup(
+        "No manual mapping items are available in the current dataset.",
+        "All visible ownership paths are already above the review threshold. Use Request Proof to show evidence quality, or reset to reload the seeded ambiguity queue.",
+        {
+          actions: [
+            { label: "Open Request Proof", action: "go", page: "attribution", primary: true },
+            { label: "Reset Demo", action: "clear-logs" }
+          ]
+        }
+      )}
     `;
   }
 
@@ -6180,7 +9058,7 @@ function manualMappingView() {
           <button class="small-btn success" data-action="manual-map-confirm" data-mapping-id="${esc(item.id)}">Accept Suggested Owner</button>
           <button class="small-btn" data-action="manual-map-defer" data-mapping-id="${esc(item.id)}">Needs More Evidence</button>
           ${requestLinked ? `<button class="small-btn" data-action="manual-map-open-request" data-request-id="${esc(item.request_id)}">Open Request Evidence</button>` : ""}
-          <button class="small-btn" data-action="manual-map-open-team" data-team-id="${esc(((dataset.teams || []).find((team) => team.name === impact.afterOwner) || {}).id || "")}">Open Team</button>
+          <button class="small-btn" data-action="manual-map-open-team" data-team-id="${esc((indexedLookup(datasetIndex.teamsByName, impact.afterOwner) || {}).id || "")}">Open Team</button>
         </div>
 
         <div class="manual-mapping-note">${esc(item.note)}</div>
@@ -6394,7 +9272,16 @@ function interventionsView() {
         </div>
         <div class="filter-bar">${filters}</div>
         <div class="intervention-summary-stack">
-          ${queueItems || `<div class="hint">No interventions in this filter.</div>`}
+          ${queueItems || emptyStateMarkup(
+            "No interventions in this filter",
+            "The selected status has no matching recommendations. Change the filter or reset the demo to restore the default intervention queue.",
+            {
+              compact: true,
+              actions: [
+                { label: "Show All", action: "set-intervention-filter", primary: true, data: { filter: "all" } }
+              ]
+            }
+          )}
         </div>
       </div>
 
@@ -6468,7 +9355,11 @@ function interventionsView() {
               <div class="intervention-actions">${interventionActions(selectedIntervention)}</div>
             </div>
           </div>
-        ` : `<div class="hint">Select an intervention to show the operating detail.</div>`}
+        ` : emptyStateMarkup(
+          "No intervention selected",
+          "Select a recommendation from the queue to show savings, risk, evidence, and next actions.",
+          { compact: true }
+        )}
       </div>
     </div>
   `;
@@ -6502,8 +9393,10 @@ function governanceView() {
     const active = state.governanceSimulationBundle === bundle.key;
     return `<button class="filter-btn${active ? " active" : ""}" data-action="governance-set-bundle" data-bundle="${esc(bundle.key)}">${esc(bundle.label)}</button>`;
   }).join("");
+  const selectedRequestValue = selectedGovernanceRequestValue();
+  const governanceRequestStatus = governanceRequestSelectionFeedback(selectedRequestValue);
   const requestOptions = (dataset.attribution_requests || []).map((request) => {
-    const active = state.governanceSimulationRequestId === request.id;
+    const active = selectedRequestValue === request.id;
     const owner = selectedRequestTeamName(request) || "Review required";
     return `<option value="${esc(request.id)}"${active ? " selected" : ""}>${esc(chainNode(request, "Service Attribution")?.value || request.id)} | ${esc(request.model)} | ${esc(owner)}</option>`;
   }).join("");
@@ -6546,7 +9439,7 @@ function governanceView() {
       "Prove that the platform can change decision posture without becoming an outage path, then export the governance exception log."
     )}
 
-    <div class="grid grid-3" style="margin-bottom:12px" data-walkthrough-anchor="walkthrough-governance">${modeCards}</div>
+    <div class="grid grid-3" style="margin-bottom:12px" data-walkthrough-anchor="walkthrough-governance">${modeCards || emptyStateMarkup("No governance modes", "No deployment modes are loaded for this local run.", { compact: true })}</div>
 
     <div class="governance-sim-grid" style="margin-bottom:12px">
       <div class="simulation-control-grid">
@@ -6555,9 +9448,20 @@ function governanceView() {
           <div class="simulation-card-subtitle">Test one request against different deployment modes and policy bundles. This shows what the interceptor would do, why, and what the next operating step should be.</div>
           <div class="simulation-button-row">${simulationModeButtons}</div>
           <div class="simulation-button-row">${bundleButtons}</div>
-          <select class="simulation-select" data-action-change="governance-set-request" data-simulation="request">
-            ${requestOptions}
+          <label class="input-label" for="governance-request-select" style="margin-top:12px">Request sample</label>
+          <select
+            id="governance-request-select"
+            class="simulation-select control-select"
+            data-action-change="governance-set-request"
+            data-simulation="request"
+            aria-label="Governance request sample"
+            aria-describedby="governance-request-feedback"
+            aria-invalid="${governanceRequestStatus.kind === "error" ? "true" : "false"}"
+            ${requestOptions ? "" : "disabled"}
+          >
+            ${requestOptions || "<option>No request samples loaded</option>"}
           </select>
+          ${fieldFeedbackMarkup("governance-request", governanceRequestStatus, selectedRequestValue)}
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
             <button class="small-btn" data-action="go" data-page="attribution">Open Request Proof</button>
             <button class="small-btn" data-action="export-artifact" data-artifact="governance-log">Export governance exception log</button>
@@ -6579,7 +9483,7 @@ function governanceView() {
                   <th>Violations (7d)</th>
                 </tr>
               </thead>
-              <tbody>${policyRows}</tbody>
+              <tbody>${policyRows || tableEmptyRowMarkup(7, "No governance policies", "No policy rows are loaded for the current demo dataset.")}</tbody>
             </table>
           </div>
         </div>
@@ -6648,7 +9552,7 @@ function governanceView() {
               <th>Expected Behavior</th>
             </tr>
           </thead>
-          <tbody>${matrixRows}</tbody>
+          <tbody>${matrixRows || tableEmptyRowMarkup(3, "No safety scenarios", "No fail-open validation scenarios are loaded.")}</tbody>
         </table>
       </div>
     </div>
@@ -6737,6 +9641,14 @@ async function resetForecastPlanner(options = {}) {
 
 function forecastView() {
   const data = forecastViewData();
+  const forecastStatePanel = state.forecastLoading
+    ? loadingStateMarkup("Forecast running", "The local runtime is generating the selected planning case.", { compact: true })
+    : data.points.length
+      ? successStateMarkup("Forecast ready", state.forecastStatus || "The forecast is available from seeded local data.", { compact: true })
+      : emptyStateMarkup("Forecast not generated", "No forecast points are available yet. Generate a live forecast or reset to the baseline local estimate.", {
+        compact: true,
+        actions: [{ label: "Generate Live Forecast", action: "forecast-generate", primary: true }]
+      });
 
   return `
     <div class="card" style="margin-bottom:12px">
@@ -6755,6 +9667,7 @@ function forecastView() {
       <div id="forecast-horizon-row" class="forecast-horizon-row">${renderForecastHorizonButtons()}</div>
       <div id="forecast-scenario-grid" class="forecast-scenario-grid">${renderForecastScenarioButtons()}</div>
       <div id="forecast-status" class="hint">${esc(state.forecastStatus)}</div>
+      <div style="margin-top:12px">${forecastStatePanel}</div>
 
       <div class="forecast-detail-grid">
         <div id="forecast-scenario-meaning" class="forecast-detail-card">${renderForecastScenarioMeaning(data)}</div>
@@ -6896,12 +9809,7 @@ function renderForecastChart() {
     points: forecastProjectionForScenario(key, state.forecastHorizonMonths)
   }));
   const compareLabels = compareProjection[0]?.points.map((point) => point.label) || [];
-  const comparePalette = [
-    "#4f8ef8",
-    "#2ac487",
-    "#eda82e",
-    "#8f6af8"
-  ];
+  const comparePalette = [PALETTE.brand, PALETTE.success, PALETTE.warning, PALETTE.neutral];
   createChart("chart-forecast-compare", {
     type: "line",
     data: {
@@ -7042,13 +9950,13 @@ function integrationsView() {
       <div class="card-header">
         <div>
           <div class="card-title">Operational Integrations</div>
-          <div class="card-subtitle">Shows how ACI plugs into the company operating system: signals in from enterprise systems, decisions out to the teams and tools that act on them.</div>
+          <div class="card-subtitle">Shows how Argmin plugs into the company operating system: signals in from enterprise systems, decisions out to the teams and tools that act on them.</div>
         </div>
         <div style="display:flex;gap:6px">
           <button class="small-btn" data-action="integrations-refresh" ${state.integrationLoading ? "disabled" : ""}>${state.integrationLoading ? "Refreshing..." : "Refresh Live State"}</button>
         </div>
       </div>
-      <div class="hint">The value here is not that ACI can send a message. It is that ACI turns telemetry into routed business handoffs with owners, SLAs, and expected downstream actions.</div>
+      <div class="hint">The value here is not that Argmin can send a message. It is that Argmin turns telemetry into routed business handoffs with owners, SLAs, and expected downstream actions.</div>
     </div>
 
     <div class="integration-summary-grid" style="margin-bottom:12px">
@@ -7062,10 +9970,10 @@ function integrationsView() {
         <div class="metric-accent" style="background:var(--amber)"></div>
         <div class="metric-label">Business Workflows</div>
         <div class="metric-value" style="font-size:20px">${fmtNumber(summary.outbound_route_count || 0)}</div>
-        <div class="metric-meta">Distinct handoff paths from ACI into owned operational workflows</div>
+        <div class="metric-meta">Distinct handoff paths from Argmin into owned operational workflows</div>
       </div>
       <div class="card metric-card">
-        <div class="metric-accent" style="background:var(--purple)"></div>
+        <div class="metric-accent" style="background:var(--green)"></div>
         <div class="metric-label">Delivery Success</div>
         <div class="metric-value" style="font-size:20px">${fmtPct(summary.success_rate_pct || 0, 0)}</div>
         <div class="metric-meta">${fmtNumber(summary.recent_delivery_count || 0)} recent handoffs • ${fmtNumber(summary.failed_deliveries || 0)} failed</div>
@@ -7081,20 +9989,20 @@ function integrationsView() {
     <div class="grid grid-7-5" style="margin-bottom:12px">
       <div class="card">
         <div class="card-title">Connected Systems</div>
-        <div class="card-subtitle">What enterprise systems ACI already consumes or hands off into, and why each connection matters.</div>
-        <div class="integration-source-grid" style="margin-top:12px">${sourceCards}</div>
+        <div class="card-subtitle">What enterprise systems Argmin already consumes or hands off into, and why each connection matters.</div>
+        <div class="integration-source-grid" style="margin-top:12px">${sourceCards || emptyStateMarkup("No connected systems", "The integration source list is empty. Reset the demo to reload seeded enterprise systems.", { compact: true })}</div>
       </div>
       <div class="card">
         <div class="card-title">Scenario Runner</div>
         <div class="card-subtitle">Run the business workflows that matter in diligence: escalation, execution handoff, pricing drift review, and executive reporting.</div>
-        <div class="integration-scenario-grid" style="margin-top:12px">${scenarioCards}</div>
+        <div class="integration-scenario-grid" style="margin-top:12px">${scenarioCards || emptyStateMarkup("No integration scenarios", "No operational handoff scenarios are loaded. Reset the demo or refresh live state before presenting integrations.", { compact: true })}</div>
       </div>
     </div>
 
     <div class="card" style="margin-bottom:12px">
       <div class="card-title">Operational Handoffs</div>
-      <div class="card-subtitle">Where ACI routes decisions once it knows who should act and why.</div>
-      <div class="integration-route-grid" style="margin-top:12px">${routeCards}</div>
+      <div class="card-subtitle">Where Argmin routes decisions once it knows who should act and why.</div>
+      <div class="integration-route-grid" style="margin-top:12px">${routeCards || emptyStateMarkup("No operational handoff routes", "No downstream route contracts are loaded for this local run.", { compact: true })}</div>
     </div>
 
     <div class="card">
@@ -7112,7 +10020,7 @@ function integrationsView() {
               <th>Sent At</th>
             </tr>
           </thead>
-          <tbody>${rows || `<tr><td colspan='6' class='muted'>No delivery records yet. Run one of the scenarios above.</td></tr>`}</tbody>
+          <tbody>${rows || tableEmptyRowMarkup(6, "No delivery records yet", "Run one of the scenarios above to create a visible simulated handoff record.")}</tbody>
         </table>
       </div>
     </div>
@@ -7160,7 +10068,7 @@ function renderCoverageSummaryCards(summary = {}) {
       label: "Agent Lineage",
       value: fmtPct(summary.agent_lineage_pct || 0),
       meta: "Root request propagation across descendant calls.",
-      accent: "var(--purple)"
+      accent: "var(--blue)"
     }
   ];
   return cards.map((card) => `
@@ -7270,7 +10178,7 @@ function coverageView() {
                 <th>Caveat</th>
               </tr>
             </thead>
-            <tbody>${pathwayRows}</tbody>
+            <tbody>${pathwayRows || tableEmptyRowMarkup(9, "No pathway rows", "No inference pathway records are loaded. Reset the demo to restore the coverage matrix.")}</tbody>
           </table>
         </div>
       </section>
@@ -7279,7 +10187,7 @@ function coverageView() {
         <section class="card">
           <div class="card-title">Blind Spots and Degraded States</div>
           <div class="card-subtitle">The product remains useful under partial data by making causes and operator actions explicit.</div>
-          <div class="blindspot-grid">${blindSpotCards}</div>
+          <div class="blindspot-grid">${blindSpotCards || emptyStateMarkup("No blind spots loaded", "No degraded pathway examples are available in the current dataset.", { compact: true })}</div>
         </section>
         <section class="card">
           <div class="card-title">Agentic Workflow Lineage</div>
@@ -7290,7 +10198,7 @@ function coverageView() {
             <div><span>Linked descendants</span><strong>${fmtNumber(lineage.linked_descendant_calls || 0)} / ${fmtNumber(lineage.total_descendant_calls || 0)}</strong></div>
             <div><span>Aggregate cost</span><strong>${fmtUSD(lineage.aggregate_cost_usd || 0, 2)}</strong></div>
           </div>
-          <div class="lineage-timeline">${lineageCalls}</div>
+          <div class="lineage-timeline">${lineageCalls || emptyStateMarkup("No lineage events", "No agentic workflow lineage records are loaded for this dataset.", { compact: true })}</div>
         </section>
       </div>
 
@@ -7307,7 +10215,7 @@ function coverageView() {
             <thead>
               <tr><th>Scenario</th><th>Name</th><th>Surface</th><th>Evidence</th><th>Status</th></tr>
             </thead>
-            <tbody>${scenarioRows}</tbody>
+            <tbody>${scenarioRows || tableEmptyRowMarkup(5, "No scenario proof rows", "No pathological scenario proof records are loaded.")}</tbody>
           </table>
         </div>
       </section>
@@ -7400,7 +10308,7 @@ function exportsView() {
       <div class="grid grid-4" style="margin-bottom:12px">
         <div class="card metric-card"><div class="metric-accent" style="background:var(--green)"></div><div class="metric-label">Chargeback Ready</div><div class="metric-value">${fmtUSD(summary.exportable_chargeback_usd || 0)}</div><div class="metric-meta">${fmtPct(readinessPct)} of previewed assignable spend</div></div>
         <div class="card metric-card"><div class="metric-accent" style="background:var(--amber)"></div><div class="metric-label">Review Required</div><div class="metric-value">${fmtUSD(summary.provisional_review_usd || 0)}</div><div class="metric-meta">Provisional or conflict-bearing ownership</div></div>
-        <div class="card metric-card"><div class="metric-accent" style="background:var(--purple)"></div><div class="metric-label">Allocated Shared</div><div class="metric-value">${fmtUSD(summary.allocated_shared_usd || 0)}</div><div class="metric-meta">Exported separately from ownership truth</div></div>
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--amber)"></div><div class="metric-label">Allocated Shared</div><div class="metric-value">${fmtUSD(summary.allocated_shared_usd || 0)}</div><div class="metric-meta">Exported separately from ownership truth</div></div>
         <div class="card metric-card"><div class="metric-accent" style="background:var(--red)"></div><div class="metric-label">Excluded Unknown</div><div class="metric-value">${fmtUSD(summary.unknown_excluded_usd || 0)}</div><div class="metric-meta">Shown with caveat, not hidden</div></div>
       </div>
 
@@ -7421,7 +10329,7 @@ function exportsView() {
                 <th>Line</th><th>Service</th><th>Owner</th><th>Cost Center</th><th>Estimated</th><th>Reconciled</th><th>TRAC</th><th>Confidence</th><th>State</th><th>Truth Basis</th><th>Action</th>
               </tr>
             </thead>
-            <tbody>${rows}</tbody>
+            <tbody>${rows || tableEmptyRowMarkup(11, "No export rows", "No chargeback export rows are available in the current dataset. Reset the demo to reload seeded finance records.")}</tbody>
           </table>
         </div>
       </section>
@@ -7429,7 +10337,7 @@ function exportsView() {
       <section class="card">
         <div class="card-title">Shared Allocation Guard</div>
         <div class="card-subtitle">Stage C allocation conserves cost but never overwrites the ownership columns used for chargeback readiness.</div>
-        <div class="allocation-list">${allocations}</div>
+        <div class="allocation-list">${allocations || emptyStateMarkup("No shared allocations", "No shared allocation splits are loaded for the selected export mode.", { compact: true })}</div>
       </section>
     </div>
   `;
@@ -7496,13 +10404,13 @@ function energyView() {
         <div class="card metric-card"><div class="metric-accent" style="background:var(--green)"></div><div class="metric-label">Rated Models</div><div class="metric-value">${fmtNumber(summary.rated_model_count || 0)}</div><div class="metric-meta">${fmtNumber(summary.unrated_model_count || 0)} explicitly unrated</div></div>
         <div class="card metric-card"><div class="metric-accent" style="background:var(--blue)"></div><div class="metric-label">Known Energy Usage</div><div class="metric-value">${fmtPct(summary.energy_known_request_pct || 0)}</div><div class="metric-meta">Unknowns remain null, not zero</div></div>
         <div class="card metric-card"><div class="metric-accent" style="background:var(--amber)"></div><div class="metric-label">Monthly Energy</div><div class="metric-value">${fmtNumber(summary.estimated_monthly_kwh || 0)} kWh</div><div class="metric-meta">${Number(summary.estimated_kwh_per_1k_requests || 0).toFixed(1)} kWh per 1K requests</div></div>
-        <div class="card metric-card"><div class="metric-accent" style="background:var(--purple)"></div><div class="metric-label">Estimated Carbon</div><div class="metric-value">${fmtNumber(summary.estimated_carbon_kgco2e || 0)} kg</div><div class="metric-meta">Informational Phase 1 disclosure</div></div>
+        <div class="card metric-card"><div class="metric-accent" style="background:var(--amber)"></div><div class="metric-label">Estimated Carbon</div><div class="metric-value">${fmtNumber(summary.estimated_carbon_kgco2e || 0)} kg</div><div class="metric-meta">Informational Phase 1 disclosure</div></div>
       </div>
 
       <section class="card" style="margin-bottom:12px">
         <div class="card-title">Observed Model Energy View</div>
         <div class="card-subtitle">Models without published data are displayed as Unrated and kept in the decision surface.</div>
-        <div class="energy-model-grid-wrap">${modelCards}</div>
+        <div class="energy-model-grid-wrap">${modelCards || emptyStateMarkup("No model energy rows", "No model energy records are loaded. Unknown values should remain explicit, not invisible.", { compact: true })}</div>
       </section>
 
       <section class="card">
@@ -7518,7 +10426,7 @@ function energyView() {
             <thead>
               <tr><th>Current</th><th>Candidate</th><th>Cost Delta</th><th>Quality Basis</th><th>Energy Delta</th><th>Annual Carbon Delta</th><th>Decision</th></tr>
             </thead>
-            <tbody>${recommendationRows}</tbody>
+            <tbody>${recommendationRows || tableEmptyRowMarkup(7, "No energy-aware candidates", "No energy optimization candidates are loaded for this dataset.")}</tbody>
           </table>
         </div>
       </section>
@@ -7530,8 +10438,35 @@ function adminView() {
   const admin = dataset.admin || FALLBACK_DATASET.admin;
   const summary = admin.summary || {};
   const lens = pageLensNarrative("admin");
-  const accountRows = (admin.accounts || []).map((account) => `
+  const persona = activeDemoPersona();
+  const personaMenuNames = (persona.allowedPages || [])
+    .map((pageKey) => PAGE_TITLES[pageKey] || pageKey)
+    .join(", ");
+  const visibleAccounts = personaVisibleAccounts(admin.accounts || [], persona);
+  const visibleOperations = personaVisibleOperations(admin.operations || [], persona);
+  const visibleAuditEvents = personaVisibleAuditEvents(admin.audit_log || [], persona);
+  const personaWorkflowRows = (persona.workflows || []).map((workflow) => `
+    <div class="persona-workflow-row">
+      <span>${esc(workflow)}</span>
+      <strong>Available</strong>
+    </div>
+  `).join("");
+  const personaRecordRows = (persona.records || []).map((record) => `
     <tr>
+      <td>${esc(record)}</td>
+      <td>${esc(persona.role)}</td>
+      <td><span class="status-badge good">Visible</span></td>
+    </tr>
+  `).join("");
+  const personaCards = DEMO_PERSONAS.map((item) => `
+    <button class="persona-card${item.key === persona.key ? " active" : ""}" data-action="set-demo-persona" data-persona-key="${esc(item.key)}">
+      <span>${esc(item.label)}</span>
+      <strong>${esc(item.name)}</strong>
+      <em>${fmtNumber((item.allowedPages || []).length)} menus • ${fmtNumber((item.permissions || []).length)} permissions</em>
+    </button>
+  `).join("");
+  const accountRows = visibleAccounts.map((account) => `
+    <tr class="${account.name === persona.name ? "selected-row" : ""}">
       <td>${esc(account.name)}</td>
       <td>${esc(account.role)}</td>
       <td><span class="status-badge ${account.status === "active" ? "good" : "warn"}">${esc(account.status)}</span></td>
@@ -7539,15 +10474,16 @@ function adminView() {
       <td>${esc(fmtDateTime(account.last_auth || ""))}</td>
     </tr>
   `).join("");
-  const operationRows = (admin.operations || []).map((operation) => `
+  const operationRows = visibleOperations.map((operation) => `
     <tr>
       <td>${esc(operation.operation)}</td>
       <td>${esc(operation.role_required)}</td>
       <td>${esc(operation.write_target)}</td>
       <td>${esc(operation.audit)}</td>
+      <td><span class="status-badge good">Allowed for persona</span></td>
     </tr>
   `).join("");
-  const auditRows = (admin.audit_log || []).map((event) => `
+  const auditRows = visibleAuditEvents.map((event) => `
     <tr>
       <td>${esc(fmtDateTime(event.timestamp || ""))}</td>
       <td>
@@ -7586,21 +10522,51 @@ function adminView() {
         </div>
       </div>
 
+      <section class="card persona-access-card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Persona Access Preview</div>
+            <div class="card-subtitle">Local RBAC simulation for menus, workflows, permissions, and records. No production identity provider is contacted.</div>
+          </div>
+          <div class="status-badge info">${esc(persona.label)} active</div>
+        </div>
+        <div class="persona-card-grid">${personaCards || emptyStateMarkup("No local personas", "No local persona definitions are loaded.", { compact: true })}</div>
+        <div class="grid grid-7-5" style="margin-top:12px">
+          <div class="persona-permission-panel">
+            <div class="section-title">Selected Persona</div>
+            <div class="persona-selected-name">${esc(persona.name)}</div>
+            <div class="hint">${esc(persona.email)} • ${esc(persona.description)}</div>
+            <div class="persona-chip-row">${(persona.permissions || []).map((permission) => `<span>${esc(permission.replaceAll("_", " "))}</span>`).join("")}</div>
+            <div class="persona-menu-list"><strong>Menus:</strong> ${esc(personaMenuNames)}</div>
+          </div>
+          <div class="persona-permission-panel">
+            <div class="section-title">Workflow Access</div>
+            <div class="persona-workflow-list">${personaWorkflowRows || emptyStateMarkup("No workflow access rows", "This persona has no configured local workflow rows.", { compact: true })}</div>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-top:12px">
+          <table class="table">
+            <thead><tr><th>Dummy Record</th><th>Persona Role</th><th>Visibility</th></tr></thead>
+            <tbody>${personaRecordRows || tableEmptyRowMarkup(3, "No dummy records", "This persona has no dummy records assigned in the local dataset.")}</tbody>
+          </table>
+        </div>
+      </section>
+
       <div class="grid grid-7-5" style="margin-bottom:12px">
         <section class="card">
           <div class="card-title">Account Lifecycle and RBAC</div>
-          <div class="card-subtitle">Invitation-gated accounts, role assignment, MFA posture, and deactivation history are visible in the same product shell.</div>
+            <div class="card-subtitle">${personaCanViewAdminRecords(persona) ? "Invitation-gated accounts, role assignment, MFA posture, and deactivation history are visible in the same product shell." : "This persona only sees account records tied to their role."}</div>
           <div class="table-wrap" style="margin-top:12px">
             <table class="table">
               <thead><tr><th>User</th><th>Role</th><th>Status</th><th>MFA</th><th>Last Auth</th></tr></thead>
-              <tbody>${accountRows}</tbody>
+              <tbody>${accountRows || tableEmptyRowMarkup(5, "No visible demo accounts", "No local dummy accounts are visible for the selected persona.")}</tbody>
             </table>
           </div>
         </section>
         <section class="card">
           <div class="card-title">Operational Diagnostics</div>
           <div class="card-subtitle">Diagnostics stay scoped to the deployment and do not imply external access to customer data.</div>
-          <div class="admin-diagnostic-grid">${diagnostics}</div>
+          <div class="admin-diagnostic-grid">${diagnostics || emptyStateMarkup("No diagnostics loaded", "No local diagnostic checks are available in the current dataset.", { compact: true })}</div>
         </section>
       </div>
 
@@ -7608,14 +10574,14 @@ function adminView() {
         <div class="card-header">
           <div>
             <div class="card-title">Customer-Visible Audit Trail</div>
-            <div class="card-subtitle">Every admin-side mutation, export, replay, and exception approval is represented as a local append-only event with actor, target, outcome, and basis.</div>
+            <div class="card-subtitle">${personaCanViewAdminRecords(persona) ? "Every admin-side mutation, export, replay, and exception approval is represented as a local append-only event with actor, target, outcome, and basis." : "Audit rows are scoped to this persona's role and visible records."}</div>
           </div>
           <button class="small-btn" data-action="go" data-page="exports">Open Exports</button>
         </div>
         <div class="table-wrap">
           <table class="table">
             <thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th><th>Outcome</th><th>Basis</th></tr></thead>
-            <tbody>${auditRows || `<tr><td colspan='6' class='muted'>No admin audit events are available in the current dataset.</td></tr>`}</tbody>
+            <tbody>${auditRows || tableEmptyRowMarkup(6, "No visible admin audit events", "No admin audit events are visible for the selected persona.")}</tbody>
           </table>
         </div>
       </section>
@@ -7624,14 +10590,14 @@ function adminView() {
         <div class="card-header">
           <div>
             <div class="card-title">Audited Admin Operations</div>
-            <div class="card-subtitle">${esc(summary.auth_policy || "")} Last audit event: ${esc(fmtDateTime(summary.last_audit_event || ""))}</div>
+            <div class="card-subtitle">${esc(summary.auth_policy || "")} This view lists only operations available to the selected persona. Last audit event: ${esc(fmtDateTime(summary.last_audit_event || ""))}</div>
           </div>
           <button class="small-btn" data-action="go" data-page="governance">Open Governance</button>
         </div>
         <div class="table-wrap">
           <table class="table">
-            <thead><tr><th>Operation</th><th>Role Required</th><th>Write Target</th><th>Audit</th></tr></thead>
-            <tbody>${operationRows}</tbody>
+            <thead><tr><th>Operation</th><th>Role Required</th><th>Write Target</th><th>Audit</th><th>Selected Persona</th></tr></thead>
+            <tbody>${operationRows || tableEmptyRowMarkup(5, "No permitted admin operations", "This persona has a read-only view here; mutation options are intentionally hidden.")}</tbody>
           </table>
         </div>
       </section>
@@ -7679,8 +10645,92 @@ function glossaryResultsMarkup() {
   return {
     filteredCount: filtered.length,
     groupCount: groups.size,
-    markup: rendered || `<div class='hint'>No glossary terms match this search query.</div>`
+    markup: rendered || emptyStateMarkup(
+      "No glossary terms match this search query.",
+      "Try a broader term such as TRAC, governance, forecasting, fail-open, or manual mapping.",
+      { compact: true }
+    )
   };
+}
+
+function glossaryResultStats() {
+  const query = state.glossaryQuery.trim().toLowerCase();
+  const categories = new Set();
+  let filteredCount = 0;
+  for (const entry of dataset.glossary || []) {
+    if (query) {
+      const hay = `${entry.term || ""} ${entry.aka || ""} ${entry.category || ""} ${entry.definition || ""} ${entry.why_it_matters || ""}`.toLowerCase();
+      if (!hay.includes(query)) {
+        continue;
+      }
+    }
+    filteredCount += 1;
+    categories.add(entry.category || "General");
+  }
+  return {
+    filteredCount,
+    groupCount: categories.size
+  };
+}
+
+function deferredContentMarkup(key, title, message, contentMarkup, options = {}) {
+  const forceVisible = Boolean(options.forceVisible);
+  const visible = forceVisible || state.deferredSectionsVisible.has(key);
+  if (visible) {
+    return contentMarkup;
+  }
+  return `
+    <div class="deferred-section" data-deferred-key="${esc(key)}">
+      <div class="deferred-section-copy">
+        <div class="deferred-section-title">${esc(title)}</div>
+        <div class="deferred-section-message">${esc(message)}</div>
+        ${options.example ? `<div class="deferred-example"><span>Example</span><strong>${esc(options.example)}</strong></div>` : ""}
+        <div class="deferred-skeleton" aria-hidden="true">
+          <span class="skeleton-line wide"></span>
+          <span class="skeleton-line"></span>
+          <span class="skeleton-line short"></span>
+        </div>
+      </div>
+      <button class="small-btn" data-action="show-deferred-section" data-deferred-key="${esc(key)}">${esc(options.buttonLabel || "Show Content")}</button>
+    </div>
+  `;
+}
+
+function showDeferredSection(key) {
+  if (!key) {
+    return;
+  }
+  state.deferredSectionsVisible.add(key);
+  render();
+}
+
+function applyGuidedExample(inputKey, value) {
+  const normalizedInput = String(inputKey || "");
+  const exampleValue = String(value || "").trim();
+  if (!exampleValue) {
+    return;
+  }
+  if (normalizedInput === "glossary-query") {
+    state.glossaryQuery = exampleValue;
+    state.deferredSectionsVisible.add("glossary-results");
+    setFormStatus("glossary-query", {
+      kind: "ok",
+      message: `Loaded example "${exampleValue}". Results update automatically.`
+    }, exampleValue);
+    render();
+    focusPageSearchInput();
+    return;
+  }
+  if (normalizedInput === "faq-query") {
+    state.faqQuery = exampleValue;
+    state.deferredSectionsVisible.add("faq-results");
+    setFormStatus("faq-query", {
+      kind: "ok",
+      message: `Loaded example "${exampleValue}". Results update automatically.`
+    }, exampleValue);
+    render();
+    focusPageSearchInput();
+  }
 }
 
 function renderGlossaryResults() {
@@ -7689,13 +10739,21 @@ function renderGlossaryResults() {
   if (!summary || !results) {
     return;
   }
+  state.deferredSectionsVisible.add("glossary-results");
   const rendered = glossaryResultsMarkup();
+  const feedback = searchFieldFeedback("glossary-query", state.glossaryQuery, rendered);
+  syncFieldFeedback("glossary-query", state.glossaryQuery, feedback, ["glossary-summary"]);
   summary.textContent = `${rendered.filteredCount} term${rendered.filteredCount === 1 ? "" : "s"} shown across ${rendered.groupCount} categor${rendered.groupCount === 1 ? "y" : "ies"}.`;
   results.innerHTML = rendered.markup;
+  normalizeInteractionContracts(document);
 }
 
 function glossaryView() {
-  const rendered = glossaryResultsMarkup();
+  const showResults = Boolean(state.glossaryQuery.trim()) || state.deferredSectionsVisible.has("glossary-results");
+  const rendered = showResults
+    ? glossaryResultsMarkup()
+    : { ...glossaryResultStats(), markup: "" };
+  const feedback = searchFieldFeedback("glossary-query", state.glossaryQuery, rendered);
 
   return `
     <div class="card">
@@ -7708,21 +10766,30 @@ function glossaryView() {
       <label class="input-label" for="glossary-query-input">Search glossary</label>
       <input
         id="glossary-query-input"
+        class="control-input"
         type="text"
         value="${esc(state.glossaryQuery)}"
         placeholder="Search terms (TRAC, fail-open, manual mapping, forecasting...)"
-        style="width:100%;border:1px solid var(--border);background:var(--surface);color:var(--text);padding:9px 10px;border-radius:8px;font:inherit;font-size:12px"
         aria-label="Search glossary terms"
+        ${fieldValidationAttrs("glossary-query", feedback, state.glossaryQuery, ["glossary-summary"])}
         data-action-input="glossary-query"
       />
+      ${fieldFeedbackMarkup("glossary-query", feedback, state.glossaryQuery)}
       <div class="hint" id="glossary-summary" style="margin:8px 0 12px">${rendered.filteredCount} term${rendered.filteredCount === 1 ? "" : "s"} shown across ${rendered.groupCount} categor${rendered.groupCount === 1 ? "y" : "ies"}.</div>
-      <div id="glossary-results">${rendered.markup}</div>
+      <div id="glossary-results">${deferredContentMarkup(
+        "glossary-results",
+        "Reference terms are ready",
+        "Core demo screens render first; load the full glossary when diligence needs it.",
+        rendered.markup,
+        { forceVisible: showResults, buttonLabel: "Show Glossary Terms", example: "governance terminology" }
+      )}</div>
     </div>
   `;
 }
 
 function faqResultsMarkup() {
   const query = state.faqQuery.trim().toLowerCase();
+  let filteredCount = 0;
   const categories = (dataset.faq || []).map((category, idx) => {
     const filteredItems = (category.items || []).filter((item) => {
       if (!query) {
@@ -7731,6 +10798,7 @@ function faqResultsMarkup() {
       const hay = `${item.question} ${item.answer}`.toLowerCase();
       return hay.includes(query);
     });
+    filteredCount += filteredItems.length;
     return {
       key: `cat-${idx}`,
       name: category.category,
@@ -7763,20 +10831,37 @@ function faqResultsMarkup() {
   }).join("");
 
   return {
-    markup: markup || `<div class='hint'>No FAQ items match this search query.</div>`
+    filteredCount,
+    groupCount: categories.length,
+    markup: markup || emptyStateMarkup(
+      "No FAQ items match this search query.",
+      "Try searching deployment, governance, methodology, intervention, or forecasting.",
+      { compact: true }
+    )
   };
 }
 
 function renderFaqResults() {
+  const summary = document.getElementById("faq-summary");
   const results = document.getElementById("faq-results");
   if (!results) {
     return;
   }
-  results.innerHTML = faqResultsMarkup().markup;
+  state.deferredSectionsVisible.add("faq-results");
+  const rendered = faqResultsMarkup();
+  const feedback = searchFieldFeedback("faq-query", state.faqQuery, rendered);
+  syncFieldFeedback("faq-query", state.faqQuery, feedback, ["faq-summary"]);
+  if (summary) {
+    summary.textContent = `${rendered.filteredCount} FAQ item${rendered.filteredCount === 1 ? "" : "s"} shown across ${rendered.groupCount} categor${rendered.groupCount === 1 ? "y" : "ies"}.`;
+  }
+  results.innerHTML = rendered.markup;
+  normalizeInteractionContracts(document);
 }
 
 function faqView() {
-  const rendered = faqResultsMarkup();
+  const showResults = Boolean(state.faqQuery.trim()) || state.deferredSectionsVisible.has("faq-results");
+  const rendered = showResults ? faqResultsMarkup() : { filteredCount: 0, groupCount: 0, markup: "" };
+  const feedback = searchFieldFeedback("faq-query", state.faqQuery, rendered);
 
   return `
     <div class="card">
@@ -7789,15 +10874,23 @@ function faqView() {
       <label class="input-label" for="faq-query-input">Search FAQ</label>
       <input
         id="faq-query-input"
+        class="control-input"
         type="text"
         value="${esc(state.faqQuery)}"
         placeholder="Search FAQs (deployment, governance, methodology...)"
-        style="width:100%;border:1px solid var(--border);background:var(--surface);color:var(--text);padding:9px 10px;border-radius:8px;font:inherit;font-size:12px"
         aria-label="Search frequently asked questions"
+        ${fieldValidationAttrs("faq-query", feedback, state.faqQuery, ["faq-summary"])}
         data-action-input="faq-query"
       />
-      <div class="hint" style="margin:8px 0 12px">Covers platform logic, deployment posture, governance controls, interventions, and forecasting assumptions.</div>
-      <div id="faq-results">${rendered.markup}</div>
+      ${fieldFeedbackMarkup("faq-query", feedback, state.faqQuery)}
+      <div class="hint" id="faq-summary" style="margin:8px 0 12px">${showResults ? `${rendered.filteredCount} FAQ item${rendered.filteredCount === 1 ? "" : "s"} shown across ${rendered.groupCount} categor${rendered.groupCount === 1 ? "y" : "ies"}.` : "Covers platform logic, deployment posture, governance controls, interventions, and forecasting assumptions."}</div>
+      <div id="faq-results">${deferredContentMarkup(
+        "faq-results",
+        "Methodology reference is ready",
+        "Keep the first paint focused; reveal FAQ content when the conversation turns to diligence.",
+        rendered.markup,
+        { forceVisible: showResults, buttonLabel: "Show FAQ", example: "deployment diligence" }
+      )}</div>
     </div>
   `;
 }
@@ -7828,67 +10921,75 @@ function renderMainView() {
 
   switch (state.page) {
     case "overview":
-      root.innerHTML = overviewView();
+      root.innerHTML = renderViewWithState(overviewView());
       renderOverviewCharts();
       break;
     case "partner_brief":
-      root.innerHTML = designPartnerView();
+      root.innerHTML = renderViewWithState(designPartnerView());
       break;
     case "requirements":
-      root.innerHTML = requirementsView();
+      root.innerHTML = renderViewWithState(requirementsView());
       break;
     case "adoption":
-      root.innerHTML = adoptionView();
+      root.innerHTML = renderViewWithState(adoptionView());
       renderAdoptionCharts();
       break;
     case "attribution":
-      root.innerHTML = attributionView();
+      root.innerHTML = renderViewWithState(attributionView());
       break;
     case "models":
-      root.innerHTML = modelsView();
+      root.innerHTML = renderViewWithState(modelsView());
       renderModelChart();
       break;
     case "teams":
-      root.innerHTML = teamsView();
+      root.innerHTML = renderViewWithState(teamsView());
       renderTeamCharts();
       break;
     case "manual_mapping":
-      root.innerHTML = manualMappingView();
+      root.innerHTML = renderViewWithState(manualMappingView());
       break;
     case "interventions":
-      root.innerHTML = interventionsView();
+      root.innerHTML = renderViewWithState(interventionsView());
       break;
     case "governance":
-      root.innerHTML = governanceView();
+      root.innerHTML = renderViewWithState(governanceView());
       break;
     case "coverage":
-      root.innerHTML = coverageView();
+      root.innerHTML = renderViewWithState(coverageView());
       break;
     case "exports":
-      root.innerHTML = exportsView();
+      root.innerHTML = renderViewWithState(exportsView());
       break;
     case "energy":
-      root.innerHTML = energyView();
+      root.innerHTML = renderViewWithState(energyView());
       break;
     case "forecast":
-      root.innerHTML = forecastView();
+      root.innerHTML = renderViewWithState(forecastView());
       renderForecastChart();
       break;
     case "integrations":
-      root.innerHTML = integrationsView();
+      root.innerHTML = renderViewWithState(integrationsView());
       break;
     case "admin":
-      root.innerHTML = adminView();
+      root.innerHTML = renderViewWithState(adminView());
       break;
     case "glossary":
-      root.innerHTML = glossaryView();
+      root.innerHTML = renderViewWithState(glossaryView());
       break;
     case "faq":
-      root.innerHTML = faqView();
+      root.innerHTML = renderViewWithState(faqView());
       break;
     default:
-      root.innerHTML = overviewView();
-      renderOverviewCharts();
+      root.innerHTML = errorStateMarkup(
+        "Unknown page",
+        `${state.page} is not a configured demo route. Use Overview or Reset Demo to return to a known state.`,
+        {
+          actions: [
+            { label: "Open Overview", action: "go", page: "overview", primary: true },
+            { label: "Reset Demo", action: "clear-logs" }
+          ]
+        }
+      );
       break;
   }
   state.lastRenderedPage = state.page;
@@ -7990,6 +11091,13 @@ async function apiRequest(method, path, body) {
     response = await fetch(path, options);
   } catch (error) {
     markRuntimeFailure(path, "Running on local demo data only", "offline");
+    setRecoveryNotice({
+      severity: "warn",
+      title: "Local demo API unavailable",
+      message: "Live proof controls are offline, but the guided walkthrough can continue on deterministic local data.",
+      detail: "Start the runtime with ./scripts/start_demo.sh or use Reset Demo after the server is running.",
+      source: "api"
+    });
     throw new Error(summarizeApiError(error));
   }
   const text = await response.text();
@@ -7997,19 +11105,36 @@ async function apiRequest(method, path, body) {
   try {
     data = text ? JSON.parse(text) : {};
   } catch (error) {
-    void error;
+    appendLog(
+      "warn",
+      "Non-JSON API response",
+      summarizeApiError(error, "The local demo API returned a non-JSON response; preserving it as a controlled raw payload."),
+      null,
+      { hidden: true }
+    );
     data = { raw: text };
   }
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
       markRuntimeFailure(path, "Backend reachable | live API requires authentication");
-    } else {
+    } else if (response.status >= 500) {
       markRuntimeFailure(path, `Backend responded ${response.status} ${response.statusText}`);
+    } else {
+      markRuntimeSuccess(path, "Backend reachable; returned controlled operator response");
     }
-    throw new Error(`${response.status} ${response.statusText}: ${JSON.stringify(data)}`);
+    const message = apiResponseErrorMessage(response, data);
+    setRecoveryNotice({
+      severity: response.status >= 500 ? "error" : "warn",
+      title: response.status >= 500 ? "Demo API recovered from an error" : "Demo API action needs attention",
+      message,
+      detail: "The UI remains available. Use Reset Demo to restore the seeded baseline before retrying.",
+      source: "api"
+    });
+    throw new Error(message);
   }
   markRuntimeSuccess(path, "Connected to demo runtime with simulated enterprise data");
+  clearRecoveryNotice("api");
   return data;
 }
 
@@ -8042,8 +11167,10 @@ async function bootstrapDemoData(options = {}) {
       { why: "Subsequent walkthrough actions now reflect live attribution and policy outcomes." }
     );
     state.adoptionDashboardCache = {};
-    await syncAdoptionFromApi({ preserveSelection: false, force: true, render: false });
-    await syncIntegrationsFromApi({ force: true, render: false });
+    await Promise.all([
+      syncAdoptionFromApi({ preserveSelection: false, force: true, render: false }),
+      syncIntegrationsFromApi({ force: true, render: false })
+    ]);
     showToast("Demo Ready", "Live walkthrough steps can now be run.");
     return true;
   } catch (error) {
@@ -8090,8 +11217,10 @@ async function resetBackendDemoState(options = {}) {
       demo_account_count: Array.isArray(result.demo_accounts) ? result.demo_accounts.length : 0
     };
     state.adoptionDashboardCache = {};
-    await syncAdoptionFromApi({ preserveSelection: false, force: true, render: false });
-    await syncIntegrationsFromApi({ force: true, render: false });
+    await Promise.all([
+      syncAdoptionFromApi({ preserveSelection: false, force: true, render: false }),
+      syncIntegrationsFromApi({ force: true, render: false })
+    ]);
     if (log) {
       appendLog("ok", "Backend demo reset", "Synthetic runtime state was restored from the fixed demo baseline.", result, {
         why: "This keeps repeated walkthroughs comparable across machines and recording sessions."
@@ -8349,9 +11478,12 @@ async function runForecastDemo(options = {}) {
     monthly_spend_usd: monthly,
     horizon_months: state.forecastHorizonMonths
   };
+  const optimistic = buildLocalForecastEstimate(monthly, state.forecastHorizonMonths, scenario);
 
+  state.forecastResult = optimistic;
+  state.forecastDirty = false;
   state.forecastLoading = true;
-  state.forecastStatus = `Generating ${scenario.label.toLowerCase()} forecast for ${state.forecastHorizonMonths} months...`;
+  state.forecastStatus = `Local ${scenario.label.toLowerCase()} estimate ready while live forecast runs.`;
   render();
 
   try {
@@ -8366,7 +11498,9 @@ async function runForecastDemo(options = {}) {
       showToast("Forecast Updated", `${scenario.label} scenario projected across ${state.forecastHorizonMonths} months.`);
     }
   } catch (error) {
-    const fallback = buildLocalForecastEstimate(monthly, state.forecastHorizonMonths, scenario);
+    const fallback = state.forecastResult?.source === "local_estimate"
+      ? state.forecastResult
+      : buildLocalForecastEstimate(monthly, state.forecastHorizonMonths, scenario);
     state.forecastResult = fallback;
     state.forecastDirty = false;
     state.forecastStatus = statusOverride || `${scenario.label} forecast estimated locally because the live forecast API is unavailable.`;
@@ -8392,7 +11526,7 @@ async function refreshIntegrationFeed() {
 
 async function loadDataset() {
   try {
-    const response = await fetch(DATASET_URL, { cache: "no-store" });
+    const response = await fetch(DATASET_URL, { cache: "default" });
     if (!response.ok) {
       throw new Error(`${response.status} ${response.statusText}`);
     }
@@ -8404,9 +11538,21 @@ async function loadDataset() {
     for (const item of dataset.interventions || []) {
       item.status = normalizeStatus(item.status);
     }
+    rebuildDatasetIndex();
   } catch (error) {
     dataset = cloneData(FALLBACK_DATASET);
-    appendLog("warn", "Dataset fallback", `Failed to load demo_dataset.json: ${String(error)}`, null, { hidden: true });
+    rebuildDatasetIndex();
+    const message = summarizeApiError(error, "The external demo dataset file could not be loaded.");
+    setRecoveryNotice({
+      severity: "warn",
+      title: "Dataset fallback active",
+      message: "The demo loaded its embedded synthetic dataset instead of leaving the screen blank.",
+      detail: `${message} Restart the local demo if this repeats after a refresh.`,
+      source: "dataset"
+    });
+    appendLog("warn", "Dataset fallback", message, null, {
+      why: "The embedded fallback keeps the investor walkthrough usable without network or filesystem assumptions."
+    });
   }
 }
 
@@ -8444,6 +11590,9 @@ function applyDatasetMetadata() {
   if (!state.governanceSimulationRequestId && (dataset.attribution_requests || []).length) {
     state.governanceSimulationRequestId = dataset.attribution_requests[0].id;
   }
+  if (state.governanceSimulationRequestId) {
+    selectedGovernanceRequestValue();
+  }
   if (!state.selectedModelName && (dataset.models || []).length) {
     state.selectedModelName = dataset.models[0].name;
   }
@@ -8453,43 +11602,110 @@ function applyDatasetMetadata() {
 }
 
 function render() {
-  // Direct render sequencing remains intentional because focus,
-  // drawer feedback, and same-page chart timing are coupled to immediate
-  // repaint order during the live demo. A requestAnimationFrame debounce was
-  // evaluated and rejected for this path.
-  const inputSnapshot = captureFocusedInputState();
-  const rootBeforeRender = document.getElementById("view-root");
-  const previousScrollTop = rootBeforeRender ? rootBeforeRender.scrollTop : 0;
-  const pageBeforeRender = state.lastRenderedPage;
-  syncSelectedInterventionForCurrentFilter();
-  renderSidebar();
-  renderTopbar();
-  renderContextRibbon();
-  renderRoleRibbon();
-  renderModeMenu();
-  renderMainView();
-  renderWalkthroughBanner();
-  applyWalkthroughHighlight();
-  renderDrawer();
-  setMobileNav(state.mobileNavOpen);
-  restoreFocusedInputState(inputSnapshot);
-  const rootAfterRender = document.getElementById("view-root");
-  if (rootAfterRender) {
-    rootAfterRender.setAttribute("aria-busy", "false");
-    if (pageBeforeRender === state.page) {
-      rootAfterRender.scrollTop = previousScrollTop;
-    } else {
-      rootAfterRender.scrollTop = state.scrollTopByPage[state.page] || 0;
+  try {
+    // Direct render sequencing remains intentional because focus,
+    // drawer feedback, and same-page chart timing are coupled to immediate
+    // repaint order during the live demo. A requestAnimationFrame debounce was
+    // evaluated and rejected for this path.
+    const inputSnapshot = captureFocusedInputState();
+    const rootBeforeRender = document.getElementById("view-root");
+    const previousScrollTop = rootBeforeRender ? rootBeforeRender.scrollTop : 0;
+    const pageBeforeRender = state.lastRenderedPage;
+    syncSelectedInterventionForCurrentFilter();
+    renderSidebar();
+    renderTopbar();
+    renderInstantFeedback();
+    renderContextRibbon();
+    renderRoleRibbon();
+    renderRecoveryBanner();
+    renderModeMenu();
+    renderMainView();
+    renderWalkthroughBanner();
+    renderPresenterConsole();
+    applyWalkthroughHighlight();
+    renderDrawer();
+    setMobileNav(state.mobileNavOpen);
+    normalizeInteractionContracts(document);
+    restoreFocusedInputState(inputSnapshot);
+    const rootAfterRender = document.getElementById("view-root");
+    if (rootAfterRender) {
+      rootAfterRender.setAttribute("aria-busy", "false");
+      if (pageBeforeRender === state.page) {
+        rootAfterRender.scrollTop = previousScrollTop;
+      } else {
+        rootAfterRender.scrollTop = state.scrollTopByPage[state.page] || 0;
+      }
     }
+  } catch (error) {
+    renderControlledRecoveryState(error);
+  }
+}
+
+function renderControlledRecoveryState(error) {
+  const message = summarizeApiError(error, "A demo-critical UI path failed while rendering.");
+  state.recoveryNotice = {
+    severity: "error",
+    title: "Demo UI recovered safely",
+    message: "A render failure was contained so the app can still guide the operator back to a known state.",
+    detail: message,
+    source: "render"
+  };
+  investorWalkthroughRunId += 1;
+  resetWalkthroughState();
+  state.pendingDemoAction = "";
+  state.runtimeStatus = "degraded";
+  state.runtimeDetail = "UI recovery mode active | reset demo state before continuing";
+  state.logs.unshift({
+    level: "err",
+    title: "UI recovery mode",
+    message,
+    payload: null,
+    at: nowLabel(),
+    why: "The app replaced a blank-screen failure with controlled recovery guidance.",
+    hidden: false
+  });
+  state.logs = state.logs.slice(0, UI_LIMITS.maxLogEntries);
+  try {
+    renderTopbar();
+    renderInstantFeedback();
+    renderRecoveryBanner();
+    renderPresenterConsole();
+    renderDrawer();
+  } catch (recoveryError) {
+    noteRecoveryRenderIssue(recoveryError);
+  }
+  const root = document.getElementById("view-root");
+  if (root) {
+    root.setAttribute("aria-busy", "false");
+    root.innerHTML = recoveryViewMarkup(state.recoveryNotice);
+  }
+  const loader = document.getElementById("app-loader");
+  if (loader instanceof HTMLElement) {
+    loader.remove();
   }
 }
 
 function handleAction(actionEl) {
   const action = actionEl.dataset.action || "";
+  if (!personaCanUseActionElement(actionEl, activeDemoPersona())) {
+    const persona = activeDemoPersona();
+    setPersonaNotice(
+      "Action Hidden For Role",
+      `${persona.label} does not have permission for this local demo action.`,
+      "Switch persona to view or run that workflow."
+    );
+    appendLog("warn", "Persona action blocked", `${persona.name} attempted ${action}.`, null, {
+      hidden: true,
+      why: "The local demo blocks role-inappropriate actions even if a stale control is clicked."
+    });
+    render();
+    return;
+  }
   // FIX: block duplicate guided-demo actions before button disabled state visually catches up.
   if (state.pendingDemoAction && ["bootstrap-demo", "run-sequence", "start-walkthrough", "run-scenario", "clear-logs"].includes(action)) {
     return;
   }
+  acknowledgeInstantAction(actionEl, action);
 
   switch (action) {
     case "close-toast":
@@ -8503,6 +11719,21 @@ function handleAction(actionEl) {
       return;
     case "toggle-mode-menu":
       toggleModeMenu();
+      return;
+    case "toggle-presenter-mode":
+      setPresenterMode(!state.presenterMode);
+      return;
+    case "presenter-step":
+      void goToPresenterStep(Number(actionEl.dataset.stepIndex || 0));
+      return;
+    case "presenter-prev":
+      void goToPresenterStep(state.presenterStepIndex - 1);
+      return;
+    case "presenter-next":
+      void goToPresenterStep(state.presenterStepIndex + 1);
+      return;
+    case "presenter-recover":
+      void recoverPresenterStep();
       return;
     case "start-walkthrough":
       void runFullSequence();
@@ -8521,6 +11752,9 @@ function handleAction(actionEl) {
       return;
     case "close-drawer":
       setExecutionDrawer(false);
+      return;
+    case "back-to-demo-path":
+      go(actionEl.dataset.page || demoPathTargetPage());
       return;
     case "bootstrap-demo":
       void bootstrapDemoData();
@@ -8549,6 +11783,9 @@ function handleAction(actionEl) {
       state.roleLens = actionEl.dataset.roleLens || "executive";
       render();
       return;
+    case "set-demo-persona":
+      setActivePersona(actionEl.dataset.personaKey || "admin");
+      return;
     case "set-mode":
       void setMode(actionEl.dataset.mode || "advisory");
       return;
@@ -8565,7 +11802,7 @@ function handleAction(actionEl) {
       render();
       return;
     case "manual-map-confirm": {
-      const mapping = getManualMappings().find((item) => item.id === (actionEl.dataset.mappingId || ""));
+      const mapping = indexedLookup(datasetIndex.manualMappingsById, actionEl.dataset.mappingId || "");
       if (!mapping) {
         return;
       }
@@ -8651,7 +11888,20 @@ function handleAction(actionEl) {
       }
       return;
     case "forecast-set-horizon":
-      state.forecastHorizonMonths = Number(actionEl.dataset.months || DEFAULT_FORECAST_HORIZON);
+      {
+        const nextHorizon = Number(actionEl.dataset.months || DEFAULT_FORECAST_HORIZON);
+        if (!Number.isFinite(nextHorizon) || !FORECAST_HORIZONS.includes(nextHorizon)) {
+          showToast(
+            "Invalid forecast horizon",
+            "The local demo preserved the previous horizon because the requested option is not part of the seeded scenario set."
+          );
+          appendLog("warn", "Invalid forecast horizon", `Rejected horizon value: ${actionEl.dataset.months || "empty"}.`, null, {
+            why: "Forecast controls only accept seeded demo horizons so stakeholder walkthroughs stay deterministic."
+          });
+          return;
+        }
+        state.forecastHorizonMonths = nextHorizon;
+      }
       updateForecastPreview();
       if (!refreshForecastPageInPlace()) {
         render();
@@ -8711,6 +11961,21 @@ function handleAction(actionEl) {
     case "toggle-faq":
       toggleFaq(actionEl.dataset.faqKey || "");
       return;
+    case "show-deferred-section":
+      showDeferredSection(actionEl.dataset.deferredKey || "");
+      return;
+    case "apply-guided-example":
+      applyGuidedExample(actionEl.dataset.inputKey || "", actionEl.dataset.value || "");
+      return;
+    case "table-sort":
+      updateTableSort(actionEl.dataset.tableKey || "", Number(actionEl.dataset.columnIndex || 0));
+      return;
+    case "table-page":
+      updateTablePage(actionEl.dataset.tableKey || "", Number(actionEl.dataset.pageDelta || 0));
+      return;
+    case "show-context-help":
+      showContextHelp(actionEl.dataset.helpKey || "");
+      return;
     default:
       return;
   }
@@ -8751,8 +12016,18 @@ function onDocumentInput(event) {
   if (!(target instanceof HTMLInputElement)) {
     return;
   }
+  if (target.dataset.actionInput === "table-filter") {
+    updateTableFilter(target.dataset.tableKey || "", target.value);
+    return;
+  }
   if (target.dataset.actionInput === "glossary-query") {
     state.glossaryQuery = target.value;
+    syncFieldFeedback(
+      "glossary-query",
+      state.glossaryQuery,
+      searchFieldFeedback("glossary-query", state.glossaryQuery, glossaryResultStats()),
+      ["glossary-summary"]
+    );
     if (inputRenderTimer) {
       clearTimeout(inputRenderTimer);
     }
@@ -8764,6 +12039,12 @@ function onDocumentInput(event) {
   }
   if (target.dataset.actionInput === "faq-query") {
     state.faqQuery = target.value;
+    syncFieldFeedback(
+      "faq-query",
+      state.faqQuery,
+      searchFieldFeedback("faq-query", state.faqQuery, faqResultsMarkup()),
+      ["faq-summary"]
+    );
     if (inputRenderTimer) {
       clearTimeout(inputRenderTimer);
     }
@@ -8779,8 +12060,19 @@ function onDocumentChange(event) {
   if (!(target instanceof HTMLSelectElement)) {
     return;
   }
+  if (target.dataset.actionChange === "table-page-size") {
+    updateTablePageSize(target.dataset.tableKey || "", target.value);
+    return;
+  }
   if (target.dataset.actionChange === "governance-set-request") {
+    const status = governanceRequestSelectionFeedback(target.value);
+    if (status.kind === "error") {
+      syncFieldFeedback("governance-request", target.value, status);
+      showToast("Request sample unavailable", status.message);
+      return;
+    }
     state.governanceSimulationRequestId = target.value;
+    setFormStatus("governance-request", status, target.value);
     syncContextFromRequest(target.value);
     render();
   }
@@ -8834,7 +12126,7 @@ function focusPageSearchInput() {
 function onKeyDown(event) {
   // FIX: allow keyboard activation for non-native controls that expose button semantics.
   if ((event.key === "Enter" || event.key === " ") && event.target instanceof HTMLElement) {
-    const actionEl = event.target.closest("[data-action][role='button']");
+    const actionEl = event.target.closest("[data-action][role='button'], tr[data-action]");
     if (actionEl instanceof HTMLElement) {
       event.preventDefault();
       handleAction(actionEl);
@@ -8870,6 +12162,32 @@ function onKeyDown(event) {
   if (eventComesFromEditableTarget(event)) {
     return;
   }
+  if (!event.metaKey && !event.ctrlKey && !event.altKey && (event.key === "p" || event.key === "P")) {
+    event.preventDefault();
+    setPresenterMode(!state.presenterMode);
+    return;
+  }
+  if (state.presenterMode && !event.metaKey && !event.ctrlKey && !event.altKey) {
+    if (event.key === "ArrowRight" || event.key === "PageDown") {
+      event.preventDefault();
+      void goToPresenterStep(state.presenterStepIndex + 1);
+      return;
+    }
+    if (event.key === "ArrowLeft" || event.key === "PageUp") {
+      event.preventDefault();
+      void goToPresenterStep(state.presenterStepIndex - 1);
+      return;
+    }
+    if (event.key === "r" || event.key === "R") {
+      event.preventDefault();
+      if (event.shiftKey) {
+        void clearExecutionLogs();
+      } else {
+        void recoverPresenterStep();
+      }
+      return;
+    }
+  }
   if (event.key === "g" || event.key === "G") {
     event.preventDefault();
     setExecutionDrawer(!state.executionDrawerOpen);
@@ -8897,13 +12215,18 @@ async function initialize() {
     const resetOnLoad = params.get("reset") === "1";
     await loadDataset();
     if (resetOnLoad) {
-      safeSessionRemove(INTERVENTION_STORAGE_KEY);
-      safeSessionRemove(MANUAL_MAPPING_STORAGE_KEY);
+      clearDemoSessionStorage();
+      clearRecoveryNotice();
+      clearPersonaNotice();
       state.logs = [];
       state.lastPayload = null;
       state.lastResponse = null;
       state.demoOutcome = null;
       state.demoScenarioRunCounts = {};
+      state.deferredSectionsVisible = new Set();
+      state.formStatus = {};
+      state.tableUi = {};
+      state.instantFeedback = null;
     }
     hydrateInterventionStatuses();
     hydrateManualMappingState();
@@ -8915,6 +12238,7 @@ async function initialize() {
       : [];
     if (resetOnLoad) {
       await resetBackendDemoState({ log: false, toast: false });
+      clearDemoSessionStorage({ includeAuthTokens: true });
     }
     await resetForecastPlanner();
     appendLog(
@@ -8942,15 +12266,33 @@ async function initialize() {
 }
 
 window.addEventListener("error", (event) => {
-  const message = event?.message || "Unexpected frontend error.";
-  appendLog("err", "Frontend error", message, null, { hidden: true });
-  setRuntimeStatus("degraded", "Frontend error logged | check guided demo timeline");
+  const message = summarizeApiError(event?.error || event?.message, "An unexpected frontend error was contained.");
+  appendLog("err", "Frontend recovered", message, null, {
+    why: "The app kept the operator in a controlled demo state instead of relying on a console-only failure."
+  });
+  setRecoveryNotice({
+    severity: "error",
+    title: "Frontend issue contained",
+    message: "The demo caught a browser-side issue and stayed available.",
+    detail: "Use Reset Demo if the current view looks stale, or reload /platform/?reset=1 before presenting.",
+    source: "frontend"
+  });
+  setRuntimeStatus("degraded", "Frontend recovery active | Reset Demo is available");
 });
 
 window.addEventListener("unhandledrejection", (event) => {
-  const message = summarizeApiError(event?.reason, "Unhandled frontend promise rejection.");
-  appendLog("err", "Unhandled rejection", message, null, { hidden: true });
-  setRuntimeStatus("degraded", "Unhandled promise rejection logged");
+  const message = summarizeApiError(event?.reason, "A frontend async action failed and was contained.");
+  appendLog("err", "Async action recovered", message, null, {
+    why: "The app surfaced controlled guidance instead of leaving the failure in the browser console."
+  });
+  setRecoveryNotice({
+    severity: "warn",
+    title: "Async demo action recovered",
+    message: "A live or browser-side action failed, but the local walkthrough remains usable.",
+    detail: "Run Reset Demo to return to the seeded baseline, then retry the action if the local API is online.",
+    source: "frontend"
+  });
+  setRuntimeStatus("degraded", "Async recovery active | local walkthrough available");
 });
 
 document.addEventListener("click", onDocumentClick);

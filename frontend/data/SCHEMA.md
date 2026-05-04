@@ -2,9 +2,17 @@
 
 `frontend/data/demo_dataset.json` is the canonical synthetic operating dataset for the investor demo UI.
 
+## Demo-Only Boundary
+
+`frontend/data/demo_dataset.json` is a `DEMO_ONLY_SYNTHETIC_FIXTURE`. It is not
+customer telemetry, production billing, production IAM, cloud inventory, or
+connector output. The top-level `meta.demo_only` flag and `meta.demo_only_notice`
+must remain present so reviewers cannot confuse this file with a production read
+model or export.
+
 ## Top-Level Keys
 
-- `meta`: tenant, environment labels, watermark, default mode, and presentation metadata
+- `meta`: demo-only flags, tenant, environment labels, watermark, default mode, and presentation metadata
 - `overview`: executive summary metrics and spend trend points
 - `adoption`: hierarchy, dashboard snapshots, and workflow-level adoption maps
   for organization, business-unit, and team views
@@ -47,6 +55,10 @@
 - Currency values are stored in USD unless a field explicitly says otherwise.
 - Percentages use `_pct` suffixes.
 - Monetary run-rate or monthly values use `_usd` or `_usd_month`.
+- Team records use canonical `team-*` identifiers and should carry
+  `business_unit_id`, `business_unit_name`, `cost_center`, and
+  `service_owner_email` so UI drill-downs, finance exports, and workflow maps
+  tell the same ownership story.
 - Lists rendered in the UI should be safe for direct display, but frontend code still escapes dynamic values before insertion.
 - `overview.total_spend_usd` is expected to reconcile to the sum of `teams[].spend_usd`
   and `models[].spend_usd` for the same 30-day window.
@@ -57,7 +69,8 @@
   staged replay and evidence-quality summaries.
 - `adoption.workflow_map.workflows[]` should remain broad enough to show
   workflow, service, capability, insertion point, evidence, and decision owner
-  variation across business units and teams.
+  variation across business units and teams. Workflow `team_id` and
+  `team_name` values should map back to top-level `teams[]` records.
 - `manual_mapping` should contain enough evidence and ownership metadata to
   show before/after impact on confidence, budget ownership, intervention
   priority, and forecast reserve.
@@ -69,6 +82,9 @@
 - `integrations.scenarios[]` should remain runnable without cloud credentials;
   if the live runtime is unavailable, the frontend simulates a local handoff
   record from this deterministic dataset.
+- `integrations.recent_deliveries[].delivery_id` should include the same
+  `YYYYMMDD` date as `sent_at` so local handoff history reads as a coherent
+  timeline rather than a mixed synthetic epoch.
 
 ## Fields Used Directly By The UI
 
@@ -105,7 +121,8 @@ Examples of high-impact fields that should remain stable:
 - `energy_efficiency.models[]`
 - `energy_efficiency.recommendations[]`
 - `admin.summary.*`
-- `admin.accounts[]`
+- `admin.accounts[]` including synthetic admin, manager, user, auditor, and
+  operator personas used by the local role-based experience switcher
 - `admin.operations[]`
 - `admin.audit_log[]`
 - `design_partner_brief.thesis.*`

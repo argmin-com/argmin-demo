@@ -29,6 +29,13 @@ def is_auth_required(path: str) -> bool:
 
 
 def can_bypass_auth(config: PlatformConfig) -> bool:
+    """Return whether the current runtime may use the demo/dev auth bypass.
+
+    DEMO_ONLY_FAKE_AUTH_BOUNDARY: this shortcut exists only for local,
+    test, and demo environments with `allow_dev_bypass` explicitly enabled.
+    Production-like environments must validate bearer tokens through
+    `decode_and_validate_token`.
+    """
     return config.environment.lower() in {
         "development",
         "dev",

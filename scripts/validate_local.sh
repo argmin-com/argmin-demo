@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 VENV_DIR="${ACI_DEMO_VENV_DIR:-${REPO_ROOT}/.venv}"
 DEPS_STAMP="${VENV_DIR}/.argmin-demo-dev-deps.sha256"
+
+fail() {
+  echo "Local validation failed: $*" >&2
+  exit 1
+}
+
+on_error() {
+  local status=$?
+  echo "Local validation failed near line ${BASH_LINENO[0]}: ${BASH_COMMAND}" >&2
+  exit "${status}"
+}
+trap on_error ERR
 
 require_python312() {
   local interpreter="$1"
@@ -19,6 +31,12 @@ PY
 }
 
 cd "${REPO_ROOT}"
+
+for required_file in pyproject.toml requirements-dev.lock; do
+  if [[ ! -f "${required_file}" ]]; then
+    fail "required file is missing: ${required_file}. Run validation from a complete clone."
+  fi
+done
 
 if [[ "${ACI_VALIDATE_SKIP_PREFLIGHT:-0}" != "1" ]]; then
   ACI_PREFLIGHT_PROFILE=validate ACI_PREFLIGHT_REQUIRE_PORT_FREE=1 "${SCRIPT_DIR}/preflight_local.sh"

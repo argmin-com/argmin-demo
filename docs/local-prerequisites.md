@@ -86,6 +86,10 @@ Quality gate plus end-to-end demo smoke on a non-default port:
 ACI_VALIDATE_SMOKE=1 ACI_DEMO_PORT=8026 ./scripts/validate_local.sh
 ```
 
+The smoke path includes the golden demo checks for login personas, navigation,
+seeded dummy data, mock API success states, presenter-critical workflows, and a
+controlled failure response.
+
 Optional shared-backend parity smoke:
 
 ```bash

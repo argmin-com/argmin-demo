@@ -9,6 +9,7 @@ on deployment topology.
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
@@ -19,6 +20,7 @@ from uuid import uuid4
 
 import structlog
 from fastapi import FastAPI, HTTPException, Query, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -26,6 +28,7 @@ from fastapi.staticfiles import StaticFiles
 from jwt import InvalidTokenError
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, Field
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from aci.api.auth import (
     can_bypass_auth,
@@ -130,7 +133,7 @@ class RequestBodyLimitMiddleware:
         max_body_bytes = self._resolve_limit(scope)
         content_length = self._content_length(scope)
         if content_length is not None and content_length > max_body_bytes:
-            await self._send_too_large(send, max_body_bytes)
+            await self._send_too_large(scope, send, max_body_bytes)
             return
 
         total_body_bytes = 0
@@ -147,7 +150,7 @@ class RequestBodyLimitMiddleware:
         try:
             await self.app(scope, limited_receive, send)
         except _RequestBodyTooLargeError:
-            await self._send_too_large(send, max_body_bytes)
+            await self._send_too_large(scope, send, max_body_bytes)
 
     def _resolve_limit(self, scope: Scope) -> int:
         app_instance = scope.get("app")
@@ -166,9 +169,21 @@ class RequestBodyLimitMiddleware:
         return None
 
     @staticmethod
-    async def _send_too_large(send: Send, max_body_bytes: int) -> None:
-        body = (
-            f'{{"detail":"request body exceeds configured max {max_body_bytes} bytes"}}'
+    async def _send_too_large(scope: Scope, send: Send, max_body_bytes: int) -> None:
+        message = f"request body exceeds configured max {max_body_bytes} bytes"
+        body = json.dumps(
+            _operator_error_payload_from_values(
+                correlation_id=_scope_correlation_id(scope),
+                status_code=413,
+                detail=message,
+                code="request_body_too_large",
+                message=message,
+                guidance=(
+                    "Reduce the local event payload size or increase "
+                    "ACI_API_MAX_REQUEST_BYTES for local stress testing."
+                ),
+            ),
+            separators=(",", ":"),
         ).encode()
         await send(
             {
@@ -245,9 +260,17 @@ async def add_security_headers(
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     if request.url.path.startswith("/platform"):
         response.headers.setdefault("Content-Security-Policy", PLATFORM_DEMO_CSP)
-        # FIX: force fresh platform assets so browsers do not run stale demo bundles.
-        response.headers.setdefault("Cache-Control", "no-store, max-age=0")
-        response.headers.setdefault("Pragma", "no-cache")
+        is_platform_shell = (
+            request.url.path in {"/platform", "/platform/"}
+            or request.url.path.endswith("/index.html")
+        )
+        if is_platform_shell:
+            response.headers.setdefault("Cache-Control", "no-store, max-age=0")
+            response.headers.setdefault("Pragma", "no-cache")
+        elif request.query_params.get("v"):
+            response.headers.setdefault("Cache-Control", "public, max-age=86400, immutable")
+        else:
+            response.headers.setdefault("Cache-Control", "public, max-age=3600")
     return response
 
 
@@ -270,9 +293,15 @@ async def enforce_service_auth(
     if not auth_header.startswith("Bearer "):
         if can_bypass_auth(app_state.config):
             return await call_next(request)
-        return JSONResponse(
+        return _operator_error_response(
+            request=request,
             status_code=401,
-            content={"detail": "missing bearer token"},
+            detail="missing bearer token",
+            code="missing_bearer_token",
+            message="missing bearer token",
+            guidance=(
+                "Run the demo profile, provide a valid bearer token, or enable local dev bypass."
+            ),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -286,9 +315,16 @@ async def enforce_service_auth(
             path=path,
             correlation_id=_request_correlation_id(request),
         )
-        return JSONResponse(
+        return _operator_error_response(
+            request=request,
             status_code=401,
-            content={"detail": "invalid bearer token"},
+            detail="invalid bearer token",
+            code="invalid_bearer_token",
+            message="invalid bearer token",
+            guidance=(
+                "Refresh the local API token or continue the static demo path without "
+                "live API calls."
+            ),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -309,9 +345,13 @@ async def enforce_runtime_surface(
 
     app_state = get_state(request.app)
     if app_state.runtime_role == "gateway" and path.startswith("/v1/") and path != "/v1/intercept":
-        return JSONResponse(
+        return _operator_error_response(
+            request=request,
             status_code=503,
-            content={"detail": "route unavailable for runtime role 'gateway'"},
+            detail="route unavailable for runtime role 'gateway'",
+            code="runtime_surface_unavailable",
+            message="route unavailable for runtime role 'gateway'",
+            guidance="Use the all-in-one local demo runtime for frontend walkthroughs.",
         )
 
     return await call_next(request)
@@ -321,6 +361,166 @@ async def enforce_runtime_surface(
 frontend_dir = Path(__file__).resolve().parents[3] / "frontend"
 if frontend_dir.exists():
     app.mount("/platform", StaticFiles(directory=str(frontend_dir), html=True), name="platform")
+
+
+def _operator_error_payload_from_values(
+    *,
+    correlation_id: str,
+    status_code: int,
+    detail: object,
+    code: str,
+    message: str,
+    guidance: str,
+    extra_error: dict[str, object] | None = None,
+) -> dict[str, object]:
+    """Build a stable operator-safe API error envelope."""
+    error: dict[str, object] = {
+        "code": code,
+        "message": message,
+        "operator_guidance": guidance,
+        "correlation_id": correlation_id,
+        "status_code": status_code,
+    }
+    if extra_error:
+        error.update(extra_error)
+    return {"detail": detail, "error": error}
+
+
+def _scope_correlation_id(scope: Scope) -> str:
+    headers = cast("list[tuple[bytes, bytes]]", scope.get("headers", []))
+    for key, value in headers:
+        if key.lower() in {b"x-aci-correlation-id", b"x-request-id"}:
+            decoded = value.decode("latin-1").strip()
+            if decoded:
+                return decoded
+    return uuid4().hex
+
+
+def _operator_error_payload(
+    *,
+    request: Request,
+    status_code: int,
+    detail: object,
+    code: str,
+    message: str,
+    guidance: str,
+    extra_error: dict[str, object] | None = None,
+) -> dict[str, object]:
+    """Build an operator-safe API error envelope without stack traces."""
+    correlation_id = _request_correlation_id(request) or uuid4().hex
+    return _operator_error_payload_from_values(
+        correlation_id=correlation_id,
+        status_code=status_code,
+        detail=detail,
+        code=code,
+        message=message,
+        guidance=guidance,
+        extra_error=extra_error,
+    )
+
+
+def _operator_error_response(
+    *,
+    request: Request,
+    status_code: int,
+    detail: object,
+    code: str,
+    message: str,
+    guidance: str,
+    extra_error: dict[str, object] | None = None,
+    headers: dict[str, str] | None = None,
+) -> JSONResponse:
+    """Return a JSONResponse using the shared local-demo error contract."""
+    return JSONResponse(
+        status_code=status_code,
+        content=_operator_error_payload(
+            request=request,
+            status_code=status_code,
+            detail=detail,
+            code=code,
+            message=message,
+            guidance=guidance,
+            extra_error=extra_error,
+        ),
+        headers=headers,
+    )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def controlled_http_exception_handler(
+    request: Request,
+    exc: StarletteHTTPException,
+) -> JSONResponse:
+    """Return HTTP errors with recovery guidance while preserving `detail`."""
+    status_code = int(exc.status_code)
+    detail = exc.detail
+    message = detail if isinstance(detail, str) else "The request did not pass API validation."
+    response = JSONResponse(
+        status_code=status_code,
+        content=_operator_error_payload(
+            request=request,
+            status_code=status_code,
+            detail=detail,
+            code="http_error",
+            message=message,
+            guidance=(
+                "Use the visible demo controls or run ./scripts/reset_demo.sh if local state "
+                "appears stale."
+            ),
+        ),
+    )
+    if exc.headers:
+        response.headers.update(exc.headers)
+    return response
+
+
+@app.exception_handler(RequestValidationError)
+async def controlled_validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+) -> JSONResponse:
+    """Return request validation failures with clear operator guidance."""
+    return JSONResponse(
+        status_code=422,
+        content=_operator_error_payload(
+            request=request,
+            status_code=422,
+            detail=exc.errors(),
+            code="request_validation_failed",
+            message="The demo API rejected the request shape.",
+            guidance=(
+                "Use the seeded UI controls or reset the demo before retrying with edited payloads."
+            ),
+        ),
+    )
+
+
+@app.exception_handler(Exception)
+async def controlled_unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Contain unexpected API failures behind a stable local-demo recovery response."""
+    correlation_id = _request_correlation_id(request) or uuid4().hex
+    logger.exception(
+        "api.unhandled_exception_recovered",
+        path=request.url.path,
+        method=request.method,
+        correlation_id=correlation_id,
+        error_type=type(exc).__name__,
+    )
+    request.state.correlation_id = correlation_id
+    return JSONResponse(
+        status_code=500,
+        content=_operator_error_payload(
+            request=request,
+            status_code=500,
+            detail="The demo API hit an unexpected local runtime error.",
+            code="local_runtime_error",
+            message="The demo API hit an unexpected local runtime error.",
+            guidance=(
+                "The UI should remain usable on seeded local data. Run ./scripts/reset_demo.sh "
+                "and retry the action; restart with ./scripts/start_demo.sh if readiness fails."
+            ),
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1353,7 +1553,36 @@ def _to_intervention_history_response(
     )
 
 
-def _gate_error_from_result(result: InterceptionResult) -> JSONResponse | None:
+def _gate_error_response(
+    *,
+    request: Request,
+    status_code: int,
+    result: InterceptionResult,
+    error_type: str,
+    message: str,
+    policy_id: str,
+    extra_error: dict[str, object] | None = None,
+) -> JSONResponse:
+    return _operator_error_response(
+        request=request,
+        status_code=status_code,
+        detail=message,
+        code=error_type,
+        message=message,
+        guidance=(
+            "The active local policy gate blocked the request. Use the visible demo "
+            "controls to switch mode, choose an approved model, or reset the demo baseline."
+        ),
+        extra_error={
+            "type": error_type,
+            "request_id": result.request_id,
+            "policy_id": policy_id,
+            **(extra_error or {}),
+        },
+    )
+
+
+def _gate_error_from_result(request: Request, result: InterceptionResult) -> JSONResponse | None:
     """Map active gate policy violations to explicit HTTP error responses."""
     hard_violations = [
         violation
@@ -1367,58 +1596,46 @@ def _gate_error_from_result(result: InterceptionResult) -> JSONResponse | None:
 
     primary = hard_violations[0]
     if primary.policy_id == "token_budget_input":
-        return JSONResponse(
+        return _gate_error_response(
+            request=request,
             status_code=413,
-            content={
-                "error": {
-                    "type": "token_size_exceeded",
-                    "message": primary.details,
-                    "request_id": result.request_id,
-                    "policy_id": primary.policy_id,
-                    "retry": False,
-                }
-            },
+            result=result,
+            error_type="token_size_exceeded",
+            message=primary.details,
+            policy_id=primary.policy_id,
+            extra_error={"retry": False},
         )
     if primary.policy_id == "model_allowlist":
         approved = result.attribution.approved_alternatives if result.attribution else []
-        return JSONResponse(
+        return _gate_error_response(
+            request=request,
             status_code=403,
-            content={
-                "error": {
-                    "type": "model_not_allowed",
-                    "message": primary.details,
-                    "request_id": result.request_id,
-                    "policy_id": primary.policy_id,
-                    "approved_alternatives": approved,
-                }
-            },
+            result=result,
+            error_type="model_not_allowed",
+            message=primary.details,
+            policy_id=primary.policy_id,
+            extra_error={"approved_alternatives": approved},
         )
     if primary.policy_id == "budget_ceiling":
-        return JSONResponse(
+        return _gate_error_response(
+            request=request,
             status_code=429,
-            content={
-                "error": {
-                    "type": "budget_exceeded",
-                    "message": primary.details,
-                    "request_id": result.request_id,
-                    "policy_id": primary.policy_id,
-                    "retry_after_seconds": 3600,
-                }
-            },
+            result=result,
+            error_type="budget_exceeded",
+            message=primary.details,
+            policy_id=primary.policy_id,
+            extra_error={"retry_after_seconds": 3600},
         )
     if primary.policy_id == "cost_ceiling":
         approved = result.attribution.approved_alternatives if result.attribution else []
-        return JSONResponse(
+        return _gate_error_response(
+            request=request,
             status_code=403,
-            content={
-                "error": {
-                    "type": "cost_approval_required",
-                    "message": primary.details,
-                    "request_id": result.request_id,
-                    "policy_id": primary.policy_id,
-                    "approved_alternatives": approved,
-                }
-            },
+            result=result,
+            error_type="cost_approval_required",
+            message=primary.details,
+            policy_id=primary.policy_id,
+            extra_error={"approved_alternatives": approved},
         )
     return None
 
@@ -1606,6 +1823,8 @@ async def bootstrap_demo() -> DemoBootstrapResponse:
     """
     Seed deterministic demo index entries for reviewer walkthroughs.
 
+    DEMO_ONLY_CONTROL_ENDPOINT: this mutates synthetic local demo state only and
+    must not be used as a production tenant bootstrap or ingestion substitute.
     This endpoint is intentionally disabled in production/staging.
     """
     app_state = get_state()
@@ -1624,6 +1843,9 @@ async def reset_demo() -> DemoBootstrapResponse:
     """
     Restore the local demo to its known baseline state.
 
+    DEMO_ONLY_CONTROL_ENDPOINT: this clears and reseeds synthetic local state so
+    presenters can recover to a fixed baseline. It is not a production reset,
+    rollback, or data-retention mechanism.
     This endpoint is intentionally disabled in production/staging.
     """
     app_state = get_state()
@@ -1660,7 +1882,12 @@ def _demo_bootstrap_response(
 
 @app.post("/v1/demo/mode", response_model=DemoModeResponse)
 async def set_demo_mode(req: DemoModeRequest) -> DemoModeResponse:
-    """Update interceptor mode for local/demo walkthroughs."""
+    """Update interceptor mode for local/demo walkthroughs.
+
+    DEMO_ONLY_CONTROL_ENDPOINT: this exists so the local UI can demonstrate
+    passive/advisory/active behavior without a production deployment workflow.
+    Production mode changes must remain deployment-controlled.
+    """
     app_state = get_state()
     if _is_production_like(app_state.config.environment):
         raise HTTPException(
@@ -1741,7 +1968,7 @@ async def intercept(request: Request, req: InterceptRequest) -> InterceptRespons
         )
 
     if result.outcome == InterceptionOutcome.HARD_STOPPED:
-        gate_error = _gate_error_from_result(result)
+        gate_error = _gate_error_from_result(request, result)
         if gate_error is not None:
             return gate_error
 

@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PROJECT_NAME="${ACI_STACK_PROJECT:-argmin-demo-stack-smoke}"
 BASE_URL="${ACI_STACK_BASE_URL:-http://127.0.0.1:8000}"
+CURL_CONNECT_TIMEOUT="${ACI_CURL_CONNECT_TIMEOUT:-2}"
+CURL_MAX_TIME="${ACI_CURL_MAX_TIME:-10}"
+CURL_OPTS=(-fsS --connect-timeout "${CURL_CONNECT_TIMEOUT}" --max-time "${CURL_MAX_TIME}")
 
 export ACI_NEO4J_PASSWORD="${ACI_NEO4J_PASSWORD:-dev-local-password}"
 
@@ -16,6 +19,19 @@ fail() {
   exit 1
 }
 
+on_error() {
+  local status=$?
+  fail "command failed near line ${BASH_LINENO[0]}: ${BASH_COMMAND}"
+  exit "${status}"
+}
+trap on_error ERR
+
+validate_project_name() {
+  if [[ ! "${PROJECT_NAME}" =~ ^[a-z0-9][a-z0-9_-]*$ ]]; then
+    fail "ACI_STACK_PROJECT must be a Docker Compose project name using lowercase letters, digits, dashes, or underscores; got '${PROJECT_NAME}'."
+  fi
+}
+
 cleanup() {
   if [[ "${ACI_STACK_KEEP_RUNNING:-0}" != "1" ]]; then
     docker compose -p "${PROJECT_NAME}" down -v >/dev/null 2>&1 || true
@@ -24,6 +40,7 @@ cleanup() {
 trap cleanup EXIT
 
 cd "${REPO_ROOT}"
+validate_project_name
 
 ACI_PREFLIGHT_PROFILE=shared-backend ACI_PREFLIGHT_REQUIRE_PORT_FREE=1 "${SCRIPT_DIR}/preflight_local.sh" \
   || fail "shared-backend prerequisite check failed"
@@ -43,8 +60,8 @@ fi
 docker compose -p "${PROJECT_NAME}" up -d --build || fail "docker compose up failed"
 
 ready=0
-for _ in {1..90}; do
-  if curl -fsS "${BASE_URL}/ready" >/dev/null 2>&1; then
+for ((attempt = 1; attempt <= 90; attempt += 1)); do
+  if curl "${CURL_OPTS[@]}" "${BASE_URL}/ready" >/dev/null 2>&1; then
     ready=1
     break
   fi
@@ -54,15 +71,15 @@ if [[ "${ready}" != "1" ]]; then
   fail "readiness endpoint did not become ready"
 fi
 
-curl -fsS "${BASE_URL}/health" >/dev/null || fail "health endpoint failed"
-curl -fsS "${BASE_URL}/ready" >/dev/null || fail "readiness endpoint failed"
+curl "${CURL_OPTS[@]}" "${BASE_URL}/health" >/dev/null || fail "health endpoint failed"
+curl "${CURL_OPTS[@]}" "${BASE_URL}/ready" >/dev/null || fail "readiness endpoint failed"
 
-curl -fsS -X POST "${BASE_URL}/v1/demo/bootstrap" >/dev/null \
+curl "${CURL_OPTS[@]}" -X POST "${BASE_URL}/v1/demo/bootstrap" >/dev/null \
   || fail "demo bootstrap failed"
-curl -fsS "${BASE_URL}/v1/attribution/customer-support-bot" >/dev/null \
+curl "${CURL_OPTS[@]}" "${BASE_URL}/v1/attribution/customer-support-bot" >/dev/null \
   || fail "seeded attribution lookup failed"
 
-INTERCEPT_RESPONSE="$(curl -fsS -X POST "${BASE_URL}/v1/intercept" \
+INTERCEPT_RESPONSE="$(curl "${CURL_OPTS[@]}" -X POST "${BASE_URL}/v1/intercept" \
   -H 'Content-Type: application/json' \
   -d '{
     "request_id": "shared-stack-smoke-enriched-1",

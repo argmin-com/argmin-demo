@@ -437,6 +437,9 @@ class AppState:
             self.graph.start()
         await self.event_bus.start()
         if self.is_demo_environment:
+            # DEMO_ONLY_AUTO_SEED: local demo startup imports synthetic fixtures
+            # after the real runtime services are assembled. Production-like
+            # environments skip this path and must ingest real tenant data.
             from aci.demo.seeder import bootstrap_demo_state
 
             await bootstrap_demo_state(self, reset_existing=False)
