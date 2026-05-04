@@ -243,13 +243,13 @@ def test_platform_demo_serves_csp_header_for_frame_ancestors() -> None:
 def test_platform_demo_assets_are_versioned_and_cacheable() -> None:
     with TestClient(app) as client:
         html = client.get("/platform/")
-        js = client.get("/platform/assets/app.js?v=20260309aa")
-        dataset = client.get("/platform/data/demo_dataset.json?v=20260309aa")
+        js = client.get("/platform/assets/app.js?v=20260309aj")
+        dataset = client.get("/platform/data/demo_dataset.json?v=20260309aj")
 
     assert html.status_code == 200
-    assert 'src="assets/app.js?v=20260309aa"' in html.text
-    assert 'href="assets/app.css?v=20260309aa"' in html.text
-    assert 'src="vendor/chart.umd.min.js?v=20260309aa"' in html.text
+    assert 'src="assets/app.js?v=20260309aj"' in html.text
+    assert 'href="assets/app.css?v=20260309aj"' in html.text
+    assert 'src="vendor/chart.umd.min.js?v=20260309aj"' in html.text
     assert js.status_code == 200
     assert js.headers["Cache-Control"] == "public, max-age=86400, immutable"
     assert "Pragma" not in js.headers

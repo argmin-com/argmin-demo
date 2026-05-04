@@ -39,6 +39,12 @@ const NAV_ITEMS = [
 
 const ALL_PAGE_KEYS = NAV_ITEMS.flatMap((group) => group.items.map((item) => item.key));
 
+const LINE_ICON_VIEWBOX = "0 0 24 24";
+
+function renderLineIcon(icon, className = "app-icon nav-icon") {
+  return `<svg class="${esc(className)}" viewBox="${LINE_ICON_VIEWBOX}" aria-hidden="true" focusable="false">${icon}</svg>`;
+}
+
 const PAGE_TITLES = {
   overview: "Overview",
   partner_brief: "Partner Brief",
@@ -63,14 +69,14 @@ const PAGE_TITLES = {
 const PALETTE = Object.freeze({
   brand: "#4f8ef8",
   brandStrong: "#6aa1ff",
-  brandText: "#9fc4ff",
+  brandText: "#c2dcff",
   success: "#2ac487",
   successText: "#8be3ba",
   warning: "#eda82e",
   warningText: "#f4c978",
   danger: "#ee5858",
   dangerText: "#ff9f9f",
-  neutral: "#8ea0bf",
+  neutral: "#a8b8d4",
   neutralStrong: "#d9e6fb",
   surface: "#18263b",
   border: "#274062"
@@ -277,7 +283,7 @@ const VALID_INTERVENTION_TRANSITIONS = {
   implemented: new Set(["review"]),
   dismissed: new Set(["review"])
 };
-const DATASET_VERSION = "20260309aa";
+const DATASET_VERSION = "20260309aj";
 const DATASET_URL = new URL(`data/demo_dataset.json?v=${DATASET_VERSION}`, window.location.href).toString();
 const TYPOGRAPHY_ROLE_SELECTORS = Object.freeze({
   heading: [
@@ -1863,12 +1869,98 @@ function normalizeLayoutContracts(root = document) {
   }
 }
 
+function normalizePrimaryActionContracts(root = document) {
+  const scope = root || document;
+  const actionGroups = scope.querySelectorAll(
+    ".state-panel-actions, .entry-home-action, .forecast-button-row, .drawer-actions, .mode-banner-right, .presenter-controls, .recovery-banner-actions, .walkthrough-banner-actions, .adoption-toolbar-right"
+  );
+  for (const group of actionGroups) {
+    const buttons = Array.from(group.querySelectorAll("button.small-btn, button.top-btn"))
+      .filter((button) => button instanceof HTMLButtonElement);
+    if (!buttons.length) {
+      continue;
+    }
+    const primaryButton = buttons.find((button) => (
+      button.dataset.primaryAction === "true"
+        || button.classList.contains("primary")
+        || button.classList.contains("success")
+    )) || null;
+    group.dataset.actionHierarchy = primaryButton ? "primary" : "secondary";
+    for (const button of buttons) {
+      const isPrimary = button === primaryButton;
+      button.dataset.actionPriority = isPrimary ? "primary" : "secondary";
+      if (isPrimary) {
+        const label = button.dataset.defaultLabel || button.textContent.trim() || "Continue";
+        button.dataset.defaultLabel = label;
+        button.dataset.primaryAction = "true";
+        button.setAttribute("aria-label", `Primary action: ${label}`);
+      } else if (button.getAttribute("aria-label")?.startsWith("Primary action:")) {
+        button.removeAttribute("aria-label");
+      }
+    }
+  }
+}
+
+function normalizeVisualStateContracts(root = document) {
+  const scope = root || document;
+  for (const button of scope.querySelectorAll("button[data-action]")) {
+    if (!(button instanceof HTMLButtonElement)) {
+      continue;
+    }
+    const isLoading = button.dataset.loading === "true" || button.getAttribute("aria-busy") === "true";
+    const isActive = button.classList.contains("active")
+      || button.classList.contains("current")
+      || button.getAttribute("aria-pressed") === "true"
+      || button.hasAttribute("aria-current");
+    const isDisabled = button.disabled || button.getAttribute("aria-disabled") === "true";
+    if (isLoading) {
+      button.dataset.uiState = "loading";
+      button.setAttribute("aria-busy", "true");
+    } else if (isActive) {
+      button.dataset.uiState = "active";
+    } else if (isDisabled) {
+      button.dataset.uiState = "disabled";
+    } else {
+      button.dataset.uiState = "idle";
+    }
+  }
+
+  const statePanelClasses = [
+    ["loading", "state-panel-loading"],
+    ["success", "state-panel-success"],
+    ["empty", "state-panel-empty"],
+    ["warning", "state-panel-warn"],
+    ["error", "state-panel-error"]
+  ];
+  for (const panel of scope.querySelectorAll(".state-panel")) {
+    if (!(panel instanceof HTMLElement)) {
+      continue;
+    }
+    const match = statePanelClasses.find(([, className]) => panel.classList.contains(className));
+    panel.dataset.uiState = match ? match[0] : "idle";
+  }
+
+  for (const feedback of scope.querySelectorAll(".field-feedback")) {
+    if (!(feedback instanceof HTMLElement)) {
+      continue;
+    }
+    feedback.dataset.uiState = feedback.classList.contains("field-feedback-ok")
+      ? "success"
+      : feedback.classList.contains("field-feedback-warn")
+        ? "warning"
+        : feedback.classList.contains("field-feedback-error")
+          ? "error"
+          : "idle";
+  }
+}
+
 function normalizeInteractionContracts(root = document) {
   const scope = root || document;
   normalizeTypographyContracts(scope);
   normalizeLayoutContracts(scope);
   normalizeScannableTables(scope);
   normalizeContextualHelp(scope);
+  normalizePrimaryActionContracts(scope);
   for (const button of scope.querySelectorAll("button[data-action]")) {
     const action = button.dataset.action || "";
     if (!button.hasAttribute("type")) {
@@ -1944,6 +2036,7 @@ function normalizeInteractionContracts(root = document) {
   }
 
   normalizeRoleBasedControls(scope);
+  normalizeVisualStateContracts(scope);
 }
 
 function normalizeFormStatus(status = {}) {
@@ -4197,7 +4290,7 @@ function renderForecastEstimateCards(data = forecastViewData()) {
   return data.points.length
     ? data.points.map((point, idx) => {
         return `
-          <div class="card" style="padding:10px;background:var(--surface)">
+          <div class="card forecast-estimate-card">
             <div class="metric-label">${esc(projectionLabels[idx] || `Month +${point.month_offset}`)}</div>
             <div style="font-size:18px;font-weight:650">${fmtUSD(point.predicted_spend_usd)}</div>
             <div class="hint">Range ${fmtUSD(point.lower_bound_usd)} - ${fmtUSD(point.upper_bound_usd)}</div>
@@ -4925,8 +5018,11 @@ function stateActionButtonsMarkup(actions = []) {
           const extraData = Object.entries(action.data || {}).map(([key, value]) => (
             ` data-${esc(key)}="${esc(value)}"`
           )).join("");
+          const primaryAttr = action.primary
+            ? ` data-primary-action="true" aria-label="Primary action: ${esc(action.label)}"`
+            : "";
           return `
-          <button class="small-btn${action.primary ? " primary" : ""}" data-action="${esc(action.action)}"${action.page ? ` data-page="${esc(action.page)}"` : ""}${action.scenario ? ` data-scenario="${esc(action.scenario)}"` : ""}${extraData}>
+          <button class="small-btn${action.primary ? " primary" : ""}" data-action="${esc(action.action)}"${action.page ? ` data-page="${esc(action.page)}"` : ""}${action.scenario ? ` data-scenario="${esc(action.scenario)}"` : ""}${extraData}${primaryAttr}>
             ${esc(action.label)}
           </button>
         `;
@@ -5225,7 +5321,7 @@ function pagePrioritySignal() {
         label: "Primary metric",
         value: fmtUSD(stats.totalSpend),
         detail: `${fmtUSD(stats.totalPotential)} is addressable, with ${fmtUSD(stats.captured)} already captured.`,
-        actions: [priorityAction("Open Forecast", "go", { page: "forecast" })]
+        actions: [priorityAction("Open Forecast Planner", "go", { page: "forecast" })]
       };
     case "partner_brief":
       return {
@@ -5241,7 +5337,7 @@ function pagePrioritySignal() {
         label: "Requirement rows",
         value: fmtNumber(proofRequirements.length),
         detail: "Each row ties a local demo surface to the PRD, engineering spec, RAIL, or architecture evidence.",
-        actions: [priorityAction("Open Coverage", "go", { page: "coverage" })]
+        actions: [priorityAction("Open Coverage Matrix", "go", { page: "coverage" })]
       };
     case "adoption": {
       const representedTeams = new Set(workflowRows.map((row) => row.team_id).filter(Boolean)).size;
@@ -5250,7 +5346,7 @@ function pagePrioritySignal() {
         label: "Mapped workflows",
         value: fmtNumber(workflowRows.length || workflowSummary.workflow_count || 0),
         detail: `${fmtNumber(representedTeams || workflowSummary.teams_with_adoption || 0)} teams and ${fmtNumber(new Set(workflowRows.map((row) => row.service_name).filter(Boolean)).size || workflowSummary.ai_services_used || 0)} AI services represented in the selected scope.`,
-        actions: [priorityAction("Organization View", "adoption-set-scope", { data: { "scope-type": "organization", "scope-id": "org-novatech" } })]
+        actions: [priorityAction("Show Organization Adoption", "adoption-set-scope", { data: { "scope-type": "organization", "scope-id": "org-novatech" } })]
       };
     }
     case "attribution": {
@@ -5261,7 +5357,7 @@ function pagePrioritySignal() {
         label: "Attribution confidence",
         value: fmtPct(confidencePct, 0),
         detail: `${chainNode(request || selectedRequest, "Service Attribution")?.value || "Selected request"} resolves to ${chainNode(request || selectedRequest, "Org Hierarchy")?.value || "review required"}.`,
-        actions: request ? [priorityAction("Inspect Request", "select-request", { data: { "request-id": request.id } })] : []
+        actions: request ? [priorityAction("Inspect Request Proof", "select-request", { data: { "request-id": request.id } })] : []
       };
     }
     case "models":
@@ -5272,7 +5368,7 @@ function pagePrioritySignal() {
         detail: selectedModel
           ? `${fmtNumber(selectedModel.requests || 0)} requests with ${fmtUSD(selectedModel.optimization_potential_usd || 0)} optimization potential.`
           : "Model records are unavailable; reset the demo to restore seeded data.",
-        actions: selectedModel ? [priorityAction("Select Model", "select-model", { data: { "model-name": selectedModel.name } })] : []
+        actions: selectedModel ? [priorityAction("Select Highest-Spend Model", "select-model", { data: { "model-name": selectedModel.name } })] : []
       };
     case "teams":
       return {
@@ -5282,7 +5378,7 @@ function pagePrioritySignal() {
         detail: selectedTeam
           ? `${fmtUSD(selectedTeam.spend_usd || 0)} current spend under ${selectedTeam.lead || "named owner"}.`
           : "Team records are unavailable; reset the demo to restore seeded data.",
-        actions: selectedTeam ? [priorityAction("Open Team", "select-team", { data: { "team-id": selectedTeam.id } })] : []
+        actions: selectedTeam ? [priorityAction("Open Team Detail", "select-team", { data: { "team-id": selectedTeam.id } })] : []
       };
     case "manual_mapping":
       return {
@@ -5291,7 +5387,7 @@ function pagePrioritySignal() {
         value: fmtNumber(mappings.needs_review + mappings.deferred),
         detail: `${fmtNumber(mappings.confirmed + mappings.reassigned)} mappings are already resolved in the local story.`,
         actions: openMapping?.request_id
-          ? [priorityAction("Inspect Evidence", "manual-map-open-request", { data: { "request-id": openMapping.request_id } })]
+          ? [priorityAction("Inspect Ownership Evidence", "manual-map-open-request", { data: { "request-id": openMapping.request_id } })]
           : []
       };
     case "interventions": {
@@ -5303,7 +5399,7 @@ function pagePrioritySignal() {
         detail: topIntervention
           ? `${topIntervention.title} can affect ${fmtUSD(topIntervention.monthly_savings_usd || 0)} per month.`
           : "No intervention is selected in the local dataset.",
-        actions: topIntervention ? [priorityAction("Start Review", "intervention-status", { data: { "intervention-id": topIntervention.id, "next-status": "review" } })] : []
+        actions: topIntervention ? [priorityAction("Start Savings Review", "intervention-status", { data: { "intervention-id": topIntervention.id, "next-status": "review" } })] : []
       };
     }
     case "governance":
@@ -5328,7 +5424,7 @@ function pagePrioritySignal() {
         label: "Chargeback ready",
         value: fmtUSD(exportSummary.exportable_chargeback_usd || 0),
         detail: `${fmtUSD(exportSummary.provisional_review_usd || 0)} remains in review and ${fmtUSD(exportSummary.unknown_excluded_usd || 0)} is excluded.`,
-        actions: [priorityAction("Export Preview", "export-artifact", { data: { artifact: "chargeback-export" } })]
+        actions: [priorityAction("Export Chargeback Preview", "export-artifact", { data: { artifact: "chargeback-export" } })]
       };
     case "energy":
       return {
@@ -5347,7 +5443,7 @@ function pagePrioritySignal() {
         label: forecast.finalPoint ? "Projected spend" : "Scenario delta",
         value: projectedValue,
         detail: `${forecast.scenario.label} over ${fmtNumber(state.forecastHorizonMonths)} months from the seeded spend curve.`,
-        actions: [priorityAction("Generate Forecast", "forecast-generate")]
+        actions: [priorityAction("Generate Live Forecast", "forecast-generate")]
       };
     }
     case "integrations":
@@ -5357,8 +5453,8 @@ function pagePrioritySignal() {
         value: fmtPct(integrationSummary.success_rate_pct || 0, 0),
         detail: `${fmtNumber(integrationSummary.recent_delivery_count || 0)} recent simulated handoffs across ${fmtNumber(integrationSummary.outbound_route_count || 0)} routes.`,
         actions: firstScenario
-          ? [priorityAction("Run Scenario", "integrations-run-scenario", { data: { "scenario-id": firstScenario.scenario_id } })]
-          : [priorityAction("Refresh Feed", "integrations-refresh")]
+          ? [priorityAction("Run Handoff Scenario", "integrations-run-scenario", { data: { "scenario-id": firstScenario.scenario_id } })]
+          : [priorityAction("Refresh Integration Feed", "integrations-refresh")]
       };
     case "admin":
       return {
@@ -6106,7 +6202,7 @@ function renderSidebar() {
       }
       return `
         <button class="nav-item${isActive ? " active" : ""}" data-action="go" data-page="${esc(item.key)}" aria-label="${esc(item.label)}" ${isActive ? 'aria-current="page"' : ""}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${item.icon}</svg>
+          ${renderLineIcon(item.icon)}
           <span>${esc(item.label)}</span>
           ${badge}
         </button>

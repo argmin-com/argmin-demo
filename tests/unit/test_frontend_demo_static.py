@@ -28,6 +28,34 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _hex_to_rgb(value: str) -> tuple[int, int, int]:
+    normalized = value.strip().removeprefix("#")
+    return (
+        int(normalized[0:2], 16),
+        int(normalized[2:4], 16),
+        int(normalized[4:6], 16),
+    )
+
+
+def _relative_luminance(hex_color: str) -> float:
+    def channel(value: int) -> float:
+        normalized = value / 255
+        if normalized <= 0.03928:
+            return normalized / 12.92
+        return float(((normalized + 0.055) / 1.055) ** 2.4)
+
+    red, green, blue = _hex_to_rgb(hex_color)
+    return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue)
+
+
+def _contrast_ratio(foreground: str, background: str) -> float:
+    fg_luminance = _relative_luminance(foreground)
+    bg_luminance = _relative_luminance(background)
+    lighter = max(fg_luminance, bg_luminance)
+    darker = min(fg_luminance, bg_luminance)
+    return (lighter + 0.05) / (darker + 0.05)
+
+
 def test_demo_energy_copy_preserves_uncertainty_instead_of_false_precision() -> None:
     js = _read(FRONTEND_APP_JS)
     schema = _read(FRONTEND_SCHEMA)
@@ -238,7 +266,7 @@ def test_frontend_uses_vendored_chart_and_no_cdn_fonts() -> None:
     html = _read(FRONTEND_INDEX)
     css = _read(FRONTEND_APP_CSS)
     assert 'src="vendor/chart.umd.min.js?v=' in html
-    assert 'src="vendor/chart.umd.min.js?v=20260309aa" defer' in html
+    assert 'src="vendor/chart.umd.min.js?v=20260309aj" defer' in html
     assert 'src="assets/app.js?v=' in html
     assert 'href="assets/app.css?v=' in html
     assert "cdnjs.cloudflare.com" not in html
@@ -353,6 +381,67 @@ def test_frontend_demo_uses_explicit_loading_success_empty_error_states() -> Non
     assert ".state-panel-empty" in css
     assert ".state-panel-error" in css
     assert ".page-state-strip" in css
+
+
+def test_frontend_standardizes_visual_state_contracts() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    for token in (
+        "--state-hover-bg: rgba(var(--brand-rgb), 0.09);",
+        "--state-hover-border: rgba(var(--brand-rgb), 0.44);",
+        "--state-active-bg: rgba(var(--brand-rgb), 0.16);",
+        "--state-active-border: rgba(var(--brand-rgb), 0.58);",
+        "--state-disabled-opacity: 0.68;",
+        "--state-disabled-bg: rgba(120, 137, 168, 0.06);",
+        "--state-loading-bg: rgba(var(--brand-rgb), 0.12);",
+        "--state-loading-border: rgba(var(--brand-rgb), 0.42);",
+        "--state-success-bg: var(--status-success-soft);",
+        "--state-warning-bg: var(--status-warning-soft);",
+        "--state-error-bg: var(--status-danger-soft);",
+    ):
+        assert token in css
+
+    assert "/* Visual State Contracts" in css
+    state_block = css.split("/* Visual State Contracts", 1)[1].split(
+        "/* Typography Role Contracts",
+        1,
+    )[0]
+    for selector in (
+        ".small-btn:not(.primary):not(.success):not(:disabled):hover",
+        ".filter-btn.active,",
+        ".nav-item.active,",
+        "[aria-pressed=\"true\"],",
+        "[data-ui-state=\"active\"]",
+        "button:disabled:not(.active):not(.current):not([aria-current]),",
+        "[data-ui-state=\"disabled\"]:not(.active):not(.current):not([aria-current])",
+        "[data-loading=\"true\"],",
+        ".state-panel-loading,",
+        "[data-ui-state=\"loading\"]",
+        ".state-panel-success,",
+        ".field-feedback-ok,",
+        ".state-panel-warn,",
+        ".field-feedback-warn,",
+        ".state-panel-error,",
+        ".field-feedback-error,",
+        ".noscript-warning,",
+    ):
+        assert selector in state_block
+    assert "border-color: var(--state-hover-border);" in state_block
+    assert "background: var(--state-active-bg);" in state_block
+    assert "opacity: var(--state-disabled-opacity);" in state_block
+    assert "cursor: progress;" in state_block
+    assert "color: var(--state-success-text);" in state_block
+    assert "color: var(--state-warning-text);" in state_block
+    assert "color: var(--state-error-text);" in state_block
+
+    assert "function normalizeVisualStateContracts(root = document)" in js
+    assert 'button.dataset.uiState = "loading";' in js
+    assert 'button.dataset.uiState = "active";' in js
+    assert 'button.dataset.uiState = "disabled";' in js
+    assert 'button.dataset.uiState = "idle";' in js
+    assert 'panel.dataset.uiState = match ? match[0] : "idle";' in js
+    assert "normalizeVisualStateContracts(scope);" in js
 
 
 def test_frontend_empty_states_guide_first_use_with_examples() -> None:
@@ -582,6 +671,69 @@ def test_frontend_demo_surfaces_one_primary_signal_per_screen() -> None:
         assert f'case "{page_key}":' in js
 
 
+def test_frontend_makes_primary_actions_unmistakable() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+
+    for token in (
+        "--action-primary-bg: var(--brand);",
+        "--action-primary-bg-hover: var(--brand-strong);",
+        "--action-primary-border: #9bc0ff;",
+        "--action-primary-text: var(--accent-ink);",
+        "--action-primary-shadow: 0 16px 34px rgba(var(--brand-rgb), 0.28);",
+        "--action-secondary-bg: rgba(120, 137, 168, 0.04);",
+        "--action-secondary-border: rgba(120, 137, 168, 0.22);",
+        "--action-secondary-text: var(--text-muted);",
+    ):
+        assert token in css
+
+    primary_block = css.split(".small-btn.primary", 1)[1].split(".small-btn.success", 1)[0]
+    assert "min-height: 36px;" in primary_block
+    assert "background: var(--action-primary-bg);" in primary_block
+    assert "color: var(--action-primary-text);" in primary_block
+    assert "font-weight: 800;" in primary_block
+    assert "box-shadow: var(--action-primary-shadow);" in primary_block
+    assert ".small-btn.primary:hover," in css
+
+    assert ".small-btn[data-action-priority=\"secondary\"]" in css
+    secondary_block = css.split(
+        '.small-btn[data-action-priority="secondary"]',
+        1,
+    )[1].split(".small-btn.click-ack", 1)[0]
+    assert "background: var(--action-secondary-bg);" in secondary_block
+    assert "color: var(--action-secondary-text);" in secondary_block
+    assert "box-shadow: none;" in secondary_block
+
+    assert ".screen-priority .state-panel-actions::before" in css
+    priority_label_block = css.split(".screen-priority .state-panel-actions::before", 1)[
+        1
+    ].split(".screen-priority .small-btn.primary", 1)[0]
+    assert 'content: "Primary action";' in priority_label_block
+    assert "text-transform: uppercase;" in priority_label_block
+    assert "data-primary-action=\"true\"" in js
+    assert "aria-label=\"Primary action: ${esc(action.label)}\"" in js
+    assert "function normalizePrimaryActionContracts(root = document)" in js
+    assert 'button.dataset.actionPriority = isPrimary ? "primary" : "secondary";' in js
+    assert 'button.setAttribute("aria-label", `Primary action: ${label}`);' in js
+    assert "normalizePrimaryActionContracts(scope);" in js
+
+    for label in (
+        "Open Forecast Planner",
+        "Open Coverage Matrix",
+        "Show Organization Adoption",
+        "Inspect Request Proof",
+        "Select Highest-Spend Model",
+        "Open Team Detail",
+        "Inspect Ownership Evidence",
+        "Start Savings Review",
+        "Export Chargeback Preview",
+        "Generate Live Forecast",
+        "Run Handoff Scenario",
+        "Refresh Integration Feed",
+    ):
+        assert label in js
+
+
 def test_frontend_uses_consistent_grid_and_spacing_system() -> None:
     js = _read(FRONTEND_APP_JS)
     css = _read(FRONTEND_APP_CSS)
@@ -589,8 +741,15 @@ def test_frontend_uses_consistent_grid_and_spacing_system() -> None:
     assert "--space-1: 4px;" in css
     assert "--space-3: 12px;" in css
     assert "--space-4: 16px;" in css
-    assert "--layout-gutter: 18px;" in css
-    assert "--layout-section-gap: var(--space-4);" in css
+    assert "--space-8: 40px;" in css
+    assert "--layout-gutter: 24px;" in css
+    assert "--layout-gap: var(--space-4);" in css
+    assert "--layout-section-gap: var(--space-6);" in css
+    assert "--layout-page-gap: var(--space-7);" in css
+    assert "--layout-card-padding: var(--space-5);" in css
+    assert "--layout-hero-padding: var(--space-7);" in css
+    assert "--layout-toolbar-padding: 12px 14px;" in css
+    assert "--layout-table-cell-padding: 12px 14px;" in css
     assert "--layout-page-max: 1440px;" in css
     assert ".layout-stack" in css
     assert ".layout-stack > *" in css
@@ -605,6 +764,26 @@ def test_frontend_uses_consistent_grid_and_spacing_system() -> None:
     assert "gap: var(--layout-gap);" in css
     assert "padding: var(--layout-gutter);" in css
     assert "width: min(100%, var(--layout-page-max));" in css
+    assert "/* Whitespace Rhythm Contracts" in css
+    whitespace_block = css.split("/* Whitespace Rhythm Contracts", 1)[1].split(
+        "/* Component Consistency Contracts",
+        1,
+    )[0]
+    assert ".screen-secondary-content," in whitespace_block
+    assert ".partner-page," in whitespace_block
+    assert "gap: var(--layout-page-gap);" in whitespace_block
+    assert ".overview-zone," in whitespace_block
+    assert "gap: var(--layout-section-gap);" in whitespace_block
+    assert ".entry-home-context" in whitespace_block
+    assert "margin-top: var(--space-7);" in whitespace_block
+    assert ".table-toolbar," in whitespace_block
+    assert "padding: var(--layout-toolbar-padding);" in whitespace_block
+    assert ".table td" in whitespace_block
+    assert "padding: var(--layout-table-cell-padding);" in whitespace_block
+    assert "--layout-hero-padding: var(--space-5);" in css.split(
+        "@media (max-width: 960px)",
+        1,
+    )[1]
 
     assert "const LAYOUT_SPACING_CLASS_BY_PX = new Map" in js
     assert "const CHART_FRAME_CLASS_BY_HEIGHT = new Map" in js
@@ -620,6 +799,9 @@ def test_frontend_uses_consistent_grid_and_spacing_system() -> None:
     assert 'cluster.dataset.layout = "cluster";' in js
     assert 'header.dataset.layout = "header";' in js
     assert 'frame.dataset.layout = "chart-frame";' in js
+    assert 'class="card forecast-estimate-card"' in js
+    assert 'style="padding:10px' not in js
+    assert ".forecast-estimate-card" in css
 
 
 def test_frontend_defines_semantic_typography_roles() -> None:
@@ -721,6 +903,169 @@ def test_frontend_uses_restrained_semantic_color_palette() -> None:
     } <= allowed_dataset_colors
 
 
+def test_frontend_enforces_readable_contrast_contracts() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+    html = _read(FRONTEND_INDEX)
+
+    contrast_pairs = (
+        ("#e8eef8", "#080d16"),
+        ("#a8b8d4", "#0f1724"),
+        ("#96a7c2", "#0b1220"),
+        ("#06101f", "#4f8ef8"),
+        ("#06101f", "#6aa1ff"),
+        ("#06101f", "#2ac487"),
+        ("#06101f", "#eda82e"),
+        ("#06101f", "#ee5858"),
+    )
+    for foreground, background in contrast_pairs:
+        assert _contrast_ratio(foreground, background) >= 4.5
+
+    assert "--text-dim: #a8b8d4;" in css
+    assert "--text-muted: #96a7c2;" in css
+    assert "--accent-ink: #06101f;" in css
+    assert "color: var(--accent-ink);" in css.split(".skip-link", 1)[1].split(
+        ".skip-link:focus",
+        1,
+    )[0]
+    assert ".brand-logo svg" in css
+    assert "background-color: var(--brand);" in css.split(".brand-logo", 1)[1].split(
+        ".brand-logo svg",
+        1,
+    )[0]
+    assert "color: var(--accent-ink);" in css.split(".brand-logo", 1)[1].split(
+        ".brand-logo svg",
+        1,
+    )[0]
+    assert 'stroke="#fff"' not in html
+    assert ".avatar" in css
+    assert "background-color: var(--brand);" in css.split(".avatar", 1)[1].split(
+        ".mode-menu",
+        1,
+    )[0]
+    assert "color: var(--accent-ink);" in css.split(".avatar", 1)[1].split(
+        ".mode-menu",
+        1,
+    )[0]
+    assert ".screen-secondary-content .section-title" in css
+    assert "color: var(--text-muted);" in css.split(
+        ".screen-secondary-content .section-title",
+        1,
+    )[1].split(".screen-secondary-content .card:not", 1)[0]
+    assert ".entry-home-action .small-btn.primary" in css
+    assert "color: var(--action-primary-text);" in css.split(
+        ".entry-home-action .small-btn.primary",
+        1,
+    )[1].split(".entry-home-action span", 1)[0]
+    assert ".adoption-child-card" in css
+    assert "color: var(--text);" in css.split(
+        ".adoption-kpi-card,",
+        1,
+    )[1].split(".adoption-child-label", 1)[0]
+    assert "font: inherit;" in css.split(".adoption-kpi-card,", 1)[1].split(
+        ".adoption-child-label",
+        1,
+    )[0]
+    assert ".adoption-child-stat strong" in css
+    assert ".trac-segment" in css
+    assert "color: var(--accent-ink);" in css.split(".trac-segment", 1)[1].split(
+        ".diagnostics-intro",
+        1,
+    )[0]
+    assert 'brandText: "#c2dcff"' in js
+    assert 'neutral: "#a8b8d4"' in js
+
+
+def test_frontend_uses_single_line_icon_style_contract() -> None:
+    js = _read(FRONTEND_APP_JS)
+    css = _read(FRONTEND_APP_CSS)
+    html = _read(FRONTEND_INDEX)
+    nav_items_block = js.split("const NAV_ITEMS = [", 1)[1].split(
+        "const ALL_PAGE_KEYS",
+        1,
+    )[0]
+
+    assert "--icon-size: 18px;" in css
+    assert "--icon-stroke-width: 1.9;" in css
+    assert ".app-icon {" in css
+    assert "fill: none;" in css.split(".app-icon {", 1)[1].split(".app-icon *", 1)[0]
+    assert "stroke: currentColor;" in css.split(".app-icon {", 1)[1].split(
+        ".app-icon *",
+        1,
+    )[0]
+    assert "stroke-width: var(--icon-stroke-width);" in css
+    assert "stroke-linecap: round;" in css
+    assert "stroke-linejoin: round;" in css
+    assert "vector-effect: non-scaling-stroke;" in css
+    assert ".nav-item .app-icon" in css
+
+    assert 'class="app-icon app-icon-brand"' in html
+    assert "fill='%234f8ef8'" in html
+    assert "stroke='%2306101f'" in html
+    assert "%238f6af8" not in html
+    assert "stroke='%23fff'" not in html
+    assert 'stroke="#fff"' not in html
+    assert 'stroke-width="2"' not in html
+
+    assert 'const LINE_ICON_VIEWBOX = "0 0 24 24";' in js
+    assert 'function renderLineIcon(icon, className = "app-icon nav-icon")' in js
+    assert 'renderLineIcon(item.icon)' in js
+    assert 'stroke-width="2"' not in js
+    assert 'stroke="currentColor"' not in js
+    assert 'fill="none"' not in nav_items_block
+    assert 'stroke=' not in nav_items_block
+    assert 'fill=' not in nav_items_block
+
+
+def test_frontend_uses_consistent_component_visual_contracts() -> None:
+    css = _read(FRONTEND_APP_CSS)
+
+    for token in (
+        "--radius-control: 8px;",
+        "--radius-card: 12px;",
+        "--radius-overlay: 12px;",
+        "--radius-pill: 999px;",
+        "--component-border: 1px solid var(--border);",
+        "--component-border-muted: 1px solid rgba(120, 137, 168, 0.18);",
+        "--component-border-strong: 1px solid var(--border-soft);",
+        "--component-surface: var(--panel);",
+        "--component-hover: rgba(var(--brand-rgb), 0.09);",
+        "--component-focus-ring: 0 0 0 3px rgba(var(--brand-rgb), 0.2);",
+        "--component-shadow-hover: 0 14px 28px rgba(4, 10, 18, 0.22);",
+        "--component-shadow-overlay: 0 18px 40px rgba(0, 0, 0, 0.32);",
+        "--component-transition: border-color 0.14s ease",
+    ):
+        assert token in css
+
+    controls_block = css.split(".control-input,", 1)[1].split(".filter-btn,", 1)[0]
+    assert ".control-select," in controls_block
+    assert ".small-btn," in controls_block
+    assert ".top-btn," in controls_block
+    assert ".drawer-close," in controls_block
+    assert "border: var(--component-border);" in controls_block
+    assert "border-radius: var(--radius-control);" in controls_block
+    assert "transition: var(--component-transition);" in controls_block
+
+    cards_block = css.split(".card,", 1)[1].split(".clickable-card:hover", 1)[0]
+    assert ".adoption-kpi-card," in cards_block
+    assert ".workflow-spotlight-card," in cards_block
+    assert ".drawer-purpose," in cards_block
+    assert "border: var(--component-border);" in cards_block
+    assert "border-radius: var(--radius-card);" in cards_block
+    assert "background-color: var(--component-surface);" in cards_block
+
+    assert ".scannable-table-wrap" in css
+    assert "border: var(--component-border-muted);" in css
+    assert "background: var(--component-surface-soft);" in css
+    assert ".filter-btn,\n.pill,\n.badge,\n.status-badge,\n.table-sort-indicator" in css
+    assert ".table-sort-btn,\n.table tbody tr" in css
+    assert ".mode-menu,\n.toast,\n.context-help-tooltip,\n.inline-term-tooltip" in css
+    assert "border: var(--component-border-strong);" in css
+    assert "border-radius: var(--radius-overlay);" in css
+    assert "box-shadow: var(--component-shadow-overlay);" in css
+    assert ".drawer {\n  border-left: var(--component-border-strong);" in css
+
+
 def test_frontend_demo_validates_role_based_personas() -> None:
     js = _read(FRONTEND_APP_JS)
     css = _read(FRONTEND_APP_CSS)
@@ -792,7 +1137,7 @@ def test_frontend_polish_and_responsive_guards_present() -> None:
     assert ".view-root.transitioning" in css
     assert ".drawer-actions.busy .small-btn" in css
     assert "width: min(360px, calc(100vw - 280px));" in css
-    assert "--text-muted: #7889a8;" in css
+    assert "--text-muted: #96a7c2;" in css
     assert "grid-template-columns: repeat(3, minmax(0, 1fr));" in css
     assert "max-height: 2000px;" in css
     assert "overflow-y: auto;" in css
